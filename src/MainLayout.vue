@@ -316,7 +316,7 @@ border-radius: 8px;
 }
 
 #app .place-title {
-  width: calc(100% -25px);
+  width: calc(100% - 25px);
   margin-bottom: - 25px;
   padding-right:10px;
 }
