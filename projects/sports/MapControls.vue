@@ -48,8 +48,8 @@
             <button>Football</button> etc TODO
         </div>
         <div class="btn-group">
-            <button @click="loadOutdoorPoints">
-            Load Outdoor
+            <button @click="loadOutdoorPoints" :class="{ active: store.outdoorsNational }">
+                Load Outdoor
             </button>
         </div>
 

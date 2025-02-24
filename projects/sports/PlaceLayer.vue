@@ -51,7 +51,7 @@ watch(
 
 watch(() => sportsStore.outdoorsNational, () => {
   if (sportsStore.outdoorsNational) {
-    renderPointsLayer("destinations_outdoors_national.geojson", 50);
+    renderPointsLayer("destinations_outdoors_national.geojson", 20); //20 is how many points should be loaded...too many will make it unresponsive
   } else {
     removePointsLayer();
   }
