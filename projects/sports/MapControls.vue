@@ -48,10 +48,22 @@
             <button>Football</button> etc TODO
         </div>
         <div class="btn-group">
-            <button @click="loadOutdoorPoints" :class="{ active: store.outdoorsNational }">
-                Load Outdoor
-            </button>
-        </div>
+    <button 
+        @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')" 
+        :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }"
+        >
+            Outdoors
+        </button>
+    </div>
+
+    <div class="btn-group">
+        <button 
+            @click="store.toggleGeoJsonFile('destinations_per_city.geojson')" 
+            :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }"
+        >
+            Destinations per city
+        </button>
+    </div>
 
         Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{ store.travelMode }}
     </div>
@@ -66,10 +78,6 @@ const communes = ref(["Lilla Edet", "Uppsala"]);
 
 const setCommune = (commune) => {
     store.updateCommune(commune);
-};
-
-const loadOutdoorPoints = () => {
-    store.toggleOutdoorPoints();
 };
 
 const setMode = (mode) => {

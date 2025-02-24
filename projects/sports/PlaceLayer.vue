@@ -49,11 +49,11 @@ watch(
 );
 
 
-watch(() => sportsStore.outdoorsNational, () => {
-  if (sportsStore.outdoorsNational) {
-    renderPointsLayer("destinations_outdoors_national.geojson", 20); //20 is how many points should be loaded...too many will make it unresponsive
+watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
+  if (newFile) {
+    renderPointsLayer(newFile, 20); //20 is how many points should be loaded...too many will make it unresponsive
   } else {
-    removePointsLayer();
+    removePointsLayer(); 
   }
 });
 
@@ -127,10 +127,7 @@ const filteredGeoJSON = {
 const renderPointsLayer = async (geojsonFile, limit = null) => { //add points layer to map
   if (!map.value) return;
 
-  if (pointsLayer.value) {
-    removePointsLayer();
-    return;
-  }
+  removePointsLayer(); 
 
   try {
     const response = await fetch(`./geojson/${geojsonFile}`);
@@ -161,7 +158,7 @@ const renderPointsLayer = async (geojsonFile, limit = null) => { //add points la
   }
 };
 
-const removePointsLayer = () => { //remove points layer
+const removePointsLayer = () => { //remove points layer from the map
   if (pointsLayer.value) {
     map.value.removeLayer(pointsLayer.value);
     pointsLayer.value = null;

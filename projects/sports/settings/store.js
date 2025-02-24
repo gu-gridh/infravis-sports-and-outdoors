@@ -20,10 +20,10 @@ export const useSportsStore = defineStore("sportsStore", () => {
         60,
     ])
     const dayType = ref('all');
-    const outdoorsNational = ref(false);
+    const activeGeoJsonFile = ref(null);
 
-    const toggleOutdoorPoints = () => { 
-        outdoorsNational.value = !outdoorsNational.value; 
+    const toggleGeoJsonFile = (filename) => {
+        activeGeoJsonFile.value = (activeGeoJsonFile.value === filename) ? null : filename;
     };
 
     const updateCommune = (value) => {
@@ -50,11 +50,11 @@ export const useSportsStore = defineStore("sportsStore", () => {
         travelTimes,
         travelModes,
         dayType,
-        outdoorsNational,
+        activeGeoJsonFile,
         updateDayType, 
         updateCommune,
         updateMode,
         updateTravelTime,
-        toggleOutdoorPoints
+        toggleGeoJsonFile,
     }
 })
