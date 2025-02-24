@@ -1,26 +1,18 @@
 <template>
     <div class="map-controls">
-       <!-- Buttons for communes -->
-         <div class="btn-group">
-             <button 
-                 v-for="commune in communes" 
-                 :key="commune" 
-                 @click="setCommune(commune)" 
-                 :class="{ active: store.commune === commune }"
-             >
-                 {{ commune }}
-             </button>
+        <!-- Buttons for communes -->
+        <div class="btn-group">
+            <button v-for="commune in communes" :key="commune" @click="setCommune(commune)"
+                :class="{ active: store.commune === commune }">
+                {{ commune }}
+            </button>
         </div>
 
         <!-- Travel Type Buttons -->
         <div class="btn-group">
             Travel type
-            <button 
-                v-for="mode in store.travelModes" 
-                :key="mode" 
-                @click="setMode(mode)"
-                :class="{ active: store.travelMode === mode }"
-            >
+            <button v-for="mode in store.travelModes" :key="mode" @click="setMode(mode)"
+                :class="{ active: store.travelMode === mode }">
                 {{ mode }}
             </button>
         </div>
@@ -48,24 +40,18 @@
             <button>Football</button> etc TODO
         </div>
         <div class="btn-group">
-    <button 
-        @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')" 
-        :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }"
-        >
-            Outdoors
-        </button>
-    </div>
+            <button @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')"
+                :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }">
+                Outdoors
+            </button>
+            <button @click="store.toggleGeoJsonFile('destinations_per_city.geojson')"
+                :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }">
+                Destinations
+            </button>
+        </div>
 
-    <div class="btn-group">
-        <button 
-            @click="store.toggleGeoJsonFile('destinations_per_city.geojson')" 
-            :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }"
-        >
-            Destinations per city
-        </button>
-    </div>
-
-        Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{ store.travelMode }}
+        Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{
+            store.travelMode }}
     </div>
 </template>
 
@@ -106,8 +92,8 @@ const setDay = (day) => {
     background-color: white;
     padding: 10px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
-}  
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+}
 
 .btn-group {
     display: flex;
@@ -126,7 +112,8 @@ button {
 
 /* ✅ Highlight Active Button */
 button.active {
-    background-color: #007bff; /* Blue */
+    background-color: #007bff;
+    /* Blue */
     color: white;
     border-color: #0056b3;
 }
