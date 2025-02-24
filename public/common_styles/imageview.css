@@ -1,0 +1,74 @@
+/*CSS here will be used by any file that has added the stylesheet*/
+
+/* CSS - Cascading Style Sheet */
+
+#app .back-button {
+  width: 30px;
+  height: 30px;
+  margin-top:0px;
+}
+
+
+.metadata .object-title {}
+
+.metadata .objects h2 {
+  font-size: 1.5vw;
+  margin-top: 30px;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.metadata .objects {
+  margin-top: 30px;
+  font-weight: 200;
+  font-size: 1.1em;
+  line-height: 1.2;
+  text-align: left;
+  padding: 0px 40px 0px 0px;
+}
+
+.metadata .objects .labels {
+  margin-bottom:20px;
+}
+
+.metadata .objects .label {
+  width: auto;
+  float: left;
+  margin-right: 10px;
+}
+
+.metadata .objects .data {
+  display: inline;
+}
+
+.metadata .objects .description {
+  font-size: 1vw;
+  margin-top:0px;
+}
+
+.metadata .objects .imagedata .description {
+  font-size: 1vw;
+  margin-top:0px;
+  margin-bottom:0px;
+}
+.metadata .theme-button {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding: 0px 0px;
+}
+
+
+@media screen and (max-width: 1500px) {
+  .metadata .objects .description {
+    font-size: 0.9em;
+  }
+
+  .metadata .objects h2 {
+    font-size: 1.5em;
+  }
+}
+
+.illustration {
+  height: calc(100vh - 80px) !important;
+}
+
