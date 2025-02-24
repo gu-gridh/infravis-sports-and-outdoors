@@ -23,10 +23,10 @@ yarn build
 Choose which project to build for, by specifying the `PROJECT` environment variable:
 
 ```sh
-PROJECT=rephotography yarn dev
+PROJECT=sports yarn dev
 # or...
-echo "PROJECT=rephotography" > .env.local
+echo "PROJECT=sport" > .env.local
 yarn dev
 ```
 
-It identifies a directory under [projects/](projects/), e.g. `projects/rephotography`, where project-specific configuration and code lives.
+It identifies a directory under [projects/](projects/), e.g. `projects/sports`, where project-specific configuration and code lives.
