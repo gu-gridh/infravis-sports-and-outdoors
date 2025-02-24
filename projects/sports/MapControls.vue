@@ -47,6 +47,11 @@
             Type of sports
             <button>Football</button> etc TODO
         </div>
+        <div class="btn-group">
+            <button @click="loadOutdoorPoints">
+            Load Outdoor
+            </button>
+        </div>
 
         Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{ store.travelMode }}
     </div>
@@ -61,6 +66,10 @@ const communes = ref(["Lilla Edet", "Uppsala"]);
 
 const setCommune = (commune) => {
     store.updateCommune(commune);
+};
+
+const loadOutdoorPoints = () => {
+    store.toggleOutdoorPoints();
 };
 
 const setMode = (mode) => {

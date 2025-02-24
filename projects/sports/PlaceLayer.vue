@@ -8,6 +8,7 @@ import "leaflet/dist/leaflet.css";
 import proj4 from "proj4";
 import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
+import markerIcon from "@/assets/marker-red.svg";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
@@ -43,6 +44,13 @@ watch(
   () => sportsStore.commune,
   (newCommune) => {
     loadCommuneGeoJSON(newCommune);
+  }
+);
+
+watch(
+  () => sportsStore.outdoorsNational,
+  () => {
+    renderLimitedPoints();
   }
 );
 
@@ -110,6 +118,38 @@ const filteredGeoJSON = {
   // Fit the map bounds to new polygons
   if (geoJsonLayer.getBounds().isValid()) {
     map.value.fitBounds(geoJsonLayer.getBounds());
+  }
+};
+
+const renderLimitedPoints = async () => { //loads the geojson points from file
+  if (!map.value) return;
+
+  try {
+    const response = await fetch("./geojson/destinations_outdoors_national.geojson");
+    const geojsonData = await response.json();
+
+    const limitedFeatures = geojsonData.features.slice(0, 50); //only first 50 points
+
+    const geoJsonLayer = L.geoJSON({ type: "FeatureCollection", features: limitedFeatures }, {
+      pointToLayer: (feature, latlng) => {
+        return L.marker(latlng, {
+          icon: L.icon({
+            iconUrl: markerIcon,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+          }),
+        }).bindPopup(`<b>${feature.properties.city_name}</b><br>${feature.properties.classification}`);
+      },
+    });
+
+    geoJsonLayer.addTo(layerGroup.value);
+
+    if (geoJsonLayer.getBounds().isValid()) {
+      map.value.fitBounds(geoJsonLayer.getBounds());
+    }
+  } catch (error) {
+    console.error("error loading points:", error);
   }
 };
 

@@ -19,7 +19,12 @@ export const useSportsStore = defineStore("sportsStore", () => {
         30,
         60,
     ])
-    const dayType = ref('all');  
+    const dayType = ref('all');
+    const outdoorsNational = ref(false);
+
+    const toggleOutdoorPoints = () => { 
+        outdoorsNational.value = !outdoorsNational.value; 
+    };
 
     const updateCommune = (value) => {
         commune.value = value;
@@ -45,9 +50,11 @@ export const useSportsStore = defineStore("sportsStore", () => {
         travelTimes,
         travelModes,
         dayType,
+        outdoorsNational,
         updateDayType, 
         updateCommune,
         updateMode,
         updateTravelTime,
+        toggleOutdoorPoints
     }
 })
