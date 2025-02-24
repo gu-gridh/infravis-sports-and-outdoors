@@ -14,6 +14,7 @@ const map = ref(null);
 const sportsStore = useSportsStore();
 const geojsonData = ref(null);
 const layerGroup = ref(null); // Stores the active layer group
+const pointsLayer = ref(null);
 
 const travelTimes = ref({
   15: "15_total",
@@ -47,12 +48,14 @@ watch(
   }
 );
 
-watch(
-  () => sportsStore.outdoorsNational,
-  () => {
-    renderLimitedPoints();
+
+watch(() => sportsStore.outdoorsNational, () => {
+  if (sportsStore.outdoorsNational) {
+    renderPointsLayer("destinations_outdoors_national.geojson", 50);
+  } else {
+    removePointsLayer();
   }
-);
+});
 
 const initMap = async () => {
   map.value = L.map("map").setView([59.8586, 17.6389], 10); // Uppsala
@@ -121,16 +124,21 @@ const filteredGeoJSON = {
   }
 };
 
-const renderLimitedPoints = async () => { //loads the geojson points from file
+const renderPointsLayer = async (geojsonFile, limit = null) => { //add points layer to map
   if (!map.value) return;
 
+  if (pointsLayer.value) {
+    removePointsLayer();
+    return;
+  }
+
   try {
-    const response = await fetch("./geojson/destinations_outdoors_national.geojson");
+    const response = await fetch(`./geojson/${geojsonFile}`);
     const geojsonData = await response.json();
 
-    const limitedFeatures = geojsonData.features.slice(0, 50); //only first 50 points
+    const filteredFeatures = limit ? geojsonData.features.slice(0, limit) : geojsonData.features;
 
-    const geoJsonLayer = L.geoJSON({ type: "FeatureCollection", features: limitedFeatures }, {
+    pointsLayer.value = L.geoJSON({ type: "FeatureCollection", features: filteredFeatures }, {
       pointToLayer: (feature, latlng) => {
         return L.marker(latlng, {
           icon: L.icon({
@@ -143,13 +151,20 @@ const renderLimitedPoints = async () => { //loads the geojson points from file
       },
     });
 
-    geoJsonLayer.addTo(layerGroup.value);
+    pointsLayer.value.addTo(map.value);
 
-    if (geoJsonLayer.getBounds().isValid()) {
-      map.value.fitBounds(geoJsonLayer.getBounds());
+    if (pointsLayer.value.getBounds().isValid()) {
+      map.value.fitBounds(pointsLayer.value.getBounds());
     }
   } catch (error) {
-    console.error("error loading points:", error);
+    console.error(`error loading ${geojsonFile}:`, error);
+  }
+};
+
+const removePointsLayer = () => { //remove points layer
+  if (pointsLayer.value) {
+    map.value.removeLayer(pointsLayer.value);
+    pointsLayer.value = null;
   }
 };
 
