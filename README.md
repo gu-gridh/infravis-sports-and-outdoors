@@ -25,7 +25,7 @@ Choose which project to build for, by specifying the `PROJECT` environment varia
 ```sh
 PROJECT=sports yarn dev
 # or...
-echo "PROJECT=sport" > .env.local
+echo "PROJECT=sports" > .env.local
 yarn dev
 ```
 
