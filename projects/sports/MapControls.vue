@@ -1,21 +1,24 @@
 <template>
     <div class="map-controls">
         <!-- Buttons for communes -->
-        <div class="btn-group">
+<!--         <div class="btn-group">
             <button v-for="commune in communes" :key="commune" @click="setCommune(commune)"
                 :class="{ active: store.commune === commune }">
                 {{ commune }}
             </button>
-        </div>
+        </div> -->
 
         <!-- drowdown for all communes from store -->
-        <div class="btn-group">
+        <div class="btn-group">Select commune
             <select @change="setCommune($event.target.value)">
                 <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
                     {{ commune.kommunnamn }}
                 </option>
             </select>
         </div>
+        <button @click="filterMore = !filterMore">More filters</button>
+        <!--For deeper filtering-->
+        <div class="filterMore" v-if="filterMore">
         <!-- Travel Type Buttons -->
         <div class="btn-group">
             Travel type
@@ -60,6 +63,8 @@
 
         Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{
             store.travelMode }}
+        </div>
+
     </div>
 </template>
 
@@ -90,6 +95,8 @@ const setDay = (day) => {
     console.log(day)
     store.updateDayType(day);
 };
+
+const filterMore = ref(false);
 </script>
 
 <style scoped>
@@ -102,6 +109,7 @@ const setDay = (day) => {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    min-width: 300px;
 }
 
 .btn-group {
@@ -119,11 +127,21 @@ button {
     transition: background-color 0.3s, color 0.3s;
 }
 
+
 /* ✅ Highlight Active Button */
 button.active {
     background-color: #007bff;
     /* Blue */
     color: white;
     border-color: #0056b3;
+}
+
+select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 </style>
