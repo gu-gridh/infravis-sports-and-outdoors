@@ -65,7 +65,12 @@ const initMap = async () => {
   // Load GeoJSON data
   const response = await fetch("./geojson/kommun_regso.geojson");
   geojsonData.value = await response.json();
-  console.log("GeoJSON Loaded:", geojsonData.value);
+  //all communes to store
+  sportsStore.allCommunes = geojsonData.value.features.map(feature => feature.properties);
+  //sort for dropdown
+  if (Array.isArray(sportsStore.allCommunes)) {
+    sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
+  }
 
   // Initialize layer group
   layerGroup.value = L.layerGroup().addTo(map.value);
