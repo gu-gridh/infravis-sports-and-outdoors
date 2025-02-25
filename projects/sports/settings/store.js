@@ -3,7 +3,8 @@ import { defineStore } from "pinia";
 
 // store for filtering map
 export const useSportsStore = defineStore("sportsStore", () => {
-    const commune = ref('Uppsala');
+    const sweden = ref(true);
+    const commune = ref('');
     const activity = ref('');
     const travelMode = ref('sustainable');
     const travelModes = ref([
@@ -43,6 +44,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     }
     
     return {
+        sweden,
         commune, 
         activity, 
         travelMode, 

@@ -14,7 +14,7 @@ const map = ref(null);
 const sportsStore = useSportsStore();
 const geojsonData = ref(null);
 const layerGroup = ref(null); // Stores the active layer group
-const pointsLayer = ref(null);
+const sweden = ref(true);
 
 const travelTimes = ref({
   15: "15_total",
@@ -48,32 +48,44 @@ watch(
   }
 );
 
-
-watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
-  if (newFile) {
-    renderPointsLayer(newFile, 20); //20 is how many points should be loaded...too many will make it unresponsive
-  } else {
-    removePointsLayer(); 
+watch(
+  () => sportsStore.outdoorsNational,
+  () => {
+    renderLimitedPoints();
   }
-});
+);
 
 const initMap = async () => {
-  map.value = L.map("map").setView([59.8586, 17.6389], 10); // Uppsala
+  map.value = L.map("map").setView([62, 15], 6); // Uppsala
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map.value);
 
   // Load GeoJSON data
-  const response = await fetch("./geojson/uppsala.geojson");
+  const response = await fetch("./geojson/kommun_regso.geojson");
   geojsonData.value = await response.json();
   console.log("GeoJSON Loaded:", geojsonData.value);
 
   // Initialize layer group
   layerGroup.value = L.layerGroup().addTo(map.value);
 
-  // Draw polygons
-  updateMapLayer();
+  if(sweden.value == true) {
+    //show all regions as polygons
+    const geoJsonLayer = L.geoJSON(geojsonData.value, {
+      style: {
+        color: "white",
+        fillColor: "blue",
+        fillOpacity: 0.6,
+        weight: 1,
+      },
+    });
+    layerGroup.value.addLayer(geoJsonLayer);
+
+    // If not whole of sweden is selected
+  } else if (sweden.value == false || sportsStore.commune !== "") {
+    updateMapLayer();
+  }
 };
 
 //  update the map layer dynamically
@@ -91,12 +103,12 @@ const updateMapLayer = () => {
     feature.properties.mode === sportsStore.travelMode && // filter by travel mode
     (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType) //also filter by day type if not "all"
   );
-});
+  });
 
-const filteredGeoJSON = {
-  type: "FeatureCollection",
-  features: filteredFeatures,
-};
+  const filteredGeoJSON = {
+    type: "FeatureCollection",
+    features: filteredFeatures,
+  };
 
   // Create a GeoJSON layer
   const geoJsonLayer = L.geoJSON(filteredGeoJSON, {
@@ -124,18 +136,16 @@ const filteredGeoJSON = {
   }
 };
 
-const renderPointsLayer = async (geojsonFile, limit = null) => { //add points layer to map
+const renderLimitedPoints = async () => { //loads the geojson points from file
   if (!map.value) return;
 
-  removePointsLayer(); 
-
   try {
-    const response = await fetch(`./geojson/${geojsonFile}`);
+    const response = await fetch("./geojson/destinations_outdoors_national.geojson");
     const geojsonData = await response.json();
 
-    const filteredFeatures = limit ? geojsonData.features.slice(0, limit) : geojsonData.features;
+    const limitedFeatures = geojsonData.features.slice(0, 50); //only first 50 points
 
-    pointsLayer.value = L.geoJSON({ type: "FeatureCollection", features: filteredFeatures }, {
+    const geoJsonLayer = L.geoJSON({ type: "FeatureCollection", features: limitedFeatures }, {
       pointToLayer: (feature, latlng) => {
         return L.marker(latlng, {
           icon: L.icon({
@@ -148,20 +158,13 @@ const renderPointsLayer = async (geojsonFile, limit = null) => { //add points la
       },
     });
 
-    pointsLayer.value.addTo(map.value);
+    geoJsonLayer.addTo(layerGroup.value);
 
-    if (pointsLayer.value.getBounds().isValid()) {
-      map.value.fitBounds(pointsLayer.value.getBounds());
+    if (geoJsonLayer.getBounds().isValid()) {
+      map.value.fitBounds(geoJsonLayer.getBounds());
     }
   } catch (error) {
-    console.error(`error loading ${geojsonFile}:`, error);
-  }
-};
-
-const removePointsLayer = () => { //remove points layer from the map
-  if (pointsLayer.value) {
-    map.value.removeLayer(pointsLayer.value);
-    pointsLayer.value = null;
+    console.error("error loading points:", error);
   }
 };
 
