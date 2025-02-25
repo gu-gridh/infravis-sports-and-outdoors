@@ -5,6 +5,8 @@
 <script setup>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.vectorgrid";
+import geojsonvt from "geojson-vt";
 import proj4 from "proj4";
 import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
@@ -13,7 +15,7 @@ import markerIcon from "@/assets/marker-red.svg";
 const map = ref(null);
 const sportsStore = useSportsStore();
 const geojsonData = ref(null);
-const layerGroup = ref(null); // Stores the active layer group
+const layerGroup = ref(null);  // Stores the active layer group
 const sweden = ref(true);
 
 const travelTimes = ref({
@@ -62,52 +64,42 @@ const initMap = async () => {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map.value);
 
-  // Load GeoJSON data
   const response = await fetch("./geojson/kommun_regso.geojson");
-  geojsonData.value = await response.json();
-  //all communes to store
-  sportsStore.allCommunes = geojsonData.value.features.map(feature => feature.properties);
-  //sort for dropdown
-  if (Array.isArray(sportsStore.allCommunes)) {
-    sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
-  }
+  const geojson = await response.json();
 
-  // Initialize layer group
-  layerGroup.value = L.layerGroup().addTo(map.value);
+  const tileIndex = geojsonvt(geojson, {
+    maxZoom: 14,
+    tolerance: 3,
+    extent: 4096,
+    buffer: 64,
+    debug: 0,
+  });
 
-  if(sweden.value == true) {
-    //show all regions as polygons
-    const geoJsonLayer = L.geoJSON(geojsonData.value, {
-      style: {
-        color: "white",
-        fillColor: "blue",
-        fillOpacity: 0.6,
-        weight: 1,
-      },
-    });
-    layerGroup.value.addLayer(geoJsonLayer);
+  const vectorGrid = L.vectorGrid.slicer(geojson, {
+    vectorTileLayerStyles: {
+      sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
+    },
+    getFeatureId: (feature) => feature.id,
+  });
 
-    // If not whole of sweden is selected
-  } else if (sweden.value == false || sportsStore.commune !== "") {
-    updateMapLayer();
-  }
+  vectorGrid.addTo(map.value);
 };
 
 //  update the map layer dynamically
 const updateMapLayer = () => {
   if (!map.value || !geojsonData.value) return;
 
-  // Clear previous layers
+  //clear previous layers
   layerGroup.value.clearLayers();
 
   const utm33n = "+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs";
 
-  // Filter features based on selected filtering types
+    //filter features based on selected filtering types
   const filteredFeatures = geojsonData.value.features.filter((feature) => {
-  return (
-    feature.properties.mode === sportsStore.travelMode && // filter by travel mode
-    (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType) //also filter by day type if not "all"
-  );
+    return (
+      feature.properties.mode === sportsStore.travelMode && // filter by travel mode
+      (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType) //also filter by day type if not "all"
+    );
   });
 
   const filteredGeoJSON = {
@@ -135,7 +127,7 @@ const updateMapLayer = () => {
 
   geoJsonLayer.addTo(layerGroup.value);
 
-  // Fit the map bounds to new polygons
+    // Fit the map bounds to new polygons
   if (geoJsonLayer.getBounds().isValid()) {
     map.value.fitBounds(geoJsonLayer.getBounds());
   }
