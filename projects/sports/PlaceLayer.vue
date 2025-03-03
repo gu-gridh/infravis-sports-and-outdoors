@@ -6,18 +6,27 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.vectorgrid";
-import geojsonvt from "geojson-vt";
-import proj4 from "proj4";
 import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import markerIcon from "@/assets/marker-red.svg";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
+
+//region's data kommun_regso
 const geojsonData = ref(null);
-const pointsLayer = ref(null); // Stores the active points layer
-const layerGroup = ref(null);  // Stores the active layer group
-const communeLayer = ref(null); // Stores the active commune layer
+
+//raw commune data
+const communeData = ref(null);
+
+//the vectorGrid layers
+const regionLayer = ref(null);  
+const communeLayer = ref(null);  
+const pointsLayer = ref(null); 
+
+
+//hold the last filtered layer created by updateMapLayer
+ const filteredLayer = ref(null);
 
 const travelTimes = ref({
   15: "15_total",
@@ -33,17 +42,6 @@ const mapStyles = ref({
 
 onMounted(async () => {
   await initMap();
-
-  //fetch all the communes
-  // const response = await fetch("./geojson/kommun_regso.geojson");
-  // const geojson = await response.json();
-  // //add name and kommun to communes objects in commune array
-  // sportsStore.allCommunes = geojson.features.map((feature) => ({
-  //   name: feature.properties.kommunnamn,
-  //   kommun: feature.properties.kommun,
-  // }))
-  // //sort in name order
-  // sportsStore.allCommunes.sort((a, b) => a.name.localeCompare(b.name));
 });
 
 //watch for store updates and refresh the map layer
@@ -62,15 +60,16 @@ watch(
   }
 );
 
+//whenever a points file is selected
 watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
   if (newFile) {
     renderPointsLayer(newFile);
   } else {
-    removePointsLayer(); 
+    removePointsLayer();
   }
 });
 
-const initMap = async () => {
+async function initMap() {
   map.value = L.map("map").setView([62, 15], 6); // Uppsala
 
   L.tileLayer(mapStyles.value.OSM, {
@@ -79,55 +78,49 @@ const initMap = async () => {
 
   try {
     const response = await fetch("./geojson/kommun_regso.geojson");
-    geojsonData.value = await response.json();
+    const rawRegion = await response.json();
+    geojsonData.value = rawRegion; 
 
-    if (!geojsonData.value?.features) throw new Error("GeoJSON features are missing.");
+    if (!rawRegion?.features) {
+      throw new Error("GeoJSON features are missing in region data.");
+    }
 
     //store communes list for dropdown
-    sportsStore.allCommunes = geojsonData.value.features.map(feature => feature.properties);
+    sportsStore.allCommunes = rawRegion.features.map((f) => f.properties);
 
     //sort the communes alphabetically
     if (Array.isArray(sportsStore.allCommunes)) {
       sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
     }
 
-    const plainGeojson = JSON.parse(JSON.stringify(geojsonData.value));
+    const plainRegion = JSON.parse(JSON.stringify(rawRegion));
 
-    const tileIndex = geojsonvt(plainGeojson, {
-      maxZoom: 14,
-      tolerance: 3,
-      extent: 4096,
-      buffer: 64,
-      debug: 0,
-    });
-
-    const vectorGrid = L.vectorGrid.slicer(plainGeojson, {
+    regionLayer.value = L.vectorGrid.slicer(plainRegion, {
       vectorTileLayerStyles: {
         sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
       },
       getFeatureId: (feature) => feature.id,
-    });
+    }).addTo(map.value);
 
-    vectorGrid.addTo(map.value);
   } catch (error) {
-    console.error("error loading GeoJSON:", error);
+    console.error("Error loading kommun_regso.geojson:", error);
   }
-};
+}
 
-//  update the map layer dynamically
-const updateMapLayer = () => {
-  if (!map.value || !geojsonData.value) return;
+function updateMapLayer() {
+  if (!map.value || !communeData.value) return;
 
-  //clear previous layers
-  layerGroup.value.clearLayers();
+  //remove the old filtered layer if it exists
+  if (filteredLayer.value) {
+    map.value.removeLayer(filteredLayer.value);
+    filteredLayer.value = null;
+  }
 
-  const utm33n = "+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs";
-
-    //filter features based on selected filtering types
-  const filteredFeatures = geojsonData.value.features.filter((feature) => {
+  //filter the raw features
+  const filteredFeatures = communeData.value.features.filter((feature) => {
     return (
-      feature.properties.mode === sportsStore.travelMode && // filter by travel mode
-      (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType) //also filter by day type if not "all"
+      feature.properties.mode === sportsStore.travelMode &&
+      (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType)
     );
   });
 
@@ -136,57 +129,87 @@ const updateMapLayer = () => {
     features: filteredFeatures,
   };
 
-  // Create a GeoJSON layer
-  const geoJsonLayer = L.geoJSON(filteredGeoJSON, {
-    style: (feature) => {
-      const time = feature.properties[travelTimes.value[sportsStore.travelTime]];
-      return {
-        color: "white",
-        fillColor: setColor(time),
-        fillOpacity: 0.7,
-        weight: 1,
-        dashArray: "2, 2",
-      };
-    },
-    coordsToLatLng: (coords) => {
-      const [lon, lat] = proj4(utm33n, "WGS84", coords); // Convert UTM to WGS84
-      return [lat, lon]; // Flip latitude and longitude
+  //convert to plain object
+  const plainFiltered = JSON.parse(JSON.stringify(filteredGeoJSON));
+
+  //create a new vectorGrid from filtered data
+  const newVectorGrid = L.vectorGrid.slicer(plainFiltered, {
+    vectorTileLayerStyles: {
+      sliced: (properties) => {
+        const time = properties[travelTimes.value[sportsStore.travelTime]];
+        return {
+          color: setColor(time),
+          fill: setColor(time),
+          fillOpacity: 0.7,
+          weight: 1,
+          dashArray: "2, 2",
+        };
+      },
     },
   });
 
-  geoJsonLayer.addTo(layerGroup.value);
+  newVectorGrid.addTo(map.value);
 
-    // Fit the map bounds to new polygons
-  if (geoJsonLayer.getBounds().isValid()) {
-    map.value.fitBounds(geoJsonLayer.getBounds());
-  }
-};
+  filteredLayer.value = newVectorGrid;
+}
 
-const renderPointsLayer = async (geojsonFile) => {
+async function loadCommuneGeoJSON(commune) {
   if (!map.value) return;
 
-  removePointsLayer(); 
+  //remove old commune layer
+  if (filteredLayer.value) {
+    map.value.removeLayer(filteredLayer.value);
+    filteredLayer.value = null;
+  }
+  if (communeLayer.value) {
+    map.value.removeLayer(communeLayer.value);
+    communeLayer.value = null;
+  }
+
+  //remove the region layer while a commune is shown
+  if (regionLayer.value) {
+    map.value.removeLayer(regionLayer.value);
+  }
+
+  const geojsonFile = commune === "Lilla Edet" ? "lilla_edet.geojson" : "uppsala.geojson";
+  try {
+    const resp = await fetch(`./geojson/${geojsonFile}`);
+    const rawCommune = await resp.json();
+
+    communeData.value = rawCommune;
+
+    const plainCommune = JSON.parse(JSON.stringify(rawCommune));
+
+    communeLayer.value = L.vectorGrid.slicer(plainCommune, {
+      vectorTileLayerStyles: {
+        sliced: { color: "red", weight: 1, fillOpacity: 0.5 },
+      },
+    }).addTo(map.value);
+
+  } catch (error) {
+    console.error(`failed to load ${geojsonFile}:`, error);
+  }
+}
+
+async function renderPointsLayer(geojsonFile) {
+  if (!map.value) return;
+
+  removePointsLayer();
 
   try {
     const response = await fetch(`./geojson/${geojsonFile}`);
-    const geojson = await response.json();
+    const rawPoints = await response.json();
 
-    const tileIndex = geojsonvt(geojson, {
-      maxZoom: 14,
-      extent: 4096,
-      buffer: 64,
-    });
+    const plainPoints = JSON.parse(JSON.stringify(rawPoints));
 
-    pointsLayer.value = L.vectorGrid.slicer(geojson, {
+    pointsLayer.value = L.vectorGrid.slicer(plainPoints, {
       vectorTileLayerStyles: {
-        sliced: (properties, zoom) => {
-          return {
-            color: "red",
-            radius: 1,
-            fillOpacity: 0.9,
-            weight: 1,
-          };
-        },
+        sliced: (properties, zoom) => ({
+          color: "red",
+          radius: 1,
+          fillOpacity: 0.9,
+          weight: 1,
+        }),
       },
       pointToLayer: (feature, latlng) => {
         return L.marker(latlng, {
@@ -196,54 +219,30 @@ const renderPointsLayer = async (geojsonFile) => {
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
           }),
-        }).bindPopup(`<b>${feature.properties.city_name}</b><br>${feature.properties.classification}`);
+        }).bindPopup(
+          `<b>${feature.properties.city_name}</b><br>${feature.properties.classification}`
+        );
       },
       getFeatureId: (feature) => feature.id,
-    });
-
-    pointsLayer.value.addTo(map.value);
+    }).addTo(map.value);
 
   } catch (error) {
-    console.error(`error loading ${geojsonFile}:`, error);
+    console.error(`error loading points file ${geojsonFile}:`, error);
   }
-};
+}
 
-const removePointsLayer = () => {
+function removePointsLayer() {
   if (pointsLayer.value) {
     map.value.removeLayer(pointsLayer.value);
     pointsLayer.value = null;
   }
-};
+}
 
-// determine polygon color based on amount of activities
-const setColor = (time) => {
-  return time === null || time === 0 ? "blue" : time > 0 && time < 6 ? "yellow" : time >= 6 && time < 10 ? "orange" : "red";
-};
-
-async function loadCommuneGeoJSON(commune) {
-  if (!map.value) return;
-
-  if (communeLayer.value) {
-    map.value.removeLayer(communeLayer.value);
-    communeLayer.value = null;
-  }
-
-  const geojsonFile = commune === "Lilla Edet" ? "lilla_edet.geojson" : "uppsala.geojson";
-
-  try {
-    const response = await fetch(`./geojson/${geojsonFile}`);
-    const data = await response.json();
-    const vectorGrid = L.vectorGrid.slicer(data, {
-      data,
-      vectorTileLayerStyles: {
-        sliced: { color: "red", weight: 1, fillOpacity: 0.5 },
-      },
-    }).addTo(map.value);
-
-    communeLayer.value = vectorGrid;
-  } catch (error) {
-    console.error(`failed to load ${geojsonFile}:, error`);
-  }
+function setColor(time) {
+  if (time === null || time === 0) return "blue";
+  if (time > 0 && time < 6) return "yellow";
+  if (time >= 6 && time < 10) return "orange";
+  return "red";
 }
 </script>
 
@@ -254,6 +253,7 @@ async function loadCommuneGeoJSON(commune) {
   padding-bottom: 20px;
   background-color: white !important;
 }
+
 .legend i {
   width: 18px;
   height: 18px;
