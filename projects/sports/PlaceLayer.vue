@@ -66,25 +66,41 @@ const initMap = async () => {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map.value);
 
-  const response = await fetch("./geojson/kommun_regso.geojson");
-  const geojson = await response.json();
+  try {
+    const response = await fetch("./geojson/kommun_regso.geojson");
+    geojsonData.value = await response.json();
 
-  const tileIndex = geojsonvt(geojson, {
-    maxZoom: 14,
-    tolerance: 3,
-    extent: 4096,
-    buffer: 64,
-    debug: 0,
-  });
+    if (!geojsonData.value?.features) throw new Error("GeoJSON features are missing.");
 
-  const vectorGrid = L.vectorGrid.slicer(geojson, {
-    vectorTileLayerStyles: {
-      sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-    },
-    getFeatureId: (feature) => feature.id,
-  });
+    //store communes list for dropdown
+    sportsStore.allCommunes = geojsonData.value.features.map(feature => feature.properties);
 
-  vectorGrid.addTo(map.value);
+    //sort the communes alphabetically
+    if (Array.isArray(sportsStore.allCommunes)) {
+      sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
+    }
+
+    const plainGeojson = JSON.parse(JSON.stringify(geojsonData.value));
+
+    const tileIndex = geojsonvt(plainGeojson, {
+      maxZoom: 14,
+      tolerance: 3,
+      extent: 4096,
+      buffer: 64,
+      debug: 0,
+    });
+
+    const vectorGrid = L.vectorGrid.slicer(plainGeojson, {
+      vectorTileLayerStyles: {
+        sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
+      },
+      getFeatureId: (feature) => feature.id,
+    });
+
+    vectorGrid.addTo(map.value);
+  } catch (error) {
+    console.error("error loading GeoJSON:", error);
+  }
 };
 
 //  update the map layer dynamically
