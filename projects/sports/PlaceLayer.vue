@@ -32,7 +32,19 @@ const mapStyles = ref({
 
 onMounted(async () => {
   await initMap();
+  //fetch all the communes
+  const response = await fetch("./geojson/kommun_regso.geojson");
+  const geojson = await response.json();
+  //add name and kommun to communes objects in commune array
+  sportsStore.allCommunes = geojson.features.map((feature) => ({
+    name: feature.properties.kommunnamn,
+    kommun: feature.properties.kommun,
+  }))
+  //sort in name order
+  sportsStore.allCommunes.sort((a, b) => a.name.localeCompare(b.name));
+
 });
+
 
 // Watch for store updates and refresh the map layer
 watch(
@@ -75,12 +87,15 @@ const initMap = async () => {
     debug: 0,
   });
 
+
   const vectorGrid = L.vectorGrid.slicer(geojson, {
     vectorTileLayerStyles: {
       sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
     },
     getFeatureId: (feature) => feature.id,
   });
+
+  console.log("vectorGrid", vectorGrid);
 
   vectorGrid.addTo(map.value);
 };

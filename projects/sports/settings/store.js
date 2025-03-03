@@ -5,7 +5,7 @@ import { defineStore } from "pinia";
 export const useSportsStore = defineStore("sportsStore", () => {
     const sweden = ref(true);
     const commune = ref('');
-    const allCommunes = ref();
+    const allCommunes = ref([]);
     const activity = ref('');
     const travelMode = ref('sustainable');
     const travelModes = ref([

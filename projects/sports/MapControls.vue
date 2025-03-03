@@ -11,8 +11,8 @@
         <!-- drowdown for all communes from store -->
         <div class="btn-group">Select commune
             <select @change="setCommune($event.target.value)">
-                <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
-                    {{ commune.kommunnamn }}
+                <option v-for="commune in store.allCommunes" :key="commune.kommun" :value="commune.kommun">
+                    {{ commune.name }}
                 </option>
             </select>
         </div>
@@ -73,7 +73,6 @@ import { ref, onMounted } from "vue";
 import { useSportsStore } from "./settings/store";
 
 const store = useSportsStore();
-const communes = ref(["Lilla Edet", "Uppsala"]);
 
 
 const setCommune = (commune) => {
