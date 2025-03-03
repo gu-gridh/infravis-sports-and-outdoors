@@ -15,6 +15,7 @@ import markerIcon from "@/assets/marker-red.svg";
 const map = ref(null);
 const sportsStore = useSportsStore();
 const geojsonData = ref(null);
+const pointsLayer = ref(null); // Stores the active points layer
 const layerGroup = ref(null);  // Stores the active layer group
 const sweden = ref(true);
 
@@ -62,12 +63,13 @@ watch(
   }
 );
 
-watch(
-  () => sportsStore.outdoorsNational,
-  () => {
-    renderLimitedPoints();
+watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
+  if (newFile) {
+    renderPointsLayer(newFile);
+  } else {
+    removePointsLayer(); 
   }
-);
+});
 
 const initMap = async () => {
   map.value = L.map("map").setView([62, 15], 6); // Uppsala
@@ -76,28 +78,41 @@ const initMap = async () => {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map.value);
 
-  const response = await fetch("./geojson/kommun_regso.geojson");
-  const geojson = await response.json();
+  try {
+    const response = await fetch("./geojson/kommun_regso.geojson");
+    geojsonData.value = await response.json();
 
-  const tileIndex = geojsonvt(geojson, {
-    maxZoom: 14,
-    tolerance: 3,
-    extent: 4096,
-    buffer: 64,
-    debug: 0,
-  });
+    if (!geojsonData.value?.features) throw new Error("GeoJSON features are missing.");
 
+    //store communes list for dropdown
+    sportsStore.allCommunes = geojsonData.value.features.map(feature => feature.properties);
 
-  const vectorGrid = L.vectorGrid.slicer(geojson, {
-    vectorTileLayerStyles: {
-      sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-    },
-    getFeatureId: (feature) => feature.id,
-  });
+    //sort the communes alphabetically
+    if (Array.isArray(sportsStore.allCommunes)) {
+      sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
+    }
 
-  console.log("vectorGrid", vectorGrid);
+    const plainGeojson = JSON.parse(JSON.stringify(geojsonData.value));
 
-  vectorGrid.addTo(map.value);
+    const tileIndex = geojsonvt(plainGeojson, {
+      maxZoom: 14,
+      tolerance: 3,
+      extent: 4096,
+      buffer: 64,
+      debug: 0,
+    });
+
+    const vectorGrid = L.vectorGrid.slicer(plainGeojson, {
+      vectorTileLayerStyles: {
+        sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
+      },
+      getFeatureId: (feature) => feature.id,
+    });
+
+    vectorGrid.addTo(map.value);
+  } catch (error) {
+    console.error("error loading GeoJSON:", error);
+  }
 };
 
 //  update the map layer dynamically
@@ -148,16 +163,32 @@ const updateMapLayer = () => {
   }
 };
 
-const renderLimitedPoints = async () => { //loads the geojson points from file
+const renderPointsLayer = async (geojsonFile) => {
   if (!map.value) return;
 
+  removePointsLayer(); 
+
   try {
-    const response = await fetch("./geojson/destinations_outdoors_national.geojson");
-    const geojsonData = await response.json();
+    const response = await fetch(`./geojson/${geojsonFile}`);
+    const geojson = await response.json();
 
-    const limitedFeatures = geojsonData.features.slice(0, 50); //only first 50 points
+    const tileIndex = geojsonvt(geojson, {
+      maxZoom: 14,
+      extent: 4096,
+      buffer: 64,
+    });
 
-    const geoJsonLayer = L.geoJSON({ type: "FeatureCollection", features: limitedFeatures }, {
+    pointsLayer.value = L.vectorGrid.slicer(geojson, {
+      vectorTileLayerStyles: {
+        sliced: (properties, zoom) => {
+          return {
+            color: "red",
+            radius: 1,
+            fillOpacity: 0.9,
+            weight: 1,
+          };
+        },
+      },
       pointToLayer: (feature, latlng) => {
         return L.marker(latlng, {
           icon: L.icon({
@@ -168,15 +199,20 @@ const renderLimitedPoints = async () => { //loads the geojson points from file
           }),
         }).bindPopup(`<b>${feature.properties.city_name}</b><br>${feature.properties.classification}`);
       },
+      getFeatureId: (feature) => feature.id,
     });
 
-    geoJsonLayer.addTo(layerGroup.value);
+    pointsLayer.value.addTo(map.value);
 
-    if (geoJsonLayer.getBounds().isValid()) {
-      map.value.fitBounds(geoJsonLayer.getBounds());
-    }
   } catch (error) {
-    console.error("error loading points:", error);
+    console.error(`error loading ${geojsonFile}:`, error);
+  }
+};
+
+const removePointsLayer = () => {
+  if (pointsLayer.value) {
+    map.value.removeLayer(pointsLayer.value);
+    pointsLayer.value = null;
   }
 };
 
