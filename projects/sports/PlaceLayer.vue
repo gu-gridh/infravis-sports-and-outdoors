@@ -189,6 +189,9 @@ async function loadGeoJSONFile(commune) {
       },
     }).addTo(map.value);
 
+    const geoJsonLayer = L.geoJSON(rawCommune);
+    map.value.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50] });
+
   } catch (error) {
     console.error(`failed to load ${geojsonFile}:`, error);
   }
