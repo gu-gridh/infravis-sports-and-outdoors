@@ -130,7 +130,8 @@ function updateIndexMapLayer() {
       sliced: (properties) => {
         const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
         const indexValue = properties[propertyName];
-
+        //constructs e.g.: "index_dd_15_min_sports_week_day"
+        
         return {
           color: setColor(indexValue),
           fill: setColor(indexValue),
