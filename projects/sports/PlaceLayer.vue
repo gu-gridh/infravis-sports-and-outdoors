@@ -56,9 +56,9 @@ onMounted(async () => {
 
 //watch for store updates and refresh the map layer
 watch(
-  () => [sportsStore.travelTime, sportsStore.travelMode, sportsStore.dayType],
+  () => [sportsStore.travelTime, sportsStore.activity, sportsStore.dayType],
   () => {
-    updateMapLayer();
+    updateIndexMapLayer();
   }
 );
 
@@ -117,7 +117,7 @@ async function initMap() {
   }
 }
 
-function updateMapLayer() {
+function updateIndexMapLayer() {
   if (!map.value || !communeData.value) return;
 
   //remove the old filtered layer if it exists
@@ -126,18 +126,10 @@ function updateMapLayer() {
     filteredLayer.value = null;
   }
 
-  //filter the raw features
-  const filteredFeatures = communeData.value.features.filter((feature) => {
-    return (
-      feature.properties.mode === sportsStore.travelMode &&
-      (sportsStore.dayType === "all" || feature.properties.day_type === sportsStore.dayType)
-    );
-  });
-
   const filteredGeoJSON = {
-    type: "FeatureCollection",
-    features: filteredFeatures,
-  };
+    type: 'FeatureCollection',
+    features: communeData.value.features,
+  }
 
   //convert to plain object
   const plainFiltered = JSON.parse(JSON.stringify(filteredGeoJSON));
@@ -146,20 +138,21 @@ function updateMapLayer() {
   const newVectorGrid = L.vectorGrid.slicer(plainFiltered, {
     vectorTileLayerStyles: {
       sliced: (properties) => {
-        const time = properties[travelTimes.value[sportsStore.travelTime]];
+        const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
+        const indexValue = properties[propertyName];
+
         return {
-          color: setColor(time),
-          fill: setColor(time),
+          color: setColor(indexValue),
+          fill: setColor(indexValue),
           fillOpacity: 0.7,
           weight: 1,
-          dashArray: "2, 2",
+          dashArray: '2, 2',
         };
       },
     },
   });
 
   newVectorGrid.addTo(map.value);
-
   filteredLayer.value = newVectorGrid;
 }
 
