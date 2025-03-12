@@ -2,6 +2,16 @@
   <div id="map" style="width: 100%; height: 100vh;"></div>
 </template>
 
+<!-- 
+what filters are needed
+how to get each commune data
+destinations outdoors & destinations need to be loaded by commune
+step by step which files are loaded...drawing!
+other files how to use?
+points layer should be regionbased instead of whole country
+coordinates in geojson!
+-->
+
 <script setup>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -56,7 +66,7 @@ watch(
 watch(
   () => sportsStore.commune,
   (newCommune) => {
-    loadCommuneGeoJSON(newCommune);
+    loadGeoJSONFile(newCommune);
   }
 );
 
@@ -153,7 +163,7 @@ function updateMapLayer() {
   filteredLayer.value = newVectorGrid;
 }
 
-async function loadCommuneGeoJSON(commune) {
+async function loadGeoJSONFile(commune) {
   if (!map.value) return;
 
   //remove old commune layer
@@ -171,7 +181,7 @@ async function loadCommuneGeoJSON(commune) {
     map.value.removeLayer(regionLayer.value);
   }
 
-  const geojsonFile = commune === "Lilla Edet" ? "lilla_edet.geojson" : "uppsala.geojson";
+  const geojsonFile = commune === "Lilla Edet" ? "lilla_edet_index.geojson" : "uppsala_index.geojson";
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
     const rawCommune = await resp.json();
@@ -182,7 +192,7 @@ async function loadCommuneGeoJSON(commune) {
 
     communeLayer.value = L.vectorGrid.slicer(plainCommune, {
       vectorTileLayerStyles: {
-        sliced: { color: "red", weight: 1, fillOpacity: 0.5 },
+        sliced: { color: "red", weight: 1, fill: "red", fillOpacity: 0.5 },
       },
     }).addTo(map.value);
 

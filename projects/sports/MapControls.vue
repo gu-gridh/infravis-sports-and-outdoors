@@ -1,101 +1,101 @@
 <template>
     <div class="map-controls">
         <!-- Buttons for communes -->
-<!--         <div class="btn-group">
-            <button v-for="commune in communes" :key="commune" @click="setCommune(commune)"
-                :class="{ active: store.commune === commune }">
-                {{ commune }}
-            </button>
-        </div> -->
-
-        <!-- drowdown for all communes from store -->
-        <div class="btn-group">Select commune
+        <div class="btn-group">
+            <label>Select commune</label>
             <select @change="setCommune($event.target.value)">
+                <option value="" selected disabled>Select a commune</option>
                 <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
                     {{ commune.kommunnamn }}
                 </option>
             </select>
         </div>
-        <button @click="filterMore = !filterMore">More filters</button>
-        <!--For deeper filtering-->
-        <div class="filterMore" v-if="filterMore">
-        <!-- Travel Type Buttons -->
-        <div class="btn-group">
-            Travel type
-            <button v-for="mode in store.travelModes" :key="mode" @click="setMode(mode)"
-                :class="{ active: store.travelMode === mode }">
-                {{ mode }}
+
+        <!-- only visible after selecting a commune -->
+        <template v-if="store.commune">
+            <div class="btn-group">
+                <span>Day Type</span>
+                <button v-for="day in dayTypes" :key="day.value" @click="setDay(day.value)"
+                    :class="{ active: store.dayType === day.value }">
+                    {{ day.label }}
+                </button>
+            </div>
+
+            <div class="btn-group">
+                <span>Activity Type</span>
+                <button v-for="type in activityTypes" :key="type.value" @click="setActivity(type.value)"
+                    :class="{ active: store.activity === type.value }">
+                    {{ type.label }}
+                </button>
+            </div>
+
+            <div class="btn-group">
+                <span>Travel Time</span>
+                <button v-for="time in store.travelTimes" :key="time" @click="setTime(time)"
+                    :class="{ active: store.travelTime === time }">
+                    {{ time }} min
+                </button>
+            </div>
+
+            <button @click="filterMore = !filterMore">
+                {{ filterMore ? "Hide Filters" : "More Filters" }}
             </button>
-        </div>
+        </template>
 
-        <!-- Travel Time Buttons -->
-        <div class="btn-group">
-            Within travel time
-            <span v-for="time in store.travelTimes" :key="time" @click="setTime(time)">
-                <button :class="{ active: store.travelTime === time }">{{ time }}</button> min
-            </span>
-        </div>
+        <!-- hidden until more filters is clicked -->
+        <div class="filterMore" v-if="filterMore && store.commune">
+            <div class="btn-group">
+                <span>Travel Type</span>
+                <button v-for="mode in store.travelModes" :key="mode" @click="setMode(mode)"
+                    :class="{ active: store.travelMode === mode }">
+                    {{ mode }}
+                </button>
+            </div>
 
-        <div class="btn-group" v-if="store.travelMode === 'transit' || store.travelMode === 'sustainable'">
-            Days of the week
-            <select @change="setDay($event.target.value)">
-                <option value="all">All</option>
-                <option value="week_day">Weekdays</option>
-                <option value="saturday">Saturday</option>
-                <option value="sunday">Sunday</option>
-            </select>
-            TODO
-        </div>
-        <div class="btn-group">
-            Type of sports
-            <button>Football</button> etc TODO
-        </div>
-        <div class="btn-group">
-            <button @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')"
-                :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }">
-                Outdoors
-            </button>
-            <button @click="store.toggleGeoJsonFile('destinations_per_city.geojson')"
-                :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }">
-                Destinations
-            </button>
-        </div>
+            <!-- point layers -->
+            <div class="btn-group">
+                <button @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')"
+                    :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }">
+                    Outdoors
+                </button>
+                <button @click="store.toggleGeoJsonFile('destinations_per_city.geojson')"
+                    :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }">
+                    Destinations
+                </button>
+            </div>
 
-        Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{
-            store.travelMode }}
+            <!-- Info -->
+            <p>
+                Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{
+                    store.travelMode }}
+            </p>
         </div>
-
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useSportsStore } from "./settings/store";
 
 const store = useSportsStore();
-
-
-const setCommune = (commune) => {
-    store.updateCommune(commune);
-};
-
-const setMode = (mode) => {
-    if (mode === "car" || mode === "bike" || mode === "walk") {
-        store.updateDayType("all");
-    }
-    store.updateMode(mode);
-};
-
-const setTime = (time) => {
-    store.updateTravelTime(time);
-};
-
-const setDay = (day) => {
-    console.log(day)
-    store.updateDayType(day);
-};
-
 const filterMore = ref(false);
+const dayTypes = [
+    { label: "Weekday", value: "week_day" },
+    { label: "Saturday", value: "saturday" },
+    { label: "Sunday", value: "sunday" }
+];
+
+const activityTypes = [
+    { label: "Sports", value: "sports" },
+    { label: "Outdoors", value: "outdoors" },
+    { label: "Total", value: "total" }
+];
+
+const setCommune = (commune) => store.updateCommune(commune);
+const setMode = (mode) => store.updateMode(mode);
+const setTime = (time) => store.updateTravelTime(time);
+const setDay = (day) => store.updateDayType(day);
+const setActivity = (activity) => store.activity = activity;
 </script>
 
 <style scoped>
@@ -113,6 +113,7 @@ const filterMore = ref(false);
 
 .btn-group {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     padding-bottom: 10px;
 }
@@ -126,11 +127,8 @@ button {
     transition: background-color 0.3s, color 0.3s;
 }
 
-
-/* ✅ Highlight Active Button */
 button.active {
     background-color: #007bff;
-    /* Blue */
     color: white;
     border-color: #0056b3;
 }
