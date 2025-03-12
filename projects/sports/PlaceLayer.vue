@@ -117,40 +117,54 @@ function updateIndexMapLayer() {
   }
 
   const filteredGeoJSON = {
-    type: 'FeatureCollection',
+    type: "FeatureCollection",
     features: communeData.value.features,
+  };
+
+  function style(feature) {
+    const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
+    const indexValue = feature.properties[propertyName];
+
+    return {
+      color: setColor(indexValue),
+      fillColor: setColor(indexValue),
+      fillOpacity: 0.7,
+      weight: 1,
+      dashArray: "2, 2",
+    };
   }
 
-  //convert to plain object
-  const plainFiltered = JSON.parse(JSON.stringify(filteredGeoJSON));
+  //hover event
+  function onEachFeature(feature, layer) {
+    layer.on("mouseover", (e) => {
+      console.log("Mouseover event: ", feature.properties);
+      const cityName = feature.properties.city_name || "Unknown Area";
+      //Leaflet popup
+      L.popup({ offset: [0, -10] })
+        .setLatLng(e.latlng)
+        .setContent(`<b>${cityName}</b>`)
+        .openOn(map.value);
+    });
 
-  //create a new vectorGrid from filtered data
-  const newVectorGrid = L.vectorGrid.slicer(plainFiltered, {
-    vectorTileLayerStyles: {
-      sliced: (properties) => {
-        const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
-        const indexValue = properties[propertyName];
-        //constructs e.g.: "index_dd_15_min_sports_week_day"
+    layer.on("mouseout", () => {
+      map.value.closePopup();
+    });
+  }
 
-        return {
-          color: setColor(indexValue),
-          fill: setColor(indexValue),
-          fillOpacity: 0.7,
-          weight: 1,
-          dashArray: '2, 2',
-        };
-      },
-    },
+  const newGeoJsonLayer = L.geoJSON(filteredGeoJSON, {
+    style,
+    onEachFeature,
   });
 
-  newVectorGrid.addTo(map.value);
-  filteredLayer.value = newVectorGrid;
+  newGeoJsonLayer.addTo(map.value);
+
+  filteredLayer.value = newGeoJsonLayer;
 }
 
 async function loadGeoJSONFile(commune) {
   if (!map.value) return;
 
-  //remove old commune layer
+  // remove old layers
   if (filteredLayer.value) {
     map.value.removeLayer(filteredLayer.value);
     filteredLayer.value = null;
@@ -159,30 +173,25 @@ async function loadGeoJSONFile(commune) {
     map.value.removeLayer(communeLayer.value);
     communeLayer.value = null;
   }
-
-  //remove the region layer while a commune is shown
   if (regionLayer.value) {
     map.value.removeLayer(regionLayer.value);
   }
 
-  const geojsonFile = commune === "Lilla Edet" ? "lilla_edet_index.geojson" : "uppsala_index.geojson";
+  //decide which file
+  const geojsonFile = commune === "Lilla Edet"
+    ? "lilla_edet_index.geojson"
+    : "uppsala_index.geojson";
+
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
     const rawCommune = await resp.json();
 
     communeData.value = rawCommune;
 
-    const plainCommune = JSON.parse(JSON.stringify(rawCommune));
-
-    communeLayer.value = L.vectorGrid.slicer(plainCommune, {
-      vectorTileLayerStyles: {
-        sliced: { color: "red", weight: 1, fill: "red", fillOpacity: 0.5 },
-      },
-    }).addTo(map.value);
-
     const geoJsonLayer = L.geoJSON(rawCommune);
     map.value.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50] });
 
+    updateIndexMapLayer();
   } catch (error) {
     console.error(`failed to load ${geojsonFile}:`, error);
   }
