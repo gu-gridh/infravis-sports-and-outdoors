@@ -131,7 +131,7 @@ function updateIndexMapLayer() {
         const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
         const indexValue = properties[propertyName];
         //constructs e.g.: "index_dd_15_min_sports_week_day"
-        
+
         return {
           color: setColor(indexValue),
           fill: setColor(indexValue),
@@ -236,10 +236,19 @@ function removePointsLayer() {
 }
 
 function setColor(time) {
-  if (time === null || time === 0) return "blue";
-  if (time > 0 && time < 6) return "yellow";
-  if (time >= 6 && time < 10) return "orange";
-  return "red";
+  if (time === null || time === 0) return "#cccccc"; //missing data
+
+  if (time >= 6 && time < 16) return "#ffcccc"; 
+  if (time >= 16 && time < 26) return "#ff9999"; 
+  if (time >= 26 && time < 36) return "#ff6666"; 
+  if (time >= 36 && time < 46) return "#ff3333"; 
+  if (time >= 46 && time < 56) return "#ff0000"; 
+  if (time >= 56 && time < 66) return "#cc0000"; 
+  if (time >= 66 && time < 76) return "#990000"; 
+  if (time >= 76 && time < 86) return "#660000";
+  if (time >= 86 && time <= 96) return "#330000"; 
+
+  return "#cccccc"; //default
 }
 </script>
 
