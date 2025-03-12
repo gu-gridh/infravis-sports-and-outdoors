@@ -138,11 +138,11 @@ function updateIndexMapLayer() {
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
       console.log("Mouseover event: ", feature.properties);
-      const cityName = feature.properties.city_name || "Unknown Area";
+      const population = feature.properties.pop_1km_grid || "unknown population";
       //Leaflet popup
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
-        .setContent(`<b>${cityName}</b>`)
+        .setContent(`<b>${population}</b>`)
         .openOn(map.value);
     });
 
