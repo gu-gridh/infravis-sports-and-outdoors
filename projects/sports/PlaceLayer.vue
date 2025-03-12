@@ -2,16 +2,6 @@
   <div id="map" style="width: 100%; height: 100vh;"></div>
 </template>
 
-<!-- 
-what filters are needed
-how to get each commune data
-destinations outdoors & destinations need to be loaded by commune
-step by step which files are loaded...drawing!
-other files how to use?
-points layer should be regionbased instead of whole country
-coordinates in geojson!
--->
-
 <script setup>
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
