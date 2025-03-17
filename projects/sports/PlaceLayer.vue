@@ -10,6 +10,7 @@ import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import markerIcon from "@/assets/marker-red.svg";
 
+
 const map = ref(null);
 const sportsStore = useSportsStore();
 
@@ -126,8 +127,8 @@ function updateIndexMapLayer() {
     const indexValue = feature.properties[propertyName];
 
     return {
-      color: setColor(indexValue),
-      fillColor: setColor(indexValue),
+      color: setIndexColor(indexValue),
+      fillColor: setIndexColor(indexValue),
       fillOpacity: 0.7,
       weight: 1,
       dashArray: "2, 2",
@@ -159,6 +160,9 @@ function updateIndexMapLayer() {
   newGeoJsonLayer.addTo(map.value);
 
   filteredLayer.value = newGeoJsonLayer;
+
+  //add legend
+  createIndexLegend(map.value);
 }
 
 async function loadGeoJSONFile(commune) {
@@ -244,21 +248,94 @@ function removePointsLayer() {
   }
 }
 
-function setColor(time) {
+function setIndexColor(time) { //for the index layer
   if (time === null || time === 0) return "#cccccc"; //missing data
 
-  if (time >= 6 && time < 16) return "#ffcccc"; 
-  if (time >= 16 && time < 26) return "#ff9999"; 
-  if (time >= 26 && time < 36) return "#ff6666"; 
-  if (time >= 36 && time < 46) return "#ff3333"; 
-  if (time >= 46 && time < 56) return "#ff0000"; 
-  if (time >= 56 && time < 66) return "#cc0000"; 
-  if (time >= 66 && time < 76) return "#990000"; 
-  if (time >= 76 && time < 86) return "#660000";
-  if (time >= 86 && time <= 96) return "#330000"; 
+  if (time >= 0 && time <= 10) return "#d71f27"; 
+  if (time >= 11 && time <= 20) return "#e95a38"; 
+  if (time >= 21 && time <= 30) return "#f69c5a"; 
+  if (time >= 31 && time <= 40) return "#fdc980"; 
+  if (time >= 41 && time <= 50) return "#fdefac"; 
+  if (time >= 51 && time <= 60) return "#e8eeac"; 
+  if (time >= 61 && time <= 70) return "#c4dd87"; 
+  if (time >= 71 && time <= 80) return "#99cc64";
+  if (time >= 81 && time <= 90) return "#55b453"; 
+  if (time >= 91 && time <= 100) return "#179847";
 
   return "#cccccc"; //default
 }
+
+function setAccColor (time) { //for the accessibility layer
+  if (time === null || time === 0) return "#cccccc"; //missing data
+
+  if (time >= 0 && time <= 5) return "#dfbec43"; 
+  if (time >= 6 && time <= 10) return "#cdbc68"; 
+  if (time >= 11 && time <= 15) return "#979077"; 
+  if (time >= 16 && time <= 20) return "#666970"; 
+  if (time >= 21 && time <= 25) return "#32446b"; 
+  if (time >= 26 && time <= 30) return "#13234b"; 
+  if (time >= 31 && time <= 35) return "#000000";
+
+
+  return "#cccccc"; //default
+}
+
+//adds legend based on what layer is active
+function createIndexLegend(map) {
+    // Check if map exists
+    if (!map) {
+        console.error("Leaflet map is not initialized!");
+        return;
+    }
+
+    var legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function () {
+        var div = L.DomUtil.create("div", "legend");
+        div.innerHTML += "<h4>Index</h4>";
+
+        var indexRanges = [
+            { min: 0, max: 10, color: "#d71f27" },
+            { min: 11, max: 20, color: "#e95a38" },
+            { min: 21, max: 30, color: "#f69c5a" },
+            { min: 31, max: 40, color: "#fdc980" },
+            { min: 41, max: 50, color: "#fdefac" },
+            { min: 51, max: 60, color: "#e8eeac" },
+            { min: 61, max: 70, color: "#c4dd87" },
+            { min: 71, max: 80, color: "#99cc64" },
+            { min: 81, max: 90, color: "#55b453" },
+            { min: 91, max: 100, color: "#179847" }
+        ];
+
+        indexRanges.forEach(function (range) {
+            div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+        });
+
+        //div.innerHTML += "<h4>Accessibility Layer Legend</h4>"; TODO!
+
+        // var accRanges = [
+        //     { min: 0, max: 5, color: "#dfbec43" },
+        //     { min: 6, max: 10, color: "#cdbc68" },
+        //     { min: 11, max: 15, color: "#979077" },
+        //     { min: 16, max: 20, color: "#666970" },
+        //     { min: 21, max: 25, color: "#32446b" },
+        //     { min: 26, max: 30, color: "#13234b" },
+        //     { min: 31, max: 35, color: "#000000" }
+        // ];
+
+        // accRanges.forEach(function (range) {
+        //     div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+        // });
+
+        return div;
+    };
+
+    legend.addTo(map);
+}
+
+
+// Add this after initializing your Leaflet map
+// createIndexLegend(map.value);
 </script>
 
 <style scoped>
@@ -280,4 +357,39 @@ function setColor(time) {
 #map.leaflet-container {
   height: calc(100vh - 80px) !important;
 }
+
+.legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    line-height: 18px;
+    font-size: 12px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Ensure it appears on top */
+}
+
+.legend h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.legend div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.legend span {
+    width: 20px;
+    height: 12px;
+    display: inline-block;
+    margin-right: 5px;
+    border: 1px solid #999;
+}
+
 </style>

@@ -6,7 +6,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     const sweden = ref(true);
     const commune = ref('');
     const allCommunes = ref();
-    const activity = ref('');
+    const activity = ref('sports');
     const travelMode = ref('sustainable');
     const travelModes = ref([
         "car", 
@@ -21,7 +21,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
         30,
         60,
     ])
-    const dayType = ref('all');
+    const dayType = ref('weekday');
     const activeGeoJsonFile = ref(null);
 
     const toggleGeoJsonFile = (filename) => {
