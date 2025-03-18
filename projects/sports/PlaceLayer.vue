@@ -126,8 +126,9 @@ function updateIndexMapLayer() {
     type: "FeatureCollection",
     features: communeData.value.features,
   };
-
+  //different styles for different mode
   function style(feature) {
+    if(sportsStore.metric === 'index') {
     const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
     const indexValue = feature.properties[propertyName];
 
@@ -139,7 +140,19 @@ function updateIndexMapLayer() {
       dashArray: "2, 2",
     };
   }
+  else if(sportsStore.metric === 'sustainability') {
+    const propertyName = `15_total`;
+    const accValue = feature.properties[propertyName];
 
+    return {
+      color: setAccColor(accValue),
+      fillColor: setAccColor(accValue),
+      fillOpacity: 0.6,
+      weight: 1,
+      dashArray: "2, 2",
+    };
+  }
+}
   //hover event
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
@@ -166,7 +179,7 @@ function updateIndexMapLayer() {
   filteredLayer.value = newGeoJsonLayer;
 
   //add legend
-  createIndexLegend(map.value);
+  createLegend(map.value);
 }
 
 async function loadGeoJSONFile(commune) {
@@ -200,8 +213,8 @@ async function loadGeoJSONFile(commune) {
 
     const geoJsonLayer = L.geoJSON(rawCommune);
     map.value.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50] });
-
     updateIndexMapLayer();
+    
   } catch (error) {
     console.error(`failed to load ${geojsonFile}:`, error);
   }
@@ -287,7 +300,7 @@ function setAccColor (time) { //for the accessibility layer
 }
 
 //adds legend based on what layer is active
-function createIndexLegend(map) {
+function createLegend(map) {
     // Check if map exists
     if (!map) {
         console.error("Leaflet map is not initialized!");
@@ -298,40 +311,41 @@ function createIndexLegend(map) {
 
     legend.onAdd = function () {
         var div = L.DomUtil.create("div", "legend");
-        div.innerHTML += "<h4>Index</h4>";
-
-        var indexRanges = [
-            { min: 0, max: 10, color: "#d71f27" },
-            { min: 11, max: 20, color: "#e95a38" },
-            { min: 21, max: 30, color: "#f69c5a" },
-            { min: 31, max: 40, color: "#fdc980" },
-            { min: 41, max: 50, color: "#fdefac" },
-            { min: 51, max: 60, color: "#e8eeac" },
-            { min: 61, max: 70, color: "#c4dd87" },
-            { min: 71, max: 80, color: "#99cc64" },
-            { min: 81, max: 90, color: "#55b453" },
-            { min: 91, max: 100, color: "#179847" }
-        ];
+        if (sportsStore.metric === "index") {
+          div.innerHTML += "<p>Index: % activities by sustainable modes</p>";
+          var indexRanges = [
+              { min: 0, max: 10, color: "#d71f27" },
+              { min: 11, max: 20, color: "#e95a38" },
+              { min: 21, max: 30, color: "#f69c5a" },
+              { min: 31, max: 40, color: "#fdc980" },
+              { min: 41, max: 50, color: "#fdefac" },
+              { min: 51, max: 60, color: "#e8eeac" },
+              { min: 61, max: 70, color: "#c4dd87" },
+              { min: 71, max: 80, color: "#99cc64" },
+              { min: 81, max: 90, color: "#55b453" },
+              { min: 91, max: 100, color: "#179847" }
+          ];
 
         indexRanges.forEach(function (range) {
             div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
         });
+        } else if (sportsStore.metric === "sustainability") {         
+          div.innerHTML += "<p>Travel time (min)</p>"; 
+          var accRanges = [
+              { min: 0, max: 5, color: "#dfbec43" },
+              { min: 6, max: 10, color: "#cdbc68" },
+              { min: 11, max: 15, color: "#979077" },
+              { min: 16, max: 20, color: "#666970" },
+              { min: 21, max: 25, color: "#32446b" },
+              { min: 26, max: 30, color: "#13234b" },
+              { min: 31, max: 35, color: "#000000" }
+          ];
 
-        //div.innerHTML += "<h4>Accessibility Layer Legend</h4>"; TODO!
-
-        // var accRanges = [
-        //     { min: 0, max: 5, color: "#dfbec43" },
-        //     { min: 6, max: 10, color: "#cdbc68" },
-        //     { min: 11, max: 15, color: "#979077" },
-        //     { min: 16, max: 20, color: "#666970" },
-        //     { min: 21, max: 25, color: "#32446b" },
-        //     { min: 26, max: 30, color: "#13234b" },
-        //     { min: 31, max: 35, color: "#000000" }
-        // ];
-
-        // accRanges.forEach(function (range) {
-        //     div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-        // });
+          accRanges.forEach(function (range) {
+              div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+          });
+        }
+      
 
         return div;
     };
@@ -340,11 +354,9 @@ function createIndexLegend(map) {
 }
 
 
-// Add this after initializing your Leaflet map
-// createIndexLegend(map.value);
 </script>
 
-<style scoped>
+<style >
 .legend {
   line-height: 18px;
   color: #555;
