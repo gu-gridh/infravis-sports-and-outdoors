@@ -29,12 +29,6 @@ const pointsLayer = ref(null);
 //hold the last filtered layer created by updateMapLayer
  const filteredLayer = ref(null);
 
-const travelTimes = ref({
-  15: "15_total",
-  30: "30_total",
-  60: "60_total",
-});
-
 const mapStyles = ref({
   arcGisTopo: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -45,7 +39,18 @@ onMounted(async () => {
   await initMap();
 });
 
-//watch for index store updates and refresh the map layer
+//watch for changes in the metric (index or sustainability)
+watch(
+  () => sportsStore.metric,
+  (metric) => {
+    console.log("metric", metric);
+    if (sportsStore.commune) {
+      loadGeoJSONFile(sportsStore.commune);
+    }
+  }
+);
+
+//watch for store updates with index file and refresh the map layer
 watch(
   () => [sportsStore.travelTime, sportsStore.activity, sportsStore.dayType],
   () => {
@@ -138,7 +143,6 @@ function updateIndexMapLayer() {
   //hover event
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
-      console.log("Mouseover event: ", feature.properties);
       const population = feature.properties.pop_1km_grid || "unknown population";
       //Leaflet popup
       L.popup({ offset: [0, -10] })
@@ -168,7 +172,7 @@ function updateIndexMapLayer() {
 async function loadGeoJSONFile(commune) {
   if (!map.value) return;
 
-  // remove old layers
+  //remove old layers
   if (filteredLayer.value) {
     map.value.removeLayer(filteredLayer.value);
     filteredLayer.value = null;
@@ -181,15 +185,17 @@ async function loadGeoJSONFile(commune) {
     map.value.removeLayer(regionLayer.value);
   }
 
-  //decide which file
-  const geojsonFile = commune === "Lilla Edet"
-    ? "lilla_edet_index.geojson"
-    : "uppsala_index.geojson";
+  //decide which file to load based on the metric
+  let geojsonFile;
+  if (sportsStore.metric === "index") {
+    geojsonFile = `${commune.toLowerCase().replace(/\s+/g, "_")}_index.geojson`;
+  } else if (sportsStore.metric === "sustainability") {
+    geojsonFile = `${commune.toLowerCase().replace(/\s+/g, "_")}.geojson`;
+  }
 
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
     const rawCommune = await resp.json();
-
     communeData.value = rawCommune;
 
     const geoJsonLayer = L.geoJSON(rawCommune);
