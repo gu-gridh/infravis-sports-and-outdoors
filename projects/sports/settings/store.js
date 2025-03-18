@@ -11,7 +11,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const activity = ref('sports');
   const travelTime = ref(15);
   const travelTimes = ref([15, 30, 60]);
-  const dayType = ref('weekday');
+  const dayType = ref('week_day');
 
   //sustainability filters
   const sustainabilityActivity = ref('sports');
