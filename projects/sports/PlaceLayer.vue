@@ -45,7 +45,7 @@ onMounted(async () => {
   await initMap();
 });
 
-//watch for store updates and refresh the map layer
+//watch for index store updates and refresh the map layer
 watch(
   () => [sportsStore.travelTime, sportsStore.activity, sportsStore.dayType],
   () => {

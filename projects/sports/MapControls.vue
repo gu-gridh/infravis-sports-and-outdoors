@@ -75,7 +75,7 @@
         <div class="btn-group">
           <span>Travel Type</span>
           <button
-            v-for="mode in store.travelModes"
+            v-for="mode in store.sustainabilityTravelModes"
             :key="mode"
             @click="setSustainabilityMode(mode)"
             :class="{ active: store.sustainabilityTravelMode === mode }"
@@ -130,12 +130,13 @@
     { label: "Total", value: "total" }
   ];
   
-  //index setters
   const setCommune = (commune) => store.updateCommune(commune);
+  const setMetric = (value) => store.setMetric(value);
+
+  //index setters
   const setDay = (day) => store.updateDayType(day);
   const setActivity = (activity) => store.activity = activity;
   const setTime = (time) => store.updateTravelTime(time);
-  const setMetric = (value) => store.setMetric(value);
   
   //sustainability setters
   const setSustainabilityDay = (day) => store.updateSustainabilityDayType(day);

@@ -9,24 +9,23 @@ export const useSportsStore = defineStore("sportsStore", () => {
 
   //index filters
   const activity = ref('sports');
-  const travelMode = ref('sustainable');
-  const travelModes = ref([
-    "car", 
-    "bicycle", 
-    "walk", 
-    "transit", 
-    "sustainable",
-  ]);
   const travelTime = ref(15);
   const travelTimes = ref([15, 30, 60]);
   const dayType = ref('weekday');
 
   //sustainability filters
   const sustainabilityActivity = ref('sports');
-  const sustainabilityTravelMode = ref('sustainable');
   const sustainabilityTravelTime = ref(15);
   const sustainabilityDayType = ref('weekday');
   const activeGeoJsonFile = ref(null);
+  const sustainabilityTravelMode = ref('sustainable');
+  const sustainabilityTravelModes = ref([
+    "car", 
+    "bicycle", 
+    "walk", 
+    "transit", 
+    "sustainable",
+  ]);
 
   //tracks button selection ("index" or "sustainability")
   const metric = ref('index');
@@ -40,10 +39,6 @@ export const useSportsStore = defineStore("sportsStore", () => {
   };
 
   //index update functions
-  const updateMode = (value) => {
-    travelMode.value = value;
-  };
-
   const updateTravelTime = (value) => {
     travelTime.value = value;
   };
@@ -80,13 +75,10 @@ export const useSportsStore = defineStore("sportsStore", () => {
     allCommunes,
     //index metric state and update functions
     activity,
-    travelMode,
     travelTime,
     travelTimes,
-    travelModes,
     dayType,
     updateDayType,
-    updateMode,
     updateTravelTime,
     //sustainability metric state and update functions
     sustainabilityActivity,
@@ -97,6 +89,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     updateSustainabilityActivity,
     updateSustainabilityTravelTime,
     updateSustainabilityMode,
+    sustainabilityTravelModes,
     //common state & functions
     activeGeoJsonFile,
     metric,
