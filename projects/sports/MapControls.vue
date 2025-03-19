@@ -1,181 +1,210 @@
 <template>
     <div class="map-controls">
-        <!-- commune selection and metric buttons -->
+      <div class="top-section">
         <div class="btn-group">
-            <label>Select commune</label>
-            <select @change="setCommune($event.target.value)">
-                <option value="" selected disabled>Select a commune</option>
-                <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
-                    {{ commune.kommunnamn }}
-                </option>
+          <label>Select commune</label>
+          <select @change="setCommune($event.target.value)">
+            <option value="" selected disabled>Select a commune</option>
+            <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
+              {{ commune.kommunnamn }}
+            </option>
+          </select>
+        </div>
+        <!-- Grid vs Regso -->
+        <div class="btn-group" v-if="store.commune">
+          <button @click="setDisplayUnit('grid')" :class="{ active: store.displayUnit === 'grid' }">
+            Grid
+          </button>
+          <button @click="setDisplayUnit('regso')" :class="{ active: store.displayUnit === 'regso' }">
+            Regso
+          </button>
+        </div>
+      </div>
+  
+      <!-- Sustainability Filters -->
+      <div class="bottom-section" v-if="store.commune">
+        <div class="btn-group">
+          <button @click="setSustainabilityFilterType('index')"
+                  :class="{ active: store.sustainabilityFilterType === 'index' }">
+            Sustainability Index
+          </button>
+          <button @click="setSustainabilityFilterType('travel')"
+                  :class="{ active: store.sustainabilityFilterType === 'travel' }">
+            Travel Time to Activities
+          </button>
+        </div>
+  
+        <template v-if="store.sustainabilityFilterType === 'index'">
+          <div class="btn-group">
+            <label>Activity</label>
+            <select @change="setSustainabilityIndexActivity($event.target.value)"
+                    :value="store.sustainabilityIndexActivity">
+              <option v-for="act in activityTypes" :key="act.value" :value="act.value">
+                {{ act.label }}
+              </option>
             </select>
-            <template v-if="store.commune">
-                <button @click="setMetric('index')" :class="{ active: store.metric === 'index' }">
-                    Index
-                </button>
-                <button @click="setMetric('sustainability')" :class="{ active: store.metric === 'sustainability' }">
-                    Sustainability
-                </button>
-            </template>
-        </div>
-
-        <!-- filters for index -->
-        <template v-if="store.commune && store.metric === 'index'">
-            <div class="btn-group">
-                <span>Day Type</span>
-                <button v-for="day in dayTypes" :key="day.value" @click="setDay(day.value)"
-                    :class="{ active: store.dayType === day.value }">
-                    {{ day.label }}
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <span>Activity Type</span>
-                <button v-for="type in activityTypes" :key="type.value" @click="setActivity(type.value)"
-                    :class="{ active: store.activity === type.value }">
-                    {{ type.label }}
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <span>Travel Time</span>
-                <button v-for="time in store.travelTimes" :key="time" @click="setTime(time)"
-                    :class="{ active: store.travelTime === time }">
-                    {{ time }} min
-                </button>
-            </div>
-        </template>
-
-        <!-- filters for sustainability -->
-        <template v-if="store.commune && store.metric === 'sustainability'">
-            <div class="btn-group">
-                <span>Day Type</span>
-                <button v-for="day in dayTypes" :key="day.value" @click="setSustainabilityDay(day.value)"
-                    :class="{ active: store.sustainabilityDayType === day.value }">
-                    {{ day.label }}
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <span>Travel Type</span>
-                <button v-for="mode in store.sustainabilityTravelModes" :key="mode" @click="setSustainabilityMode(mode)"
-                    :class="{ active: store.sustainabilityTravelMode === mode }">
-                    {{ mode }}
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <span>Activity Type</span>
-                <button v-for="type in activityTypes" :key="type.value" @click="setSustainabilityActivity(type.value)"
-                    :class="{ active: store.sustainabilityActivity === type.value }">
-                    {{ type.label }}
-                </button>
-            </div>
-
-            <div class="btn-group">
-                <span>Travel Time</span>
-                <button v-for="time in store.travelTimes" :key="time" @click="setSustainabilityTime(time)"
-                    :class="{ active: store.sustainabilityTravelTime === time }">
-                    {{ time }} min
-                </button>
-            </div>
-        </template>
-
-        <!-- point layers -->
-        <div class="btn-group">
-            <button @click="store.toggleGeoJsonFile('destinations_outdoors_national.geojson')"
-                :class="{ active: store.activeGeoJsonFile === 'destinations_outdoors_national.geojson' }">
-                Outdoors
+          </div>
+          <div class="btn-group">
+            <label>Minutes</label>
+            <button v-for="min in minutesOptions" :key="min"
+                    @click="setSustainabilityIndexMinutes(min)"
+                    :class="{ active: store.sustainabilityIndexMinutes === min }">
+              {{ min }}
             </button>
-            <button @click="store.toggleGeoJsonFile('destinations_per_city.geojson')"
-                :class="{ active: store.activeGeoJsonFile === 'destinations_per_city.geojson' }">
-                Destinations
+          </div>
+          <div class="btn-group">
+            <span>Day</span>
+            <button v-for="day in dayTypes" :key="day.value"
+                    @click="setSustainabilityIndexDay(day.value)"
+                    :class="{ active: store.sustainabilityIndexDay === day.value }">
+              {{ day.label }}
             </button>
-        </div>
-
-        <!-- Info -->
-        <p>
-            Amount of accessible sports facilities in {{ store.commune }} within {{ store.travelTime }} minutes by {{
-                store.travelMode }}
-        </p>
+          </div>
+        </template>
+  
+        <!-- Travel Time filters -->
+        <template v-if="store.sustainabilityFilterType === 'travel'">
+          <div class="btn-group">
+            <label>Activity</label>
+            <select @change="setTravelTimeActivity($event.target.value)"
+                    :value="store.travelTimeActivity">
+              <option v-for="act in activityTypes" :key="act.value" :value="act.value">
+                {{ act.label }}
+              </option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <label>Mode</label>
+            <select @change="setTravelTimeTransportMode($event.target.value)"
+                    :value="store.travelTimeTransportMode">
+              <option v-for="mode in travelModes" :key="mode" :value="mode">
+                {{ mode }}
+              </option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <label>Minutes</label>
+            <button v-for="min in minutesOptions" :key="min"
+                    @click="setTravelTimeMinutes(min)"
+                    :class="{ active: store.travelTimeMinutes === min }">
+              {{ min }}
+            </button>
+          </div>
+          <div class="btn-group">
+            <span>Day</span>
+            <button v-for="day in dayTypes" :key="day.value"
+                    @click="setTravelTimeDay(day.value)"
+                    :class="{ active: store.travelTimeDay === day.value }">
+              {{ day.label }}
+            </button>
+          </div>
+          <div class="btn-group">
+            <label>Population Weight by Grid</label>
+            <button @click="toggleTravelTimePopulationWeight"
+                    :class="{ active: store.travelTimePopulationWeight }">
+              {{ store.travelTimePopulationWeight ? 'On' : 'Off' }}
+            </button>
+          </div>
+          <div class="btn-group">
+            <label>% Population with Access to City</label>
+            <button @click="toggleTravelTimePercentageAccess"
+                    :class="{ active: store.travelTimePercentageAccess }">
+              {{ store.travelTimePercentageAccess ? 'On' : 'Off' }}
+            </button>
+          </div>
+        </template>
+      </div>
     </div>
-</template>
-
-<script setup>
-import { ref } from "vue";
-import { useSportsStore } from "./settings/store";
-
-const store = useSportsStore();
-
-//options shared by both metrics
-const dayTypes = [
+  </template>
+  
+  <script setup>
+  import { useSportsStore } from "./settings/store";
+  
+  const store = useSportsStore();
+  
+  const dayTypes = [
     { label: "Weekday", value: "week_day" },
     { label: "Saturday", value: "saturday" },
     { label: "Sunday", value: "sunday" }
-];
-
-const activityTypes = [
+  ];
+  
+  const activityTypes = [
     { label: "Sports", value: "sports" },
     { label: "Outdoors", value: "outdoors" },
     { label: "Total", value: "total" }
-];
-
-const setCommune = (commune) => store.updateCommune(commune);
-const setMetric = (value) => store.setMetric(value);
-
-//index setters
-const setDay = (day) => store.updateDayType(day);
-const setActivity = (activity) => store.activity = activity;
-const setTime = (time) => store.updateTravelTime(time);
-
-//sustainability setters
-const setSustainabilityDay = (day) => store.updateSustainabilityDayType(day);
-const setSustainabilityActivity = (activity) => store.updateSustainabilityActivity(activity);
-const setSustainabilityTime = (time) => store.updateSustainabilityTravelTime(time);
-const setSustainabilityMode = (mode) => store.updateSustainabilityMode(mode);
-</script>
-
-<style scoped>
-.map-controls {
+  ];
+  
+  const minutesOptions = [15, 30, 60];
+  const travelModes = ["car", "bicycle", "walk", "transit", "sustainable"];
+  
+  //commune and (grid/regso)
+  const setCommune = (value) => store.updateCommune(value);
+  const setDisplayUnit = (value) => (store.displayUnit = value);
+  
+  //index or travel
+  const setSustainabilityFilterType = (value) => (store.sustainabilityFilterType = value);
+  
+  //sustainability filters
+  const setSustainabilityIndexActivity = (value) => (store.sustainabilityIndexActivity = value);
+  const setSustainabilityIndexMinutes = (value) => (store.sustainabilityIndexMinutes = value);
+  const setSustainabilityIndexDay = (value) => (store.sustainabilityIndexDay = value);
+  
+  //travel time filters
+  const setTravelTimeActivity = (value) => (store.travelTimeActivity = value);
+  const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = value);
+  const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
+  const setTravelTimeDay = (value) => (store.travelTimeDay = value);
+  const toggleTravelTimePopulationWeight = () => (store.travelTimePopulationWeight = !store.travelTimePopulationWeight);
+  const toggleTravelTimePercentageAccess = () => (store.travelTimePercentageAccess = !store.travelTimePercentageAccess);
+  </script>
+  
+  <style scoped>
+  .map-controls {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 1000;
+    min-width: 300px;
+  }
+  
+  .top-section,
+  .bottom-section {
     background-color: white;
     padding: 10px;
+    margin-bottom: 10px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    min-width: 300px;
-}
-
-.btn-group {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .btn-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     padding-bottom: 10px;
-}
-
-button {
+  }
+  
+  button {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f0f0f0;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
-}
-
-button.active {
+  }
+  
+  button.active {
     background-color: #007bff;
     color: white;
     border-color: #0056b3;
-}
-
-select {
+  }
+  
+  select {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f0f0f0;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
-}
-</style>
+  }
+  </style>
+  

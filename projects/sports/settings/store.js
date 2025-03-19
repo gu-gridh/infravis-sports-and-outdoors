@@ -1,100 +1,48 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-//store for filtering map
 export const useSportsStore = defineStore("sportsStore", () => {
-  const sweden = ref(true);
+  //commune data
   const commune = ref('');
-  const allCommunes = ref();
+  const allCommunes = ref([]);
 
-  //index filters
-  const activity = ref('sports');
-  const travelTime = ref(15);
-  const travelTimes = ref([15, 30, 60]);
-  const dayType = ref('week_day');
+  //(grid vs regso)
+  const displayUnit = ref('grid');
 
-  //sustainability filters
-  const sustainabilityActivity = ref('sports');
-  const sustainabilityTravelTime = ref(15);
-  const sustainabilityDayType = ref('weekday');
-  const activeGeoJsonFile = ref(null);
-  const sustainabilityTravelMode = ref('sustainable');
-  const sustainabilityTravelModes = ref([
-    "car", 
-    "bicycle", 
-    "walk", 
-    "transit", 
-    "sustainable",
-  ]);
+  //("index" or "travel")
+  const sustainabilityFilterType = ref('index');
 
-  //tracks button selection ("index" or "sustainability")
-  const metric = ref('index');
+  //sustainability Index filters
+  const sustainabilityIndexActivity = ref('sports');
+  const sustainabilityIndexMinutes = ref(15);
+  const sustainabilityIndexDay = ref('week_day');
 
-  const toggleGeoJsonFile = (filename) => {
-    activeGeoJsonFile.value = (activeGeoJsonFile.value === filename) ? null : filename;
-  };
+  //travel time filters
+  const travelTimeActivity = ref('sports');
+  const travelTimeTransportMode = ref('sustainable');
+  const travelTimeMinutes = ref(15);
+  const travelTimeDay = ref('week_day');
+  const travelTimePopulationWeight = ref(false);
+  const travelTimePercentageAccess = ref(false);
 
   const updateCommune = (value) => {
     commune.value = value;
   };
 
-  //index update functions
-  const updateTravelTime = (value) => {
-    travelTime.value = value;
-  };
-
-  const updateDayType = (value) => {
-    dayType.value = value;
-  };
-
-  //sustainability update functions
-  const updateSustainabilityDayType = (value) => {
-    sustainabilityDayType.value = value;
-  };
-
-  const updateSustainabilityActivity = (value) => {
-    sustainabilityActivity.value = value;
-  };
-
-  const updateSustainabilityTravelTime = (value) => {
-    sustainabilityTravelTime.value = value;
-  };
-
-  const updateSustainabilityMode = (value) => {
-    sustainabilityTravelMode.value = value;
-  };
-
-  //setter for metric
-  const setMetric = (value) => {
-    metric.value = value;
-  };
-
   return {
-    sweden,
     commune,
     allCommunes,
-    //index metric state and update functions
-    activity,
-    travelTime,
-    travelTimes,
-    dayType,
-    updateDayType,
-    updateTravelTime,
-    //sustainability metric state and update functions
-    sustainabilityActivity,
-    sustainabilityTravelMode,
-    sustainabilityTravelTime,
-    sustainabilityDayType,
-    updateSustainabilityDayType,
-    updateSustainabilityActivity,
-    updateSustainabilityTravelTime,
-    updateSustainabilityMode,
-    sustainabilityTravelModes,
-    //common state & functions
-    activeGeoJsonFile,
-    metric,
-    toggleGeoJsonFile,
+    displayUnit,
+    sustainabilityFilterType,
+    sustainabilityIndexActivity,
+    sustainabilityIndexMinutes,
+    sustainabilityIndexDay,
+    travelTimeActivity,
+    travelTimeTransportMode,
+    travelTimeMinutes,
+    travelTimeDay,
+    travelTimePopulationWeight,
+    travelTimePercentageAccess,
     updateCommune,
-    setMetric,
   };
 });
