@@ -183,10 +183,10 @@ async function loadGeoJSONFile(commune) {
   // For travel: t1_ttm_dd_15_30_60_by_<displayUnit>.geojson
   const prefix = sportsStore.sustainabilityFilterType === "index"
     ? "t2_index_15_30_60"
-    : "t1_ttm_dd_15_30_60";
+    : "t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
-  console.log(`${prefix}_by_${unit}.geojson`);
+  console.log('Loading file...' + `${prefix}_by_${unit}.geojson`);
 
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
