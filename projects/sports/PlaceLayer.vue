@@ -43,7 +43,7 @@ onMounted(async () => {
 
 //load commune geojson
 watch(
-  [() => sportsStore.commune, () => sportsStore.displayUnit],
+  [() => sportsStore.commune, () => sportsStore.displayUnit, () => sportsStore.sustainabilityFilterType],
   ([newCommune, newDisplayUnit]) => {
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
     loadGeoJSONFile(newCommune); 
@@ -186,7 +186,7 @@ async function loadGeoJSONFile(commune) {
     : "t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
-  console.log('Loading file...' + `${prefix}_by_${unit}.geojson`);
+  console.log('Loading file... ' + `${prefix}_by_${unit}.geojson`);
 
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
