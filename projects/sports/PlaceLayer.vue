@@ -50,6 +50,22 @@ watch(
   }
 );
 
+//watch for changes in the sustainability index and travel time filters
+watch( 
+  [
+    () => sportsStore.sustainabilityIndexActivity,
+    () => sportsStore.sustainabilityIndexMinutes,
+    () => sportsStore.sustainabilityIndexDay,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.travelTimeTransportMode,
+    () => sportsStore.travelTimeMinutes,
+    () => sportsStore.travelTimeDay,
+  ],
+  () => {
+    updateIndexMapLayer();
+  }
+);
+
 //whenever a points file is selected
 // watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
 //   if (newFile) {
@@ -97,77 +113,73 @@ async function initMap() {
   }
 }
 
-// function updateIndexMapLayer() {
-//   if (!map.value || !communeData.value) return;
+function updateIndexMapLayer() {
+  if (!map.value || !communeData.value) return;
 
-//   //remove the old filtered layer if it exists
-//   if (filteredLayer.value) {
-//     map.value.removeLayer(filteredLayer.value);
-//     filteredLayer.value = null;
-//   }
+  //remove old layer
+  if (filteredLayer.value) {
+    map.value.removeLayer(filteredLayer.value);
+  }
 
-//different styles for different mode
-//   const filteredGeoJSON = {
-//     type: "FeatureCollection",
-//     features: communeData.value.features,
-//   };
+  const features = communeData.value.features.filter((f) => {
+    if (sportsStore.sustainabilityFilterType === "index") { //sustainability index
+      return true;
+    } else { //travel time to activity
+      const modeOk = f.properties.mode === sportsStore.travelTimeTransportMode;
+      const dayOk = f.properties.day_type === sportsStore.travelTimeDay;
+      return modeOk && dayOk;
+    }
+  });
 
-//   function style(feature) {
-// if(sportsStore.metric === 'index') {
+  const newFC = { type: "FeatureCollection", features };
 
-//     const propertyName = `index_dd_${sportsStore.travelTime}_min_${sportsStore.activity}_${sportsStore.dayType}`;
-//     const indexValue = feature.properties[propertyName];
+  function styleFeature(feature) {
+    if (sportsStore.sustainabilityFilterType === "index") { //sustainability index
+      console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
+      const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+      const val = feature.properties[propName];
+      return {
+        color: setIndexColor(val),
+        fillColor: setIndexColor(val),
+        fillOpacity: 0.6,
+        weight: 1,
+        dashArray: "2,2",
+      };
+    } else { //travel time to activity
+      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeMinutes}`;
+      console.log('propName:', propName);
+      const val = feature.properties[propName];
+      return {
+        color: setAccColor(val),
+        fillColor: setAccColor(val),
+        fillOpacity: 0.6,
+        weight: 1,
+        dashArray: "2,2",
+      };
+    }
+  }
 
-//     return {
-//       color: setIndexColor(indexValue),
-//       fillColor: setIndexColor(indexValue),
-//       fillOpacity: 0.7,
-//       weight: 1,
-//       dashArray: "2, 2",
-//     };
-//   }
-// else if(sportsStore.metric === 'sustainability') {
-//     const propertyName = `15_total`;
-//     const accValue = feature.properties[propertyName];
+  //hover features...
+  function onEachFeature(feature, layer) {
+    layer.on("mouseover", (e) => {
+      const population = feature.properties.pop_1km_grid ?? "unknown";
+      L.popup({ offset: [0, -10] })
+        .setLatLng(e.latlng)
+        .setContent(`<b>Population: ${population}</b>`)
+        .openOn(map.value);
+    });
+    layer.on("mouseout", () => {
+      map.value.closePopup();
+    });
+  }
 
-//     return {
-//       color: setAccColor(accValue),
-//       fillColor: setAccColor(accValue),
-//       fillOpacity: 0.6,
-//       weight: 1,
-//       dashArray: "2, 2",
-//     };
-//   }
-// }
+  filteredLayer.value = L.geoJSON(newFC, {
+    style: styleFeature,
+    onEachFeature,
+  });
 
-//   //hover event
-//   function onEachFeature(feature, layer) {
-//     layer.on("mouseover", (e) => {
-//       const population = feature.properties.pop_1km_grid || "unknown population";
-//       //Leaflet popup
-//       L.popup({ offset: [0, -10] })
-//         .setLatLng(e.latlng)
-//         .setContent(`<b>${population}</b>`)
-//         .openOn(map.value);
-//     });
-
-//     layer.on("mouseout", () => {
-//       map.value.closePopup();
-//     });
-//   }
-
-//   const newGeoJsonLayer = L.geoJSON(filteredGeoJSON, {
-//     style,
-//     onEachFeature,
-//   });
-
-//   newGeoJsonLayer.addTo(map.value);
-
-//   filteredLayer.value = newGeoJsonLayer;
-
-//   //add legend
-// createLegend(map.value);
-// }
+  filteredLayer.value.addTo(map.value);  
+}
 
 async function loadGeoJSONFile(commune) {
   if (!map.value) return;
@@ -258,39 +270,39 @@ async function loadGeoJSONFile(commune) {
 //   }
 // }
 
-// function setIndexColor(time) { //for the index layer
-//   if (time === null || time === 0) return "#cccccc"; //missing data
+function setIndexColor(time) { //for the index layer
+  if (time === null || time === 0) return "#cccccc"; //missing data
 
-//   if (time >= 0 && time <= 10) return "#d71f27"; 
-//   if (time >= 11 && time <= 20) return "#e95a38"; 
-//   if (time >= 21 && time <= 30) return "#f69c5a"; 
-//   if (time >= 31 && time <= 40) return "#fdc980"; 
-//   if (time >= 41 && time <= 50) return "#fdefac"; 
-//   if (time >= 51 && time <= 60) return "#e8eeac"; 
-//   if (time >= 61 && time <= 70) return "#c4dd87"; 
-//   if (time >= 71 && time <= 80) return "#99cc64";
-//   if (time >= 81 && time <= 90) return "#55b453"; 
-//   if (time >= 91 && time <= 100) return "#179847";
+  if (time >= 0 && time <= 10) return "#d71f27"; 
+  if (time >= 11 && time <= 20) return "#e95a38"; 
+  if (time >= 21 && time <= 30) return "#f69c5a"; 
+  if (time >= 31 && time <= 40) return "#fdc980"; 
+  if (time >= 41 && time <= 50) return "#fdefac"; 
+  if (time >= 51 && time <= 60) return "#e8eeac"; 
+  if (time >= 61 && time <= 70) return "#c4dd87"; 
+  if (time >= 71 && time <= 80) return "#99cc64";
+  if (time >= 81 && time <= 90) return "#55b453"; 
+  if (time >= 91 && time <= 100) return "#179847";
 
-//   return "#cccccc"; //default
-// }
+  return "#cccccc"; //default
+}
 
-// function setAccColor (time) { //for the accessibility layer
-//   if (time === null || time === 0) return "#cccccc"; //missing data
+function setAccColor (time) { //for the accessibility layer
+  if (time === null || time === 0) return "#cccccc"; //missing data
 
-//   if (time >= 0 && time <= 5) return "#dfbec43"; 
-//   if (time >= 6 && time <= 10) return "#cdbc68"; 
-//   if (time >= 11 && time <= 15) return "#979077"; 
-//   if (time >= 16 && time <= 20) return "#666970"; 
-//   if (time >= 21 && time <= 25) return "#32446b"; 
-//   if (time >= 26 && time <= 30) return "#13234b"; 
-//   if (time >= 31 && time <= 35) return "#000000";
+  if (time >= 0 && time <= 5) return "#dfbec43"; 
+  if (time >= 6 && time <= 10) return "#cdbc68"; 
+  if (time >= 11 && time <= 15) return "#979077"; 
+  if (time >= 16 && time <= 20) return "#666970"; 
+  if (time >= 21 && time <= 25) return "#32446b"; 
+  if (time >= 26 && time <= 30) return "#13234b"; 
+  if (time >= 31 && time <= 35) return "#000000";
 
 
-//   return "#cccccc"; //default
-// }
+  return "#cccccc"; //default
+}
 
-//adds legend based on what layer is active
+// adds legend based on what layer is active
 // function createLegend(map) {
 // Check if map exists
 //     if (!map) {
@@ -342,9 +354,6 @@ async function loadGeoJSONFile(commune) {
 
 //     legend.addTo(map);
 // }
-
-// Add this after initializing your Leaflet map
-// createIndexLegend(map.value);
 </script>
 
 <style>

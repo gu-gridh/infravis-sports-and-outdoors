@@ -39,7 +39,7 @@
             <label>Activity</label>
             <select @change="setSustainabilityIndexActivity($event.target.value)"
                     :value="store.sustainabilityIndexActivity">
-              <option v-for="act in activityTypes" :key="act.value" :value="act.value">
+              <option v-for="act in sustainabilityIndexOptions" :key="act.value" :value="act.value">
                 {{ act.label }}
               </option>
             </select>
@@ -127,11 +127,32 @@
     { label: "Saturday", value: "saturday" },
     { label: "Sunday", value: "sunday" }
   ];
+
+  const sustainabilityIndexOptions = [
+  { label: "Total",    value: "total" },
+  { label: "Sports",   value: "sports" },
+  { label: "Outdoors", value: "outdoors" }
+];
   
   const activityTypes = [
-    { label: "Sports", value: "sports" },
-    { label: "Outdoors", value: "outdoors" },
-    { label: "Total", value: "total" }
+    { label: "Disc golf",         value: "Disc golf" },
+    { label: "Dog park",          value: "Dog park" },
+    { label: "Football",          value: "Football" },
+    { label: "Golf",              value: "Golf" },
+    { label: "Gym / fitness centre", value: "Gym / fitness centre" },
+    { label: "Horse riding",      value: "Horse riding" },
+    { label: "Ice hockey",        value: "Ice hockey" },
+    { label: "Other ballsports",  value: "Other ballsports" },
+    { label: "Outdoor swimming",  value: "Outdoor swimming" },
+    { label: "Outdoors",          value: "Outdoors" },
+    { label: "Picnic",            value: "Picnic" },
+    { label: "Playground",        value: "Playground" },
+    { label: "Racket sports",     value: "Racket sports" },
+    { label: "Walking / running", value: "Walking / running" },
+    { label: "Athletics",         value: "Athletics" },
+    { label: "Gymnastics",        value: "Gymnastics" },
+    { label: "Outdoor gym",       value: "Outdoor gym" },
+    { label: "Swimming pool",     value: "Swimming pool" }
   ];
   
   const minutesOptions = [15, 30, 60];

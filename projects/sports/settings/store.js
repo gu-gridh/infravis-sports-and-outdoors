@@ -13,12 +13,12 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const sustainabilityFilterType = ref('index');
 
   //sustainability Index filters
-  const sustainabilityIndexActivity = ref('sports');
+  const sustainabilityIndexActivity = ref('total');
   const sustainabilityIndexMinutes = ref(15);
   const sustainabilityIndexDay = ref('week_day');
 
   //travel time filters
-  const travelTimeActivity = ref('sports');
+  const travelTimeActivity = ref('Disc golf');
   const travelTimeTransportMode = ref('sustainable');
   const travelTimeMinutes = ref(15);
   const travelTimeDay = ref('week_day');
