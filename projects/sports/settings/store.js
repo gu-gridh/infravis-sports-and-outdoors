@@ -1,60 +1,48 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 
-// store for filtering map
 export const useSportsStore = defineStore("sportsStore", () => {
-    const commune = ref('Uppsala');
-    const activity = ref('');
-    const travelMode = ref('sustainable');
-    const travelModes = ref([
-        "car", 
-        "bicycle", 
-        "walk", 
-        "transit", 
-        "sustainable",
-      ])
-    const travelTime = ref(15);
-    const travelTimes = ref([
-        15,
-        30,
-        60,
-    ])
-    const dayType = ref('all');
-    const activeGeoJsonFile = ref(null);
+  //commune data
+  const commune = ref('');
+  const allCommunes = ref([]);
 
-    const toggleGeoJsonFile = (filename) => {
-        activeGeoJsonFile.value = (activeGeoJsonFile.value === filename) ? null : filename;
-    };
+  //(grid vs regso)
+  const displayUnit = ref('grid');
 
-    const updateCommune = (value) => {
-        commune.value = value;
-    }
+  //("index" or "travel")
+  const sustainabilityFilterType = ref('index');
 
-    const updateMode = (value) => {
-        travelMode.value = value;
-    }
+  //sustainability Index filters
+  const sustainabilityIndexActivity = ref('total');
+  const sustainabilityIndexMinutes = ref(15);
+  const sustainabilityIndexDay = ref('week_day');
 
-    const updateTravelTime = (value) => {
-        travelTime.value = value;
-    }
+  //travel time filters
+  const travelTimeActivity = ref('Disc golf');
+  const travelTimeTransportMode = ref('sustainable');
+  const travelTimeMinutes = ref(15);
+  const travelTimeDay = ref('week_day');
+  const travelTimePopulationWeight = ref(false);
+  const travelTimePercentageAccess = ref(false);
 
-    const updateDayType = (value) => {
-        dayType.value = value;
-    }
-    
-    return {
-        commune, 
-        activity, 
-        travelMode, 
-        travelTime, 
-        travelTimes,
-        travelModes,
-        dayType,
-        activeGeoJsonFile,
-        updateDayType, 
-        updateCommune,
-        updateMode,
-        updateTravelTime,
-        toggleGeoJsonFile,
-    }
-})
+  const updateCommune = (value) => {
+    commune.value = value;
+  };
+
+  return {
+    commune,
+    allCommunes,
+    displayUnit,
+    sustainabilityFilterType,
+    sustainabilityIndexActivity,
+    sustainabilityIndexMinutes,
+    sustainabilityIndexDay,
+    travelTimeActivity,
+    travelTimeTransportMode,
+    travelTimeMinutes,
+    travelTimeDay,
+    travelTimePopulationWeight,
+    travelTimePercentageAccess,
+    updateCommune,
+  };
+});

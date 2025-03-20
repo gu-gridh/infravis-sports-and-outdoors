@@ -14,7 +14,7 @@ const store = mapStore();
     <template #background>
       <div class="map-container">
         <MapControls />
-        <PlaceLayer :params="tagParams">
+        <PlaceLayer>
         </PlaceLayer>
 
       </div>
