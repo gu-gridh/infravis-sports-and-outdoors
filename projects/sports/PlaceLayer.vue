@@ -135,7 +135,7 @@ function updateIndexMapLayer() {
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") { //sustainability index
-      console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
+      //console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
       const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
       const val = feature.properties[propName];
       return {
@@ -147,7 +147,7 @@ function updateIndexMapLayer() {
       };
     } else { //travel time to activity
       const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeMinutes}`;
-      console.log('propName:', propName);
+      //console.log('propName:', propName);
       const val = feature.properties[propName];
       return {
         color: setAccColor(val),
@@ -218,6 +218,8 @@ async function loadGeoJSONFile(commune) {
     //move map to fit the new layer
     map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] });
 
+    createLegend(map.value);
+    
   } catch (error) {
     console.error(`Failed to load ${geojsonFile}:`, error);
   }
@@ -303,57 +305,56 @@ function setAccColor (time) { //for the accessibility layer
 }
 
 // adds legend based on what layer is active
-// function createLegend(map) {
+ function createLegend(map) {
 // Check if map exists
-//     if (!map) {
-//         console.error("Leaflet map is not initialized!");
-//         return;
-//     }
+     if (!map) {
+         return;
+     }
 
-//     var legend = L.control({ position: "bottomright" });
+     var legend = L.control({ position: "bottomright" });
 
-//     legend.onAdd = function () {
-//         var div = L.DomUtil.create("div", "legend");
-// if (sportsStore.metric === "index") {
-//   div.innerHTML += "<p>Index: % activities by sustainable modes</p>";
-//         var indexRanges = [
-//             { min: 0, max: 10, color: "#d71f27" },
-//             { min: 11, max: 20, color: "#e95a38" },
-//             { min: 21, max: 30, color: "#f69c5a" },
-//             { min: 31, max: 40, color: "#fdc980" },
-//             { min: 41, max: 50, color: "#fdefac" },
-//             { min: 51, max: 60, color: "#e8eeac" },
-//             { min: 61, max: 70, color: "#c4dd87" },
-//             { min: 71, max: 80, color: "#99cc64" },
-//             { min: 81, max: 90, color: "#55b453" },
-//             { min: 91, max: 100, color: "#179847" }
-//         ];
+     legend.onAdd = function () {
+         var div = L.DomUtil.create("div", "legend");
+ if (sportsStore.sustainabilityFilterType === "index") {
+   div.innerHTML += "<p>Index: % activities by sustainable modes</p>";
+         var indexRanges = [
+             { min: 0, max: 10, color: "#d71f27" },
+             { min: 11, max: 20, color: "#e95a38" },
+             { min: 21, max: 30, color: "#f69c5a" },
+             { min: 31, max: 40, color: "#fdc980" },
+             { min: 41, max: 50, color: "#fdefac" },
+             { min: 51, max: 60, color: "#e8eeac" },
+             { min: 61, max: 70, color: "#c4dd87" },
+             { min: 71, max: 80, color: "#99cc64" },
+             { min: 81, max: 90, color: "#55b453" },
+             { min: 91, max: 100, color: "#179847" }
+         ];
 
-//         indexRanges.forEach(function (range) {
-//             div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-//         });
-// } else if (sportsStore.metric === "sustainability") {         
-//           div.innerHTML += "<p>Travel time (min)</p>"; 
-//           var accRanges = [
-//               { min: 0, max: 5, color: "#dfbec43" },
-//               { min: 6, max: 10, color: "#cdbc68" },
-//               { min: 11, max: 15, color: "#979077" },
-//               { min: 16, max: 20, color: "#666970" },
-//               { min: 21, max: 25, color: "#32446b" },
-//               { min: 26, max: 30, color: "#13234b" },
-//               { min: 31, max: 35, color: "#000000" }
-//           ];
+         indexRanges.forEach(function (range) {
+             div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+         });
+ } else if (sportsStore.sustainabilityFilterType === "travel") {         
+           div.innerHTML += "<p>Travel time (min)</p>"; 
+           var accRanges = [
+               { min: 0, max: 5, color: "#dfbec43" },
+               { min: 6, max: 10, color: "#cdbc68" },
+               { min: 11, max: 15, color: "#979077" },
+              { min: 16, max: 20, color: "#666970" },
+               { min: 21, max: 25, color: "#32446b" },
+               { min: 26, max: 30, color: "#13234b" },
+               { min: 31, max: 35, color: "#000000" }
+           ];
 
-// accRanges.forEach(function (range) {
-//               div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-//           });
-//         }
+ accRanges.forEach(function (range) {
+               div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+           });
+         }
 
-//         return div;
-//     };
+         return div;
+     };
 
-//     legend.addTo(map);
-// }
+     legend.addTo(map);
+ }
 </script>
 
 <style>
