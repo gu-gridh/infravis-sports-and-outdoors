@@ -163,13 +163,18 @@ function updateIndexMapLayer() {
     }
   }
 
+  function noDecimals(num) {
+    return num.toFixed(0);
+  }
+
   //hover features...
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
       const population = feature.properties.pop_1km_grid ?? "unknown";
+      const sustIndex = noDecimals(feature.properties.index_dd_15_min_total_week_day) ?? "unknown"; //dynamilcally change this based on the selected index
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
-        .setContent(`<b>Population: ${population}</b>`)
+        .setContent(`<b>Population: ${population}</b><br><b>Sust. Index: ${sustIndex}</b>`)
         .openOn(map.value);
     });
     layer.on("mouseout", () => {
@@ -193,6 +198,9 @@ async function loadGeoJSONFile(commune) {
     map.value.removeLayer(filteredLayer.value);
     filteredLayer.value = null;
   }
+
+  
+
 
   //compute filename based on store values:
   // For index: t2_index_15_30_60_by_<displayUnit>.geojson

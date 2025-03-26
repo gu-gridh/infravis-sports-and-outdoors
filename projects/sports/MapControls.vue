@@ -14,7 +14,7 @@
           </select>
           <button class="clearbtn" @click="store.commune = ''">Clear</button>
           </p>
-          <p>
+
             <div class="btn-group2" >
               Display unit
           <button @click="setDisplayUnit('grid')" :class="{ active: store.displayUnit === 'grid' }">
@@ -24,7 +24,7 @@
             Regso
           </button>
         </div>
-      </p>
+
       </div>
           
           
