@@ -1,17 +1,22 @@
 <template>
     <div class="map-controls">
-      <div class="top-section">
-        <div class="btn-group">
-          <label>Select commune</label>
-          <select @change="setCommune($event.target.value)">
-            <option value="" selected disabled>Select a commune</option>
+      <div class="section">
+        <h2>MISTRA dashboard</h2>
+      </div>
+      <div class="section">
+          <h2>Municipality</h2>
+          <p>
+            <select @change="setCommune($event.target.value)" v-model="store.commune">
+            
             <option v-for="commune in store.allCommunes" :key="commune.id" :value="commune.kommunnamn">
               {{ commune.kommunnamn }}
             </option>
           </select>
-        </div>
-        <!-- Grid vs Regso -->
-        <div class="btn-group" v-if="store.commune">
+          <button class="clearbtn" @click="store.commune = ''">Clear</button>
+          </p>
+          <p>
+            <div class="btn-group2" >
+              Display unit
           <button @click="setDisplayUnit('grid')" :class="{ active: store.displayUnit === 'grid' }">
             Grid
           </button>
@@ -19,10 +24,17 @@
             Regso
           </button>
         </div>
+      </p>
       </div>
+          
+          
+        <!-- Grid vs Regso -->
+        
   
       <!-- Sustainability Filters -->
-      <div class="bottom-section" v-if="store.commune">
+      <div class="section" >
+        <h2>Indicator</h2>
+        <p>Choose one</p>
         <div class="btn-group">
           <button @click="setSustainabilityFilterType('index')"
                   :class="{ active: store.sustainabilityFilterType === 'index' }">
@@ -188,13 +200,21 @@
     min-width: 300px;
   }
   
-  .top-section,
-  .bottom-section {
-    background-color: white;
+ .section {
+    background-color: rgb(255, 255, 255, 0.7);
     padding: 10px;
     margin-bottom: 10px;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    padding-top: 15px;
+  }
+
+  .clearbtn {
+    margin-left: 10px;
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
   }
   
   .btn-group {
@@ -204,8 +224,18 @@
     padding-bottom: 10px;
   }
   
-  button {
+  .btn-group button {
     padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .btn-group2 button {
+    width: 50px;
+    margin: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f0f0f0;

@@ -108,6 +108,10 @@ async function initMap() {
       getFeatureId: (feature) => feature.id,
     }).addTo(map.value);
 
+    //add north arror and scale
+    L.control.scale({ imperial: false }).addTo(map.value);
+
+
   } catch (error) {
     console.error("Error loading kommun_regso.geojson:", error);
   }
@@ -417,5 +421,9 @@ function setAccColor (time) { //for the accessibility layer
   display: inline-block;
   margin-right: 5px;
   border: 1px solid #999;
+}
+
+.leaflet-left {
+  width: 400px;
 }
 </style>
