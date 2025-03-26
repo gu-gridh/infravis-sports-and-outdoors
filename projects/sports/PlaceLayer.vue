@@ -164,7 +164,9 @@ function updateIndexMapLayer() {
   }
 
   function noDecimals(num) {
-    return num.toFixed(0);
+    //if the number is an integer, return it as is
+    if (num % 1 === 0) return num;
+    return num.toFixed(2);
   }
 
   //hover features...
@@ -215,6 +217,7 @@ async function loadGeoJSONFile(commune) {
   try {
     const resp = await fetch(`./geojson/${geojsonFile}`);
     const rawCommune = await resp.json();
+
     //only include those for the selected commune
     const filteredFeatures = rawCommune.features.filter(
       (feature) => feature.properties.city_name === commune
