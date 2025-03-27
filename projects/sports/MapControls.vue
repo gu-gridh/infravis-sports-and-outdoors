@@ -137,7 +137,7 @@
   const dayTypes = [
     { label: "Weekday", value: "week_day" },
     { label: "Saturday", value: "saturday" },
-    { label: "Sunday", value: "sunday" }
+    { label: "Sunday", value: "sunday" },
   ];
 
   const sustainabilityIndexOptions = [

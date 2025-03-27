@@ -128,55 +128,45 @@ function updateIndexMapLayer() {
   const features = communeData.value.features.filter((f) => {
     if (sportsStore.sustainabilityFilterType === "index") { //sustainability index
       return true;
-    } else { //travel time to activity
-      const modeOk = f.properties.mode === sportsStore.travelTimeTransportMode;
-      const dayOk = f.properties.day_type === sportsStore.travelTimeDay;
-      return modeOk && dayOk;
+    } else { // travel time to activity
+      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      return f.properties[propName] !== undefined;
     }
   });
 
   const newFC = { type: "FeatureCollection", features };
 
   function styleFeature(feature) {
-    if (sportsStore.sustainabilityFilterType === "index") { //sustainability index
-      //console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
-      const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
-      const val = feature.properties[propName];
-      return {
-        color: setIndexColor(val),
-        fillColor: setIndexColor(val),
-        fillOpacity: 0.6,
-        weight: 1,
-        dashArray: "2,2",
-      };
-    } else { //travel time to activity
-      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeMinutes}`;
-      //console.log('propName:', propName);
-      const val = feature.properties[propName];
-      return {
-        color: setAccColor(val),
-        fillColor: setAccColor(val),
-        fillOpacity: 0.6,
-        weight: 1,
-        dashArray: "2,2",
-      };
-    }
+  if (sportsStore.sustainabilityFilterType === "index") {
+    const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+    const val = feature.properties[propName];
+    return {
+      color: setIndexColor(val),
+      fillColor: setIndexColor(val),
+      fillOpacity: 0.6,
+      weight: 1,
+      dashArray: "2,2",
+    };
+  } else { // travel time to activity
+    const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+    const val = feature.properties[propName];
+    return {
+      color: setAccColor(val),
+      fillColor: setAccColor(val),
+      fillOpacity: 0.6,
+      weight: 1,
+      dashArray: "2,2",
+    };
   }
-
-  function noDecimals(num) {
-    //if the number is an integer, return it as is
-    if (num % 1 === 0) return num;
-    return num.toFixed(2);
-  }
+}
 
   //hover features...
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
       const population = feature.properties.pop_1km_grid ?? "unknown";
-      const sustIndex = noDecimals(feature.properties.index_dd_15_min_total_week_day) ?? "unknown"; //dynamilcally change this based on the selected index
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
-        .setContent(`<b>Population: ${population}</b><br><b>Sust. Index: ${sustIndex}</b>`)
+        .setContent(`<b>Population: ${population}</b>`)
         .openOn(map.value);
     });
     layer.on("mouseout", () => {
@@ -201,15 +191,12 @@ async function loadGeoJSONFile(commune) {
     filteredLayer.value = null;
   }
 
-  
-
-
   //compute filename based on store values:
   // For index: t2_index_15_30_60_by_<displayUnit>.geojson
   // For travel: t1_ttm_dd_15_30_60_by_<displayUnit>.geojson
   const prefix = sportsStore.sustainabilityFilterType === "index"
     ? "t2_index_15_30_60"
-    : "t1_ttm_15_30_60";
+    : "wide_t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
   console.log('Loading file... ' + `${prefix}_by_${unit}.geojson`);
@@ -234,6 +221,7 @@ async function loadGeoJSONFile(commune) {
     map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] });
 
     createLegend(map.value);
+    updateIndexMapLayer();
     
   } catch (error) {
     console.error(`Failed to load ${geojsonFile}:`, error);
