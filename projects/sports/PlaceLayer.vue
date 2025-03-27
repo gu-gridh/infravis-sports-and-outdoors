@@ -130,6 +130,7 @@ function updateIndexMapLayer() {
       return true;
     } else { // travel time to activity
       const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      console.log('propName:', propName);
       return f.properties[propName] !== undefined;
     }
   });
