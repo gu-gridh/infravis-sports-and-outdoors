@@ -315,6 +315,9 @@ function setAccColor (time) { //for the accessibility layer
          return;
      }
 
+      // Remove existing legend
+      document.querySelectorAll(".legend").forEach((el) => el.remove());
+
      var legend = L.control({ position: "bottomright" });
 
      legend.onAdd = function () {
