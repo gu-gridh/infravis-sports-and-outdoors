@@ -130,12 +130,13 @@ function updateIndexMapLayer() {
   // scale if travel time population weight is set
   let scaledFeatures = features;
   if (sportsStore.sustainabilityFilterType !== "index" && sportsStore.travelTimePopulationWeight) {
+    
     scaledFeatures = features.map((feature) => {
-      const pop = feature.properties.pop_1km_grid ?? 0;
-      const normPop = Math.min(9, pop) / 9;       // Normalize 0–9 → 0–1
-      const scale = 0.8 + normPop * 0.7;          // Scale from 0.8x to 1.5x
+      const pop = feature.properties.pop_1km_grid_decile ?? 0;
+      const normPop = Math.min(9, pop) / 9;         // Normalize to 0–1
+      const scale = 0.3 + normPop * 0.8;            
       const scaled = turf.transformScale(feature, scale);
-      scaled.properties = feature.properties;
+      scaled.properties = feature.properties; 
       return scaled;
     });
   }
