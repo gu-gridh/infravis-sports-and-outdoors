@@ -39,7 +39,12 @@ watch(
   [() => sportsStore.commune, () => sportsStore.displayUnit, () => sportsStore.sustainabilityFilterType, () => sportsStore.travelTimePopulationWeight],
   ([newCommune, newDisplayUnit]) => {
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
-    loadGeoJSONFile(newCommune); 
+    loadGeoJSONFile(newCommune);
+
+    if (!newCommune) { //reset map position when no commune
+      map.value.setView([62, 15], 6);
+      return;
+    }
   }
 );
 
@@ -69,7 +74,9 @@ watch(
 // });
 
 async function initMap() {
-  map.value = L.map("map").setView([62, 15], 6); //Uppsala
+  map.value = L.map("map", {
+    minZoom: 4, 
+  }).setView([62, 15], 6); //Uppsala
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
