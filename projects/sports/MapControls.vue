@@ -1,7 +1,7 @@
 <template>
   <div class="map-controls">
     <div class="section">
-      <h2>MISTRA dashboard</h2>
+      <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
     </div>
     <div class="section">
       <h2>Municipality</h2>
