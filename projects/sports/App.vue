@@ -12,4 +12,10 @@ provide("config", config);
 </template>
 
 <style>
+h2 {
+  font-size: 24px !important;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 5px !important;
+} 
 </style>
