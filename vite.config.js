@@ -10,6 +10,7 @@ export default defineConfig(({ command, mode }) => {
   return {
     root: "projects/" + project,
     publicDir: "../../public",
+    base: '/accessibility-index/',
     plugins: [vue()],
     resolve: {
       alias: {

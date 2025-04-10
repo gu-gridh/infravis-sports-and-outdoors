@@ -30,6 +30,11 @@ const mapStyles = ref({
   topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
 
+//for generating asset URLs
+function asset(path) {
+  return `${import.meta.env.BASE_URL}${path}`;
+}
+
 onMounted(async () => {
   await initMap();
 });
@@ -83,7 +88,7 @@ async function initMap() {
   }).addTo(map.value);
 
   try {
-    const response = await fetch("./geojson/kommun_regso.geojson");
+    const response = await fetch(asset("geojson/kommun_regso.geojson"));
     const rawRegion = await response.json();
     geojsonData.value = rawRegion;
 
@@ -108,7 +113,7 @@ async function initMap() {
       getFeatureId: (feature) => feature.id,
     }).addTo(map.value);
 
-    //add north arror and scale
+    //add north arrow and scale
     L.control.scale({ imperial: false }).addTo(map.value);
 
 
@@ -126,13 +131,13 @@ function updateIndexMapLayer() {
   }
 
   const features = communeData.value.features.filter((f) => {
-  if (sportsStore.sustainabilityFilterType === "index") {
-    return true;
-  } else {
-    const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
-    return f.properties[propName] !== undefined;
-  }
-});
+    if (sportsStore.sustainabilityFilterType === "index") {
+      return true;
+    } else {
+      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      return f.properties[propName] !== undefined;
+    }
+  });
 
   // scale if travel time population weight is set
   let scaledFeatures = features;
@@ -214,10 +219,10 @@ async function loadGeoJSONFile(commune) {
     : "wide_t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
-  console.log('Loading file... ' + `${prefix}_by_${unit}.geojson`);
+  console.log('Loading file... ' + geojsonFile);
 
   try {
-    const resp = await fetch(`./geojson/${geojsonFile}`);
+    const resp = await fetch(asset(`geojson/${geojsonFile}`));
     const rawCommune = await resp.json();
 
     //only include those for the selected commune
@@ -275,11 +280,11 @@ function setAccColor (time) { //for the accessibility layer
 
 // adds legend based on what layer is active
  function createLegend(map) {
-// Check if map exists
+    // Check if map exists
     if (!map) {
       return;
     }
-  // Remove existing legend
+    // Remove existing legend
     document.querySelectorAll(".legend").forEach((el) => el.remove());
     
     var legend = L.control({ position: "bottomright" });
