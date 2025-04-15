@@ -141,7 +141,7 @@ async function initMap() {
 function updateIndexMapLayer() {
   if (!map.value || !communeData.value) return;
 
-  //remove old layer
+  // remove old layer
   if (filteredLayer.value) {
     map.value.removeLayer(filteredLayer.value);
   }
@@ -150,21 +150,19 @@ function updateIndexMapLayer() {
     if (sportsStore.sustainabilityFilterType === "index") {
       return true;
     } else {
-      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      const propName = generateTravelPropName();
       return f.properties[propName] !== undefined;
     }
   });
 
-  // scale if travel time population weight is set
   let scaledFeatures = features;
   if (sportsStore.sustainabilityFilterType !== "index" && sportsStore.travelTimePopulationWeight) {
-    
     scaledFeatures = features.map((feature) => {
       const pop = feature.properties.pop_1km_grid_decile ?? 0;
-      const normPop = Math.min(9, pop) / 9;         // Normalize to 0–1
-      const scale = 0.3 + normPop * 0.8;            
+      const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
+      const scale = 0.3 + normPop * 0.8;
       const scaled = turf.transformScale(feature, scale);
-      scaled.properties = feature.properties; 
+      scaled.properties = feature.properties;
       return scaled;
     });
   }
@@ -173,6 +171,7 @@ function updateIndexMapLayer() {
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
+      console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
       const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
       const val = feature.properties[propName];
       return {
@@ -182,17 +181,16 @@ function updateIndexMapLayer() {
         weight: 1,
       };
     } else { // travel time to activity
-      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      const propName = generateTravelPropName();
       const val = feature.properties[propName];
       return {
         color: 'black',
         fillColor: setAccColor(val),
         fillOpacity: 0.9,
         weight: 1,
-        
       };
     }
-}
+  }
 
   //hover features...
   function onEachFeature(feature, layer) {
@@ -213,7 +211,26 @@ function updateIndexMapLayer() {
     onEachFeature,
   });
 
-  filteredLayer.value.addTo(map.value);  
+  filteredLayer.value.addTo(map.value);
+}
+
+function generateTravelPropName() {
+  //replace spaces with underscores
+  const activity = sportsStore.travelTimeActivity.replace(/ /g, '_');
+  const mode = sportsStore.travelTimeTransportMode.replace(/ /g, '_');
+  const minutes = sportsStore.travelTimeMinutes;
+  
+  const modeLower = sportsStore.travelTimeTransportMode.toLowerCase();
+  let dayPart = "";
+  if (modeLower === "sustainable" || modeLower === "transit") { //only add day if mode is sustainable or transit
+    const dayValue = sportsStore.travelTimeDay;
+    if (dayValue.toLowerCase() === "saturday" || dayValue.toLowerCase() === "sunday") { //check if the day is saturday or sunday
+      dayPart = `_${dayValue.replace(/ /g, '_')}`;
+    }
+  }
+  
+  console.log('Travel prop name:', `${activity}_${mode}${dayPart}_${minutes}`);
+  return `${activity}_${mode}${dayPart}_${minutes}`;
 }
 
 async function loadGeoJSONFile(commune) {
@@ -229,8 +246,8 @@ async function loadGeoJSONFile(commune) {
   // For index: t2_index_15_30_60_by_<displayUnit>.geojson
   // For travel: t1_ttm_dd_15_30_60_by_<displayUnit>.geojson
   const prefix = sportsStore.sustainabilityFilterType === "index"
-    ? "t2_index_15_30_60"
-    : "wide_t1_ttm_15_30_60";
+    ? "t2_index"
+    : "t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
   console.log('Loading file... ' + geojsonFile);
@@ -262,10 +279,8 @@ async function loadGeoJSONFile(commune) {
   }
 }
 
-
 function setIndexColor(time) { //for the index layer
   if (time === null || time === 0) return "#cccccc"; //missing data
-
   if (time >= 0 && time <= 10) return "#d71f27"; 
   if (time >= 11 && time <= 20) return "#e95a38"; 
   if (time >= 21 && time <= 30) return "#f69c5a"; 
