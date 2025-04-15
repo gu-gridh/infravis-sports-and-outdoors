@@ -50,6 +50,7 @@ function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
         const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
         const val = feature.properties[propName];
+        console.log("Index mode:", { propName, val, properties: feature.properties });
         return {
             color: "black",
             fillColor: setIndexColor(val),
@@ -102,19 +103,19 @@ async function loadLayer() {
         let geoData = await response.json();
         console.log("CityLayer GeoJSON loaded:", geoData);
 
-        if (
-            sportsStore.sustainabilityFilterType !== "index" &&
-            sportsStore.travelTimePopulationWeight
-        ) {
-            geoData.features = geoData.features.map((feature) => {
-                const pop = feature.properties.pop_1km_grid_decile ?? 0;
-                const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
-                const scale = 0.3 + normPop * 0.8;
-                const scaledFeature = turf.transformScale(feature, scale);
-                scaledFeature.properties = feature.properties;
-                return scaledFeature;
-            });
-        }
+        // if (
+        //     sportsStore.sustainabilityFilterType !== "index" &&
+        //     sportsStore.travelTimePopulationWeight
+        // ) {
+        //     geoData.features = geoData.features.map((feature) => {
+        //         const pop = feature.properties.pop_1km_grid_decile ?? 0;
+        //         const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
+        //         const scale = 0.3 + normPop * 0.8;
+        //         const scaledFeature = turf.transformScale(feature, scale);
+        //         scaledFeature.properties = feature.properties;
+        //         return scaledFeature;
+        //     });
+        // }
 
         if (layer.value) {
             props.map.removeLayer(layer.value);

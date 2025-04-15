@@ -170,7 +170,6 @@ function updateIndexMapLayer() {
   }
 
   const newFC = { type: "FeatureCollection", features: scaledFeatures };
-  
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
