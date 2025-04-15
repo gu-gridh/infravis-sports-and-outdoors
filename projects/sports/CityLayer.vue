@@ -136,7 +136,6 @@ async function loadLayer() {
             },
         }).addTo(props.map);
 
-        props.map.fitBounds(layer.value.getBounds(), { padding: [20, 20] });
     } catch (error) {
         console.error(error);
     }
