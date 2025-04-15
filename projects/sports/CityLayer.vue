@@ -6,7 +6,7 @@
 import { onMounted, onBeforeUnmount, watch, ref, computed } from "vue";
 import L from "leaflet";
 import { useSportsStore } from "./settings/store";
-import * as turf from "@turf/turf";
+// import * as turf from "@turf/turf";
 
 const props = defineProps({
     map: {
@@ -31,19 +31,23 @@ const geojsonFile = computed(() => {
 });
 
 function generateTravelPropName() {
-    //replace spaces with underscores
-    const activity = sportsStore.travelTimeActivity.replace(/ /g, '_');
-    const mode = sportsStore.travelTimeTransportMode.replace(/ /g, '_');
-
-    //check if the day is saturday or sunday and add if so
+  //replace spaces with underscores
+  const activity = sportsStore.travelTimeActivity.replace(/ /g, '_');
+  const mode = sportsStore.travelTimeTransportMode.replace(/ /g, '_');
+  
+  const minutes = sportsStore.travelTimeMinutes;
+  
+  const modeLower = sportsStore.travelTimeTransportMode.toLowerCase();
+  let dayPart = "";
+  if (modeLower === "sustainable" || modeLower === "transit") { //only add if sustainable or transit mode
+    //check if the day is saturday or sunday
     const dayValue = sportsStore.travelTimeDay;
-    let dayPart = "";
     if (dayValue.toLowerCase() === "saturday" || dayValue.toLowerCase() === "sunday") {
-        dayPart = `_${dayValue.replace(/ /g, '_')}`;
+      dayPart = `_${dayValue.replace(/ /g, '_')}`;
     }
-
-    const minutes = sportsStore.travelTimeMinutes;
-    return `${activity}_${mode}${dayPart}_${minutes}`;
+  }
+  
+  return `${activity}_${mode}${dayPart}_${minutes}`;
 }
 
 function styleFeature(feature) {
