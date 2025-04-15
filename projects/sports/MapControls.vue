@@ -193,7 +193,7 @@ const activityTypes = [
   { label: "Dog park", value: "Dog park" },
   { label: "Football", value: "Football" },
   { label: "Golf", value: "Golf" },
-  { label: "Gym / fitness centre", value: "Gym / fitness centre" },
+  { label: "Gym / fitness centre", value: "Gym FitnessCentre" },
   { label: "Horse riding", value: "Horse riding" },
   { label: "Ice hockey", value: "Ice hockey" },
   { label: "Other ballsports", value: "Other ballsports" },
