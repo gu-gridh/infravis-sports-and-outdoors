@@ -1,5 +1,8 @@
 <template>
-  <div id="map" style="width: 100%; height: 100vh;"></div>
+  <div>
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+    <CityLayer v-if="map" :map="map" />
+  </div>
 </template>
 
 <script setup>
@@ -9,6 +12,7 @@ import "leaflet.vectorgrid";
 import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
+import CityLayer from "./CityLayer.vue";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
@@ -41,15 +45,28 @@ onMounted(async () => {
 
 //load commune geojson
 watch(
-  [() => sportsStore.commune, () => sportsStore.displayUnit, () => sportsStore.sustainabilityFilterType, () => sportsStore.travelTimePopulationWeight],
+  [
+    () => sportsStore.commune,
+    () => sportsStore.displayUnit,
+    () => sportsStore.sustainabilityFilterType,
+    () => sportsStore.travelTimePopulationWeight
+  ],
   ([newCommune, newDisplayUnit]) => {
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
-    loadGeoJSONFile(newCommune);
 
-    if (!newCommune) { //reset map position when no commune
+    if (!newCommune) {
       map.value.setView([62, 15], 6);
+
+      //remove filtered layer if present
+      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
+        map.value.removeLayer(filteredLayer.value);
+        filteredLayer.value = null;
+      }
+
       return;
     }
+
+    loadGeoJSONFile(newCommune);
   }
 );
 
@@ -104,18 +121,17 @@ async function initMap() {
       sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
     }
 
-    const plainRegion = JSON.parse(JSON.stringify(rawRegion));
+    // const plainRegion = JSON.parse(JSON.stringify(rawRegion));
 
-    regionLayer.value = L.vectorGrid.slicer(plainRegion, {
-      vectorTileLayerStyles: {
-        sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-      },
-      getFeatureId: (feature) => feature.id,
-    }).addTo(map.value);
+    // regionLayer.value = L.vectorGrid.slicer(plainRegion, {
+    //   vectorTileLayerStyles: {
+    //     sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
+    //   },
+    //   getFeatureId: (feature) => feature.id,
+    // }).addTo(map.value);
 
     //add north arrow and scale
     L.control.scale({ imperial: false }).addTo(map.value);
-
 
   } catch (error) {
     console.error("Error loading kommun_regso.geojson:", error);
@@ -192,7 +208,6 @@ function updateIndexMapLayer() {
       map.value.closePopup();
     });
   }
-  
 
   filteredLayer.value = L.geoJSON(newFC, {
     style: styleFeature,
