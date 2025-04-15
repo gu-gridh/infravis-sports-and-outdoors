@@ -101,6 +101,55 @@ function setAccColor(time) {
     return "#cccccc";
 }
 
+function createLegend(map) {
+        // Check if map exists
+        if (!map) {
+      return;
+    }
+    // Remove existing legend
+    document.querySelectorAll(".legend").forEach((el) => el.remove());
+    
+    var legend = L.control({ position: "bottomright" });
+     legend.onAdd = function () {
+      var div = L.DomUtil.create("div", "legend");
+      if (sportsStore.sustainabilityFilterType === "index") {
+        div.innerHTML += "<p>Index: % activities by sustainable modes</p>";
+              var indexRanges = [
+                  { min: 0, max: 10, color: "#d71f27" },
+                  { min: 11, max: 20, color: "#e95a38" },
+                  { min: 21, max: 30, color: "#f69c5a" },
+                  { min: 31, max: 40, color: "#fdc980" },
+                  { min: 41, max: 50, color: "#fdefac" },
+                  { min: 51, max: 60, color: "#e8eeac" },
+                  { min: 61, max: 70, color: "#c4dd87" },
+                  { min: 71, max: 80, color: "#99cc64" },
+                  { min: 81, max: 90, color: "#55b453" },
+                  { min: 91, max: 100, color: "#179847" }
+              ];
+              indexRanges.forEach(function (range) {
+                  div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+              });
+      } else if (sportsStore.sustainabilityFilterType === "travel") {         
+                div.innerHTML += "<p>Travel time (min)</p>"; 
+                var accRanges = [
+                    { min: 0, max: 5, color: "#dfbec43" },
+                    { min: 6, max: 10, color: "#cdbc68" },
+                    { min: 11, max: 15, color: "#979077" },
+                    { min: 16, max: 20, color: "#666970" },
+                    { min: 21, max: 25, color: "#32446b" },
+                    { min: 26, max: 30, color: "#13234b" },
+                    { min: 31, max: 35, color: "#000000" }
+                ];
+
+        accRanges.forEach(function (range) {
+          div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+           });
+         }
+         return div;
+     };
+     legend.addTo(map);
+}
+
 async function loadLayer() {
     try {
         const response = await fetch(asset(geojsonFile.value));
@@ -129,7 +178,7 @@ async function loadLayer() {
             style: styleFeature,
             onEachFeature: (feature, lyr) => {
                 lyr.on("mouseover", (e) => {
-                    const content = `<b>Feature:</b> ${feature.properties.name || "N/A"}`;
+                    const content = `${feature.properties.city_name + " kommun" || "N/A"}`;
                     L.popup({ offset: [0, -10] })
                         .setLatLng(e.latlng)
                         .setContent(content)
@@ -140,6 +189,7 @@ async function loadLayer() {
                 });
             },
         }).addTo(props.map);
+        createLegend(props.map)
 
     } catch (error) {
         console.error(error);
