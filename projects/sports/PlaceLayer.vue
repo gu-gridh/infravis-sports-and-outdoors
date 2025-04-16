@@ -1,5 +1,18 @@
 <template>
-  <div id="map" style="width: 100%; height: 100vh;"></div>
+  <div>
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+    <div 
+      class="info-backdrop" 
+      :class="{ visible: showInfo }"
+    >
+      <div class="info-overlay">
+        <h2>Info Overlay</h2>
+        <p>This is an info overlay.</p>
+        <button @click="emit('close')">Close</button>
+      </div>
+    </div>
+    <CityLayer v-if="map" :map="map" />
+  </div>
 </template>
 
 <script setup>
@@ -9,9 +22,17 @@ import "leaflet.vectorgrid";
 import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
+import CityLayer from "./CityLayer.vue";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
+
+const emit = defineEmits(['close']);
+
+//info overlay
+const props = defineProps({
+  showInfo: Boolean
+})
 
 //region's data kommun_regso
 const geojsonData = ref(null);
@@ -30,21 +51,48 @@ const mapStyles = ref({
   topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
 
+
+watch(() => props.showInfo, (newVal) => {
+  console.log("showInfo changed:", newVal);
+  if (newVal == true) {
+    document.querySelector(".info-overlay").style.display = "block";
+  } else {
+    document.querySelector(".info-overlay").style.display = "none";
+  }
+})
+//for generating asset URLs
+function asset(path) {
+  return `${import.meta.env.BASE_URL}${path}`;
+}
+
 onMounted(async () => {
   await initMap();
 });
 
 //load commune geojson
 watch(
-  [() => sportsStore.commune, () => sportsStore.displayUnit, () => sportsStore.sustainabilityFilterType, () => sportsStore.travelTimePopulationWeight],
+  [
+    () => sportsStore.commune,
+    () => sportsStore.displayUnit,
+    () => sportsStore.sustainabilityFilterType,
+    () => sportsStore.travelTimePopulationWeight
+  ],
   ([newCommune, newDisplayUnit]) => {
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
-    loadGeoJSONFile(newCommune);
 
-    if (!newCommune) { //reset map position when no commune
-      map.value.setView([62, 15], 6);
+    if (!newCommune) {
+      map.value.setView([63, 17], 5);
+
+      //remove filtered layer if present
+      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
+        map.value.removeLayer(filteredLayer.value);
+        filteredLayer.value = null;
+      }
+
       return;
     }
+
+    loadGeoJSONFile(newCommune);
   }
 );
 
@@ -75,15 +123,15 @@ watch(
 
 async function initMap() {
   map.value = L.map("map", {
-    minZoom: 4, 
-  }).setView([62, 15], 6); //Uppsala
+    minZoom: 5, 
+  }).setView([63, 17], 5); // Sweden's approximate center (Sollefteå)
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map.value);
 
   try {
-    const response = await fetch("./geojson/kommun_regso.geojson");
+    const response = await fetch(asset("geojson/kommun_regso.geojson"));
     const rawRegion = await response.json();
     geojsonData.value = rawRegion;
 
@@ -99,18 +147,39 @@ async function initMap() {
       sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
     }
 
-    const plainRegion = JSON.parse(JSON.stringify(rawRegion));
+    // const plainRegion = JSON.parse(JSON.stringify(rawRegion));
 
-    regionLayer.value = L.vectorGrid.slicer(plainRegion, {
-      vectorTileLayerStyles: {
-        sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-      },
-      getFeatureId: (feature) => feature.id,
+    // regionLayer.value = L.vectorGrid.slicer(plainRegion, {
+    //   vectorTileLayerStyles: {
+    //     sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
+    //   },
+    //   getFeatureId: (feature) => feature.id,
+    // }).addTo(map.value);
+
+    //add north arrow and scale
+    L.control.scale({
+      imperial: false,
+      metric: true,
+      bar: true,          // enables the dual bar
+      position: 'bottomleft'
     }).addTo(map.value);
 
-    //add north arror and scale
-    L.control.scale({ imperial: false }).addTo(map.value);
+    const NorthArrowControl = L.Control.extend({
+      onAdd: function (map) {
+        const img = L.DomUtil.create("img");
+        img.src = "./assets/north-arrow.svg";
+        img.style.width = "50px";
+        img.style.opacity = "0.8";
+        img.title = "North arrow";
+        return img;
+      },
+    });
 
+    L.control.northArrow = function (opts) {
+      return new NorthArrowControl(opts);
+    };
+
+    L.control.northArrow({ position: "topright" }).addTo(map.value);
 
   } catch (error) {
     console.error("Error loading kommun_regso.geojson:", error);
@@ -120,39 +189,37 @@ async function initMap() {
 function updateIndexMapLayer() {
   if (!map.value || !communeData.value) return;
 
-  //remove old layer
+  // remove old layer
   if (filteredLayer.value) {
     map.value.removeLayer(filteredLayer.value);
   }
 
   const features = communeData.value.features.filter((f) => {
-  if (sportsStore.sustainabilityFilterType === "index") {
-    return true;
-  } else {
-    const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
-    return f.properties[propName] !== undefined;
-  }
-});
+    if (sportsStore.sustainabilityFilterType === "index") {
+      return true;
+    } else {
+      const propName = generateTravelPropName();
+      return f.properties[propName] !== undefined;
+    }
+  });
 
-  // scale if travel time population weight is set
   let scaledFeatures = features;
   if (sportsStore.sustainabilityFilterType !== "index" && sportsStore.travelTimePopulationWeight) {
-    
     scaledFeatures = features.map((feature) => {
       const pop = feature.properties.pop_1km_grid_decile ?? 0;
-      const normPop = Math.min(9, pop) / 9;         // Normalize to 0–1
-      const scale = 0.3 + normPop * 0.8;            
+      const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
+      const scale = 0.3 + normPop * 0.8;
       const scaled = turf.transformScale(feature, scale);
-      scaled.properties = feature.properties; 
+      scaled.properties = feature.properties;
       return scaled;
     });
   }
 
   const newFC = { type: "FeatureCollection", features: scaledFeatures };
-  
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
+      console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
       const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
       const val = feature.properties[propName];
       return {
@@ -162,17 +229,16 @@ function updateIndexMapLayer() {
         weight: 1,
       };
     } else { // travel time to activity
-      const propName = `${sportsStore.travelTimeActivity}_${sportsStore.travelTimeTransportMode}_${sportsStore.travelTimeDay}_${sportsStore.travelTimeMinutes}`;
+      const propName = generateTravelPropName();
       const val = feature.properties[propName];
       return {
         color: 'black',
         fillColor: setAccColor(val),
         fillOpacity: 0.9,
         weight: 1,
-        
       };
     }
-}
+  }
 
   //hover features...
   function onEachFeature(feature, layer) {
@@ -187,14 +253,32 @@ function updateIndexMapLayer() {
       map.value.closePopup();
     });
   }
-  
 
   filteredLayer.value = L.geoJSON(newFC, {
     style: styleFeature,
     onEachFeature,
   });
 
-  filteredLayer.value.addTo(map.value);  
+  filteredLayer.value.addTo(map.value);
+}
+
+function generateTravelPropName() {
+  //replace spaces with underscores
+  const activity = sportsStore.travelTimeActivity.replace(/ /g, '_');
+  const mode = sportsStore.travelTimeTransportMode.replace(/ /g, '_');
+  const minutes = sportsStore.travelTimeMinutes;
+  
+  const modeLower = sportsStore.travelTimeTransportMode.toLowerCase();
+  let dayPart = "";
+  if (modeLower === "sustainable" || modeLower === "transit") { //only add day if mode is sustainable or transit
+    const dayValue = sportsStore.travelTimeDay;
+    if (dayValue.toLowerCase() === "saturday" || dayValue.toLowerCase() === "sunday") { //check if the day is saturday or sunday
+      dayPart = `_${dayValue.replace(/ /g, '_')}`;
+    }
+  }
+  
+  console.log('Travel prop name:', `${activity}_${mode}${dayPart}_${minutes}`);
+  return `${activity}_${mode}${dayPart}_${minutes}`;
 }
 
 async function loadGeoJSONFile(commune) {
@@ -210,14 +294,14 @@ async function loadGeoJSONFile(commune) {
   // For index: t2_index_15_30_60_by_<displayUnit>.geojson
   // For travel: t1_ttm_dd_15_30_60_by_<displayUnit>.geojson
   const prefix = sportsStore.sustainabilityFilterType === "index"
-    ? "t2_index_15_30_60"
-    : "wide_t1_ttm_15_30_60";
+    ? "t2_index"
+    : "t1_ttm_15_30_60";
   const unit = sportsStore.displayUnit; //either "grid" or "regso"
   const geojsonFile = `${prefix}_by_${unit}.geojson`;
-  console.log('Loading file... ' + `${prefix}_by_${unit}.geojson`);
+  console.log('Loading file... ' + geojsonFile);
 
   try {
-    const resp = await fetch(`./geojson/${geojsonFile}`);
+    const resp = await fetch(asset(`geojson/${geojsonFile}`));
     const rawCommune = await resp.json();
 
     //only include those for the selected commune
@@ -243,10 +327,8 @@ async function loadGeoJSONFile(commune) {
   }
 }
 
-
 function setIndexColor(time) { //for the index layer
   if (time === null || time === 0) return "#cccccc"; //missing data
-
   if (time >= 0 && time <= 10) return "#d71f27"; 
   if (time >= 11 && time <= 20) return "#e95a38"; 
   if (time >= 21 && time <= 30) return "#f69c5a"; 
@@ -275,11 +357,11 @@ function setAccColor (time) { //for the accessibility layer
 
 // adds legend based on what layer is active
  function createLegend(map) {
-// Check if map exists
+    // Check if map exists
     if (!map) {
       return;
     }
-  // Remove existing legend
+    // Remove existing legend
     document.querySelectorAll(".legend").forEach((el) => el.remove());
     
     var legend = L.control({ position: "bottomright" });
@@ -341,7 +423,7 @@ function setAccColor (time) { //for the accessibility layer
 }
 
 #map.leaflet-container {
-  height: calc(100vh - 80px) !important;
+  height: calc(100vh - 82px) !important;
 }
 
 .legend {
@@ -388,5 +470,46 @@ function setAccColor (time) { //for the accessibility layer
 
 .leaflet-left {
   width: 400px;
+}
+
+.info-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.info-backdrop.visible {
+  display: flex;
+}
+
+.info-overlay {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.leaflet-control-scale-line {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #000;
+  padding: 2px 4px;
+}
+
+
+.leaflet-control-scale {
+  background: transparent;
+  box-shadow: none;
 }
 </style>

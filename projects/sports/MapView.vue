@@ -6,15 +6,19 @@ import MainLayout from "@/MainLayout.vue";
 import MapControls from "./MapControls.vue";
 
 const store = mapStore();
+const showInfoOverlay = ref(false)
 
+function handleShowInfo() {
+  showInfoOverlay.value = true
+}
 </script>
 
 <template>
   <MainLayout>
     <template #background>
       <div class="map-container">
-        <MapControls />
-        <PlaceLayer>
+        <MapControls @showInfo="handleShowInfo"/> 
+        <PlaceLayer :show-info="showInfoOverlay" @close="showInfoOverlay = false">
         </PlaceLayer>
 
       </div>
@@ -30,7 +34,6 @@ const store = mapStore();
 <style>
 .map-container {
   height: calc(100vh - 80px) !important;
-  position: relative;
   width: 100%;
 }
 

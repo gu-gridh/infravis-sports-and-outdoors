@@ -8,7 +8,7 @@
          
           <slot name="title">
             <!--<div v-if="config" class="px-8 py-6 bg-white rounded-t-lg shadow-lg">-->
-            <div v-if="config" class="py-1">
+            <div v-if="config" class="">
               <div class="main-title" v-html="config.title"></div>
               <div class="sub-title" v-html="config.subtitle"></div>
             </div>
