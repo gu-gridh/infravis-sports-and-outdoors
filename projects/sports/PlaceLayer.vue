@@ -81,7 +81,7 @@ watch(
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
 
     if (!newCommune) {
-      map.value.setView([62, 15], 5);
+      map.value.setView([63, 17], 5);
 
       //remove filtered layer if present
       if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
@@ -157,7 +157,12 @@ async function initMap() {
     // }).addTo(map.value);
 
     //add north arrow and scale
-    L.control.scale({ imperial: false }).addTo(map.value);
+    L.control.scale({
+      imperial: false,
+      metric: true,
+      bar: true,          // enables the dual bar
+      position: 'bottomleft'
+    }).addTo(map.value);
 
     const NorthArrowControl = L.Control.extend({
       onAdd: function (map) {
@@ -493,5 +498,18 @@ function setAccColor (time) { //for the accessibility layer
   max-width: 500px;
   width: 90%;
   text-align: center;
+}
+
+.leaflet-control-scale-line {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #000;
+  padding: 2px 4px;
+}
+
+
+.leaflet-control-scale {
+  background: transparent;
+  box-shadow: none;
 }
 </style>
