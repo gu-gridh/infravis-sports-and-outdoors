@@ -124,7 +124,7 @@ watch(
 async function initMap() {
   map.value = L.map("map", {
     minZoom: 5, 
-  }).setView([62, 15], 5); //Uppsala
+  }).setView([63, 17], 5); // Sweden's approximate center (Sollefteå)
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -418,7 +418,7 @@ function setAccColor (time) { //for the accessibility layer
 }
 
 #map.leaflet-container {
-  height: calc(100vh - 80px) !important;
+  height: calc(100vh - 82px) !important;
 }
 
 .legend {
