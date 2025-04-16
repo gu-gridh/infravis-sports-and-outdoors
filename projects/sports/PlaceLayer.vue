@@ -98,7 +98,7 @@ watch(
 async function initMap() {
   map.value = L.map("map", {
     minZoom: 4, 
-  }).setView([62, 15], 6); //Uppsala
+  }).setView([62, 15], 5); //Uppsala
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -132,6 +132,23 @@ async function initMap() {
 
     //add north arrow and scale
     L.control.scale({ imperial: false }).addTo(map.value);
+
+    const NorthArrowControl = L.Control.extend({
+      onAdd: function (map) {
+        const img = L.DomUtil.create("img");
+        img.src = "./assets/north-arrow.svg";
+        img.style.width = "50px";
+        img.style.opacity = "1";
+        img.title = "North arrow";
+        return img;
+      },
+    });
+
+    L.control.northArrow = function (opts) {
+      return new NorthArrowControl(opts);
+    };
+
+L.control.northArrow({ position: "topright" }).addTo(map.value);
 
   } catch (error) {
     console.error("Error loading kommun_regso.geojson:", error);
