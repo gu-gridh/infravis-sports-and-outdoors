@@ -24,6 +24,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const travelTimeDay = ref('week_day');
   const travelTimePopulationWeight = ref(false);
   const travelTimePercentageAccess = ref(false);
+  
 
   const updateCommune = (value) => {
     commune.value = value;

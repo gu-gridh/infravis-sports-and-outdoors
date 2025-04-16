@@ -1,7 +1,8 @@
 <template>
   <div class="map-controls">
-    <div class="section">
+    <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
+      <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
     <div class="section">
       <h2>Municipality</h2>
@@ -140,6 +141,7 @@ const searchQuery = ref("");
 const isDropdownVisible = ref(false);
 const searchContainer = ref(null);
 
+
 const filteredCommunes = computed(() => {
   if (!searchQuery.value) return [];
   return store.allCommunes.filter(c =>
@@ -167,6 +169,10 @@ function handleClickOutside(event) {
   if (searchContainer.value && !searchContainer.value.contains(event.target)) {
     isDropdownVisible.value = false;
   }
+}
+
+function showInfo() {
+  store.showInfo = true;
 }
 
 onMounted(() => {
@@ -250,6 +256,18 @@ const toggleTravelTimePercentageAccess = () => (store.travelTimePercentageAccess
   padding-top: 15px;
 }
 
+.logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.info-button {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
 .municipality-search {
   position: relative;
 }
@@ -303,6 +321,7 @@ input[type="text"] {
   padding-bottom: 10px;
 }
 
+
 .btn-group button,
 .btn-group2 button {
   padding: 5px;
@@ -311,12 +330,13 @@ input[type="text"] {
   background-color: #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
+  
 }
 
 button.active {
-  background-color: #007bff;
+  background-color: #497723;
   color: white;
-  border-color: #0056b3;
+  border-color: #497723;
 }
 
 select {

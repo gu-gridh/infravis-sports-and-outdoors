@@ -1,6 +1,16 @@
 <template>
   <div>
     <div id="map" style="width: 100%; height: 100vh;"></div>
+    <div 
+      class="info-backdrop" 
+      :class="{ visible: showInfo }"
+    >
+      <div class="info-overlay">
+        <h2>Info Overlay</h2>
+        <p>This is an info overlay.</p>
+        <button @click="emit('close')">Close</button>
+      </div>
+    </div>
     <CityLayer v-if="map" :map="map" />
   </div>
 </template>
@@ -16,6 +26,13 @@ import CityLayer from "./CityLayer.vue";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
+
+const emit = defineEmits(['close']);
+
+//info overlay
+const props = defineProps({
+  showInfo: Boolean
+})
 
 //region's data kommun_regso
 const geojsonData = ref(null);
@@ -34,6 +51,15 @@ const mapStyles = ref({
   topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
 
+
+watch(() => props.showInfo, (newVal) => {
+  console.log("showInfo changed:", newVal);
+  if (newVal == true) {
+    document.querySelector(".info-overlay").style.display = "block";
+  } else {
+    document.querySelector(".info-overlay").style.display = "none";
+  }
+})
 //for generating asset URLs
 function asset(path) {
   return `${import.meta.env.BASE_URL}${path}`;
@@ -55,7 +81,7 @@ watch(
     console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
 
     if (!newCommune) {
-      map.value.setView([62, 15], 6);
+      map.value.setView([62, 15], 5);
 
       //remove filtered layer if present
       if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
@@ -97,7 +123,7 @@ watch(
 
 async function initMap() {
   map.value = L.map("map", {
-    minZoom: 4, 
+    minZoom: 5, 
   }).setView([62, 15], 5); //Uppsala
 
   L.tileLayer(mapStyles.value.OSM, {
@@ -138,7 +164,7 @@ async function initMap() {
         const img = L.DomUtil.create("img");
         img.src = "./assets/north-arrow.svg";
         img.style.width = "50px";
-        img.style.opacity = "1";
+        img.style.opacity = "0.8";
         img.title = "North arrow";
         return img;
       },
@@ -148,7 +174,7 @@ async function initMap() {
       return new NorthArrowControl(opts);
     };
 
-L.control.northArrow({ position: "topright" }).addTo(map.value);
+    L.control.northArrow({ position: "topright" }).addTo(map.value);
 
   } catch (error) {
     console.error("Error loading kommun_regso.geojson:", error);
@@ -439,5 +465,33 @@ function setAccColor (time) { //for the accessibility layer
 
 .leaflet-left {
   width: 400px;
+}
+
+.info-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.info-backdrop.visible {
+  display: flex;
+}
+
+.info-overlay {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
 }
 </style>
