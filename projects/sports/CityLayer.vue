@@ -91,7 +91,7 @@ function setIndexColor(time) {
 
 function setAccColor(time) {
     if (time === null || time === 0) return "#cccccc";
-    if (time >= 0 && time <= 5) return "#dfbec43";
+    if (time >= 1 && time <= 5) return "#dfbec43";
     if (time >= 6 && time <= 10) return "#cdbc68";
     if (time >= 11 && time <= 15) return "#979077";
     if (time >= 16 && time <= 20) return "#666970";
@@ -130,9 +130,9 @@ function createLegend(map) {
                   div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
               });
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
-                div.innerHTML += "<p>Travel time (min)</p>"; 
+                div.innerHTML += `<p>Activities within ${sportsStore.travelTimeMinutes} min</p>`; 
                 var accRanges = [
-                    { min: 0, max: 5, color: "#dfbec43" },
+                    { min: 1, max: 5, color: "#dfbec43" },
                     { min: 6, max: 10, color: "#cdbc68" },
                     { min: 11, max: 15, color: "#979077" },
                     { min: 16, max: 20, color: "#666970" },

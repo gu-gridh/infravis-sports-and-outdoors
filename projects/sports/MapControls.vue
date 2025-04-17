@@ -113,20 +113,26 @@
             {{ day.label }}
           </button>
         </div>
-        <div class="btn-group">
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
           <label>Population Weight by Grid</label>
-          <button @click="toggleTravelTimePopulationWeight"
-                  :class="{ active: store.travelTimePopulationWeight }">
-            {{ store.travelTimePopulationWeight ? 'On' : 'Off' }}
-          </button>
+          <label class="switch">
+            <input type="checkbox"
+                  v-model="store.travelTimePopulationWeight"
+                  :disabled="!store.commune">
+            <span class="slider"></span>
+          </label>
         </div>
-        <div class="btn-group">
+
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
           <label>% Population with Access to City</label>
-          <button @click="toggleTravelTimePercentageAccess"
-                  :class="{ active: store.travelTimePercentageAccess }">
-            {{ store.travelTimePercentageAccess ? 'On' : 'Off' }}
-          </button>
+          <label class="switch">
+            <input type="checkbox"
+                  v-model="store.travelTimePercentageAccess"
+                  :disabled="!store.commune">
+            <span class="slider"></span>
+          </label>
         </div>
+
       </template>
     </div>
   </div>
@@ -358,5 +364,72 @@ select {
   font-size: 16px;
   cursor: pointer;
   color: #888;
+}
+
+/* Greyout button styles */
+.greyout {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1em;
+}
+
+.toggle-switch label {
+  margin-right: 1em;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 26px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Checked state */
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Disabled state */
+input:disabled + .slider {
+  background-color: #999;
+  cursor: not-allowed;
 }
 </style>
