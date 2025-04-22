@@ -54,7 +54,7 @@ function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
         const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
         const val = feature.properties[propName];
-        console.log("Index mode:", { propName, val, properties: feature.properties });
+        //console.log("Index mode:", { propName, val, properties: feature.properties });
         return {
             color: "black",
             fillColor: setIndexColor(val),
@@ -64,7 +64,7 @@ function styleFeature(feature) {
     } else {
         const propName = generateTravelPropName();
         const val = feature.properties[propName];
-        console.log("Travel mode:", { propName, val, properties: feature.properties });
+        //console.log("Travel mode:", { propName, val, properties: feature.properties });
         return {
             color: "black",
             fillColor: setAccColor(val),
@@ -75,6 +75,7 @@ function styleFeature(feature) {
 }
 
 function setIndexColor(time) {
+    console.log("setIndexColor", time);
     if (time === null || time === 0) return "#cccccc";
     if (time >= 0 && time <= 10) return "#d71f27";
     if (time >= 11 && time <= 20) return "#e95a38";
@@ -90,6 +91,7 @@ function setIndexColor(time) {
 }
 
 function setAccColor(time) {
+    console.log("setAccColor", time);
     if (time === null || time === 0) return "#cccccc";
     if (time >= 1 && time <= 5) return "#dfbec43";
     if (time >= 6 && time <= 10) return "#cdbc68";
@@ -97,7 +99,7 @@ function setAccColor(time) {
     if (time >= 16 && time <= 20) return "#666970";
     if (time >= 21 && time <= 25) return "#32446b";
     if (time >= 26 && time <= 30) return "#13234b";
-    if (time >= 31 && time <= 35) return "#000000";
+    if (time >= 31 ) return "#000000";
     return "#cccccc";
 }
 
@@ -132,13 +134,14 @@ function createLegend(map) {
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
                 div.innerHTML += `<p>Activities within ${sportsStore.travelTimeMinutes} min</p>`; 
                 var accRanges = [
+                    {min: 0, max: 0, color: '#cccccc'},
                     { min: 1, max: 5, color: "#dfbec43" },
                     { min: 6, max: 10, color: "#cdbc68" },
                     { min: 11, max: 15, color: "#979077" },
                     { min: 16, max: 20, color: "#666970" },
                     { min: 21, max: 25, color: "#32446b" },
                     { min: 26, max: 30, color: "#13234b" },
-                    { min: 31, max: 35, color: "#000000" }
+                    { min: 31, max: 100, color: "#000000" }
                 ];
 
         accRanges.forEach(function (range) {
