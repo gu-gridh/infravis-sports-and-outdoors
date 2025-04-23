@@ -75,7 +75,6 @@ function styleFeature(feature) {
 }
 
 function setIndexColor(percent) {
-    console.log("setIndexColor", percent);
     //no decimals
     percent = Math.round(percent);
     if (percent === null || undefined) return "#cccccc";
@@ -93,17 +92,15 @@ function setIndexColor(percent) {
 }
 
 function setAccColor(time) {
-    
     //no decimals
     time = Math.round(time);
-    console.log("setAccColor", time);
     //if (time === null || undefined) return "#cccccc";
     if (time >= 0 && time <= 5) return "#ffea46";
     if (time >= 6 && time <= 10) return "#ccbb69";
     if (time >= 11 && time <= 15) return "#969078";
     if (time >= 16 && time <= 20) return "#666970";
     if (time >= 21 && time <= 25) return "#31446b";
-    if (time >= 26 && time <= 40) return "#00204d";
+    if (time >= 26 && time <= 60) return "#00204d";
     else console.log("setAccColor: out of range", time);
 
 }
@@ -137,14 +134,14 @@ function createLegend(map) {
                   div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
               });
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
-                div.innerHTML += `<p>Activities within ${sportsStore.travelTimeMinutes} min</p>`; 
+                div.innerHTML += `<p>Traveltime to activity (min)</p>`;
                 var accRanges = [
                     { min: 0, max: 5, color: "#ffea46" },
                     { min: 6, max: 10, color: "#ccbb69" },
                     { min: 11, max: 15, color: "#969078" },
                     { min: 16, max: 20, color: "#666970" },
                     { min: 21, max: 25, color: "#31446b" },
-                    { min: 26, max: 40, color: "#00204d" }
+                    { min: 26, max: 60, color: "#00204d" }
                 ];
 
         accRanges.forEach(function (range) {
