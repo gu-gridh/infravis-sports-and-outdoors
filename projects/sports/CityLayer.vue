@@ -74,20 +74,22 @@ function styleFeature(feature) {
     }
 }
 
-function setIndexColor(time) {
-    console.log("setIndexColor", time);
-    if (time === null || time === 0) return "#cccccc";
-    if (time >= 0 && time <= 10) return "#d71f27";
-    if (time >= 11 && time <= 20) return "#e95a38";
-    if (time >= 21 && time <= 30) return "#f69c5a";
-    if (time >= 31 && time <= 40) return "#fdc980";
-    if (time >= 41 && time <= 50) return "#fdefac";
-    if (time >= 51 && time <= 60) return "#e8eeac";
-    if (time >= 61 && time <= 70) return "#c4dd87";
-    if (time >= 71 && time <= 80) return "#99cc64";
-    if (time >= 81 && time <= 90) return "#55b453";
-    if (time >= 91 && time <= 100) return "#179847";
-    return "#cccccc";
+function setIndexColor(percent) {
+    console.log("setIndexColor", percent);
+    //no decimals
+    percent = Math.round(percent);
+    if (percent === null || undefined) return "#cccccc";
+    if (percent >= 0 && percent <= 10) return "#d7191c";
+    if (percent >= 11 && percent <= 20) return "#e85b3b";
+    if (percent >= 21 && percent <= 30) return "#f99d59";
+    if (percent >= 31 && percent <= 40) return "#fec981";
+    if (percent >= 41 && percent <= 50) return "#ffedab";
+    if (percent >= 51 && percent <= 60) return "#ebf7ad";
+    if (percent >= 61 && percent <= 70) return "#c4e687";
+    if (percent >= 71 && percent <= 80) return "#96d265";
+    if (percent >= 81 && percent <= 90) return "#58b453";
+    if (percent >= 91 && percent <= 100) return "#1a9641";
+    else console.log("setIndexColor: out of range", percent);
 }
 
 function setAccColor(time) {
@@ -115,18 +117,18 @@ function createLegend(map) {
      legend.onAdd = function () {
       var div = L.DomUtil.create("div", "legend");
       if (sportsStore.sustainabilityFilterType === "index") {
-        div.innerHTML += "<p>Index: % activities by sustainable modes</p>";
+        div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
               var indexRanges = [
-                  { min: 0, max: 10, color: "#d71f27" },
-                  { min: 11, max: 20, color: "#e95a38" },
-                  { min: 21, max: 30, color: "#f69c5a" },
-                  { min: 31, max: 40, color: "#fdc980" },
-                  { min: 41, max: 50, color: "#fdefac" },
-                  { min: 51, max: 60, color: "#e8eeac" },
-                  { min: 61, max: 70, color: "#c4dd87" },
-                  { min: 71, max: 80, color: "#99cc64" },
-                  { min: 81, max: 90, color: "#55b453" },
-                  { min: 91, max: 100, color: "#179847" }
+                  { min: 0, max: 10, color: "#d7191c" },
+                  { min: 11, max: 20, color: "#e85b3b" },
+                  { min: 21, max: 30, color: "#f99d59" },
+                  { min: 31, max: 40, color: "#fec981" },
+                  { min: 41, max: 50, color: "#ffedab" },
+                  { min: 51, max: 60, color: "#ebf7ad" },
+                  { min: 61, max: 70, color: "#c4e687" },
+                  { min: 71, max: 80, color: "#96d265" },
+                  { min: 81, max: 90, color: "#58b453" },
+                  { min: 91, max: 100, color: "#1a9641" }
               ];
               indexRanges.forEach(function (range) {
                   div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
