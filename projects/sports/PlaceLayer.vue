@@ -40,7 +40,7 @@ const geojsonData = ref(null);
 //raw commune data
 const communeData = ref(null);
 
-const regionLayer = ref(null);
+//const regionLayer = ref(null);
 //const pointsLayer = ref(null);
 
 const filteredLayer = ref(null);
@@ -282,50 +282,52 @@ function generateTravelPropName() {
 }
 
 async function loadGeoJSONFile(commune) {
-  if (!map.value) return;
+      if (!map.value) return
 
-  //remove old layers
-  if (filteredLayer.value) {
-    map.value.removeLayer(filteredLayer.value);
-    filteredLayer.value = null;
-  }
+      //remove old layer
+      if (filteredLayer.value) {
+        map.value.removeLayer(filteredLayer.value)
+        filteredLayer.value = null
+      }
 
-  //compute filename based on store values:
-  // For index: t2_index_15_30_60_by_<displayUnit>.geojson
-  // For travel: t1_ttm_dd_15_30_60_by_<displayUnit>.geojson
-  const prefix = sportsStore.sustainabilityFilterType === "index"
-    ? "t2_index"
-    : "t1_ttm_15_30_60";
-  const unit = sportsStore.displayUnit; //either "grid" or "regso"
-  const geojsonFile = `${prefix}_by_${unit}.geojson`;
-  console.log('Loading file... ' + geojsonFile);
+      const prefix = sportsStore.sustainabilityFilterType === 'index'
+        ? 't2_index'
+        : 't1_ttm_15_30_60'
 
-  try {
-    const resp = await fetch(asset(`geojson/${geojsonFile}`));
-    const rawCommune = await resp.json();
+      //"grid" or "regso"
+      const unit = sportsStore.displayUnit
 
-    //only include those for the selected commune
-    const filteredFeatures = rawCommune.features.filter(
-      (feature) => feature.properties.city_name === commune
-    );
-    communeData.value = {
-      type: "FeatureCollection",
-      features: filteredFeatures,
-    };
+      // build path based on unit
+      let geojsonPath
+      if (unit === 'grid') {
+        // for example:: geojson/geojson_grid_by_city/Ale/Ale_t2_index_by_grid.geojson
+        geojsonPath = `geojson/geojson_grid_by_city/${commune}/${commune}_${prefix}_by_${unit}.geojson`
+      } else {
+        // or: geojson/t2_index_by_regso.geojson
+        geojsonPath = `geojson/${prefix}_by_${unit}.geojson`
+      }
 
-    filteredLayer.value = L.geoJSON(communeData.value);
-    filteredLayer.value.addTo(map.value);
+      console.log('Loading file:', geojsonPath)
 
-    //move map to fit the new layer
-    map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] });
+      try {
+        const resp = await fetch(asset(geojsonPath))
+        const raw = await resp.json()
 
-    createLegend(map.value);
-    updateIndexMapLayer();
-    
-  } catch (error) {
-    console.error(`Failed to load ${geojsonFile}:`, error);
-  }
-}
+        const features = raw.features.filter(
+          f => f.properties.city_name === commune
+        )
+        communeData.value = { type: 'FeatureCollection', features }
+
+        filteredLayer.value = L.geoJSON(communeData.value)
+        filteredLayer.value.addTo(map.value)
+        map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] })
+
+        createLegend(map.value)
+        updateIndexMapLayer()
+      } catch (err) {
+        console.error(err)
+      }
+    }
 
 function setIndexColor(time) { //for the index layer
   if (time === null || time === 0) return "#cccccc"; //missing data
