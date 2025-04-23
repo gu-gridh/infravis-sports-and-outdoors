@@ -93,16 +93,19 @@ function setIndexColor(percent) {
 }
 
 function setAccColor(time) {
+    
+    //no decimals
+    time = Math.round(time);
     console.log("setAccColor", time);
-    if (time === null || time === 0) return "#cccccc";
-    if (time >= 1 && time <= 5) return "#dfbec43";
-    if (time >= 6 && time <= 10) return "#cdbc68";
-    if (time >= 11 && time <= 15) return "#979077";
+    //if (time === null || undefined) return "#cccccc";
+    if (time >= 0 && time <= 5) return "#ffea46";
+    if (time >= 6 && time <= 10) return "#ccbb69";
+    if (time >= 11 && time <= 15) return "#969078";
     if (time >= 16 && time <= 20) return "#666970";
-    if (time >= 21 && time <= 25) return "#32446b";
-    if (time >= 26 && time <= 30) return "#13234b";
-    if (time >= 31 ) return "#000000";
-    return "#cccccc";
+    if (time >= 21 && time <= 25) return "#31446b";
+    if (time >= 26 && time <= 40) return "#00204d";
+    else console.log("setAccColor: out of range", time);
+
 }
 
 function createLegend(map) {
@@ -136,14 +139,12 @@ function createLegend(map) {
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
                 div.innerHTML += `<p>Activities within ${sportsStore.travelTimeMinutes} min</p>`; 
                 var accRanges = [
-                    {min: 0, max: 0, color: '#cccccc'},
-                    { min: 1, max: 5, color: "#dfbec43" },
-                    { min: 6, max: 10, color: "#cdbc68" },
-                    { min: 11, max: 15, color: "#979077" },
+                    { min: 0, max: 5, color: "#ffea46" },
+                    { min: 6, max: 10, color: "#ccbb69" },
+                    { min: 11, max: 15, color: "#969078" },
                     { min: 16, max: 20, color: "#666970" },
-                    { min: 21, max: 25, color: "#32446b" },
-                    { min: 26, max: 30, color: "#13234b" },
-                    { min: 31, max: 100, color: "#000000" }
+                    { min: 21, max: 25, color: "#31446b" },
+                    { min: 26, max: 40, color: "#00204d" }
                 ];
 
         accRanges.forEach(function (range) {
