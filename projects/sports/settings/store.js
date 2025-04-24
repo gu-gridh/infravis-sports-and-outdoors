@@ -7,7 +7,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const allCommunes = ref([]);
 
   //(grid vs regso)
-  const displayUnit = ref('grid');
+  const displayUnit = ref('city');
 
   //("index" or "travel")
   const sustainabilityFilterType = ref('index');
