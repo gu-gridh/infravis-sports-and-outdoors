@@ -6,6 +6,7 @@
 import { onMounted, onBeforeUnmount, watch, ref, computed } from "vue";
 import L from "leaflet";
 import { useSportsStore } from "./settings/store";
+import { max } from "lodash";
 // import * as turf from "@turf/turf";
 
 const props = defineProps({
@@ -116,6 +117,7 @@ function createLegend(map) {
     var legend = L.control({ position: "bottomright" });
      legend.onAdd = function () {
       var div = L.DomUtil.create("div", "legend");
+      var accRanges = []
       if (sportsStore.sustainabilityFilterType === "index") {
         div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
               var indexRanges = [
@@ -135,14 +137,30 @@ function createLegend(map) {
               });
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
                 div.innerHTML += `<p>Traveltime to activity (min)</p>`;
-                var accRanges = [
+                //if <15min
+                if (sportsStore.travelTimeMinutes == 15) {
+                    accRanges = [
                     { min: 0, max: 5, color: "#ffea46" },
                     { min: 6, max: 10, color: "#ccbb69" },
                     { min: 11, max: 15, color: "#969078" },
-                    { min: 16, max: 20, color: "#666970" },
+                ]    
+                }
+                else if (sportsStore.travelTimeMinutes == 30) {
+                    accRanges = [
+                    {min: 16, max: 20, color: "#666970" },
                     { min: 21, max: 25, color: "#31446b" },
-                    { min: 26, max: 60, color: "#00204d" }
-                ];
+                    { min: 26, max: 30, color: "#00204d" },
+                ]
+                } else if (sportsStore.travelTimeMinutes == 60) {
+                    accRanges = [
+                    {min: 60, max: 65, color: "#00204d"},
+                    { min: 66, max: 70, color: "#31446b" },
+                    { min: 71, max: 75, color: "#666970" },
+                    { min: 76, max: 80, color: "#969078" },
+                    { min: 81, max: 85, color: "#ccbb69" },
+                    { min: 86, max: 90, color: "#ffea46" },
+                ]
+                } 
 
         accRanges.forEach(function (range) {
           div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
@@ -245,6 +263,19 @@ watch(
         }
     }
 );
+
+//change legend if travel time is changed
+// watch(
+//     () => sportsStore.travelTimeActivity,
+//     (newActivity) => {
+//         if (layer.value) {
+//             props.map.removeLayer(layer.value);
+//             layer.value = null;
+//             loadLayer();
+//         }
+//     }
+// );
+
 </script>
 
 <style scoped>
