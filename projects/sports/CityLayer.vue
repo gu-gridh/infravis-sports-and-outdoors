@@ -96,23 +96,23 @@ function setAccColor(time) {
     //no decimals
     time = Math.round(time);
     //if (time === null || undefined) return "#cccccc";
-    console.log("setAccColor", time);
+    
     if (time === null || time === undefined || time == 0) return "#ffffff"; //white
     if(sportsStore.travelTimeMinutes == 15) {
         if (time > 0 && time <= 5) return "#ffea46";
         if (time >= 6 && time <= 10) return "#ccbb69";
         if (time >= 11 && time <= 15) return "#969078";
     } else if(sportsStore.travelTimeMinutes == 30) {
+        console.log("setAccColor", time);
         if (time >= 16 && time <= 20) return "#666970";
         if (time >= 21 && time <= 25) return "#31446b";
         if (time >= 26 && time <= 30) return "#00204d";
     } else if(sportsStore.travelTimeMinutes == 60) {
+        console.log("setAccColor", time);
         if (time >= 31 && time <= 35) return "#00204d";
         if (time >= 36 && time <= 40) return "#31446b";
         if (time >= 41 && time <= 45) return "#666970";
         if (time >= 46 && time <= 50) return "#969078";
-        if (time >= 51 && time <= 55) return "#ccbb69";
-        if (time >= 56 && time <= 60) return "#ffea46";
     } else {
         console.log("setAccColor: out of range", time);
 
@@ -167,12 +167,11 @@ function createLegend(map) {
                 ]
                 } else if (sportsStore.travelTimeMinutes == 60) {
                     accRanges = [
-                    {min: 60, max: 65, color: "#00204d"},
-                    { min: 66, max: 70, color: "#31446b" },
-                    { min: 71, max: 75, color: "#666970" },
-                    { min: 76, max: 80, color: "#969078" },
-                    { min: 81, max: 85, color: "#ccbb69" },
-                    { min: 86, max: 90, color: "#ffea46" },
+                    {min: 31, max: 35, color: "#00204d"},
+                    { min: 36, max: 40, color: "#31446b" },
+                    { min: 41, max: 50, color: "#666970" },
+                    { min: 51, max: 60, color: "#969078" },
+                    
                 ]
                 } 
         //always show value 0 as white on legend
