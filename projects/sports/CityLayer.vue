@@ -96,13 +96,27 @@ function setAccColor(time) {
     //no decimals
     time = Math.round(time);
     //if (time === null || undefined) return "#cccccc";
-    if (time >= 0 && time <= 5) return "#ffea46";
-    if (time >= 6 && time <= 10) return "#ccbb69";
-    if (time >= 11 && time <= 15) return "#969078";
-    if (time >= 16 && time <= 20) return "#666970";
-    if (time >= 21 && time <= 25) return "#31446b";
-    if (time >= 26 && time <= 60) return "#00204d";
-    else console.log("setAccColor: out of range", time);
+    console.log("setAccColor", time);
+    if (time === null || time === undefined || time == 0) return "#ffffff"; //white
+    if(sportsStore.travelTimeMinutes == 15) {
+        if (time > 0 && time <= 5) return "#ffea46";
+        if (time >= 6 && time <= 10) return "#ccbb69";
+        if (time >= 11 && time <= 15) return "#969078";
+    } else if(sportsStore.travelTimeMinutes == 30) {
+        if (time >= 16 && time <= 20) return "#666970";
+        if (time >= 21 && time <= 25) return "#31446b";
+        if (time >= 26 && time <= 30) return "#00204d";
+    } else if(sportsStore.travelTimeMinutes == 60) {
+        if (time >= 31 && time <= 35) return "#00204d";
+        if (time >= 36 && time <= 40) return "#31446b";
+        if (time >= 41 && time <= 45) return "#666970";
+        if (time >= 46 && time <= 50) return "#969078";
+        if (time >= 51 && time <= 55) return "#ccbb69";
+        if (time >= 56 && time <= 60) return "#ffea46";
+    } else {
+        console.log("setAccColor: out of range", time);
+
+    }
 
 }
 
@@ -140,7 +154,7 @@ function createLegend(map) {
                 //if <15min
                 if (sportsStore.travelTimeMinutes == 15) {
                     accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
+                    { min: 1, max: 5, color: "#ffea46" },
                     { min: 6, max: 10, color: "#ccbb69" },
                     { min: 11, max: 15, color: "#969078" },
                 ]    
@@ -161,7 +175,8 @@ function createLegend(map) {
                     { min: 86, max: 90, color: "#ffea46" },
                 ]
                 } 
-
+        //always show value 0 as white on legend
+        div.innerHTML += `<div><span style="background:#ffffff"></span> 0</div>`;
         accRanges.forEach(function (range) {
           div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
            });
