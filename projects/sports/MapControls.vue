@@ -120,6 +120,14 @@
           </label>
         </div>
 
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
+          <label>Destinations</label>
+          <label class="switch">
+            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
+            <span class="slider"></span>
+          </label>
+        </div>
+
       </template>
     </div>
   </div>
@@ -234,8 +242,6 @@ const setTravelTimeActivity = (value) => (store.travelTimeActivity = value);
 const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = value);
 const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
 const setTravelTimeDay = (value) => (store.travelTimeDay = value);
-const toggleTravelTimePopulationWeight = () => (store.travelTimePopulationWeight = !store.travelTimePopulationWeight);
-const toggleTravelTimePercentageAccess = () => (store.travelTimePercentageAccess = !store.travelTimePercentageAccess);
 </script>
 
 <style scoped>

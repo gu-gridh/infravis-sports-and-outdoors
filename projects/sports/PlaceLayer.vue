@@ -26,8 +26,11 @@ import CityLayer from "./CityLayer.vue";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
-
 const emit = defineEmits(['close']);
+
+//destinations layer
+const destinationsLayer = ref(null)
+const destinationsData  = ref(null)
 
 //info overlay
 const props = defineProps({
@@ -37,12 +40,7 @@ const props = defineProps({
 //region's data kommun_regso
 const geojsonData = ref(null);
 
-//raw commune data
 const communeData = ref(null);
-
-//const regionLayer = ref(null);
-//const pointsLayer = ref(null);
-
 const filteredLayer = ref(null);
 
 const mapStyles = ref({
@@ -51,6 +49,26 @@ const mapStyles = ref({
   topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
 
+onMounted(async () => {
+  await initMap();
+});
+
+watch( //load destinations
+  [
+    () => sportsStore.destinations,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.commune,
+  ],
+  async ([show, activity]) => {
+    if (!show) {
+      clearDestinations()
+      return
+    }
+    await loadDestinationsData()
+    renderDestinations(activity)
+  },
+  { immediate: true }
+)
 
 watch(() => props.showInfo, (newVal) => {
   console.log("showInfo changed:", newVal);
@@ -60,14 +78,6 @@ watch(() => props.showInfo, (newVal) => {
     document.querySelector(".info-overlay").style.display = "none";
   }
 })
-//for generating asset URLs
-function asset(path) {
-  return `${import.meta.env.BASE_URL}${path}`;
-}
-
-onMounted(async () => {
-  await initMap();
-});
 
 //load commune geojson
 watch(
@@ -112,19 +122,24 @@ watch(
   }
 );
 
-//whenever a points file is selected
-// watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
-//   if (newFile) {
-//     renderPointsLayer(newFile);
-//   } else {
-//     removePointsLayer();
-//   }
-// });
+function asset(path) {
+  return `${import.meta.env.BASE_URL}${path}`;
+}
+
+function uriSegment(str) {
+  return encodeURIComponent(str);
+}
 
 async function initMap() {
   map.value = L.map("map", {
     minZoom: 5, 
   }).setView([63, 17], 5); // Sweden's approximate center (Sollefteå)
+
+  map.value.createPane('communePane')  
+  map.value.getPane('communePane').style.zIndex = 650
+
+  map.value.createPane('destinationsPane')
+  map.value.getPane('destinationsPane').style.zIndex = 700
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -146,15 +161,6 @@ async function initMap() {
     if (Array.isArray(sportsStore.allCommunes)) {
       sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
     }
-
-    // const plainRegion = JSON.parse(JSON.stringify(rawRegion));
-
-    // regionLayer.value = L.vectorGrid.slicer(plainRegion, {
-    //   vectorTileLayerStyles: {
-    //     sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-    //   },
-    //   getFeatureId: (feature) => feature.id,
-    // }).addTo(map.value);
 
     //add north arrow and scale
     L.control.scale({
@@ -182,7 +188,7 @@ async function initMap() {
     L.control.northArrow({ position: "topright" }).addTo(map.value);
 
   } catch (error) {
-    console.error("Error loading kommun_regso.geojson:", error);
+    console.error(error);
   }
 }
 
@@ -255,6 +261,7 @@ function updateIndexMapLayer() {
   }
 
   filteredLayer.value = L.geoJSON(newFC, {
+    pane: 'communePane',
     style: styleFeature,
     onEachFeature,
   });
@@ -300,9 +307,9 @@ async function loadGeoJSONFile(commune) {
       // build path based on unit
       let geojsonPath
       if (unit === 'grid') {
-        // for example:: geojson/geojson_grid_by_city/Ale/Ale_t2_index_by_grid.geojson
-        geojsonPath = `geojson/geojson_grid_by_city/${commune}/${commune}_${prefix}_by_${unit}.geojson`
-      } else {
+        const seg = uriSegment(commune);
+        geojsonPath = `geojson/geojson_grid_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;     
+      } else { //regso
         // or: geojson/t2_index_by_regso.geojson
         geojsonPath = `geojson/${prefix}_by_${unit}.geojson`
       }
@@ -318,7 +325,7 @@ async function loadGeoJSONFile(commune) {
         )
         communeData.value = { type: 'FeatureCollection', features }
 
-        filteredLayer.value = L.geoJSON(communeData.value)
+        filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
         filteredLayer.value.addTo(map.value)
         map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] })
 
@@ -327,7 +334,7 @@ async function loadGeoJSONFile(commune) {
       } catch (err) {
         console.error(err)
       }
-    }
+}
 
 function setIndexColor(percent) { //for the index layer
   //no decimals
@@ -360,7 +367,7 @@ function setAccColor (time) { //for the accessibility layer
 }
 
 // adds legend based on what layer is active
- function createLegend(map) {
+function createLegend(map) {
     // Check if map exists
     if (!map) {
       return;
@@ -406,7 +413,53 @@ function setAccColor (time) { //for the accessibility layer
          return div;
      };
      legend.addTo(map);
- }
+}
+
+const loadDestinationsData = async () => {
+  if (destinationsData.value) return
+  try {
+    const resp = await fetch(asset('geojson/destinations.geojson'))
+    destinationsData.value = await resp.json()
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const clearDestinations = () => {
+  if (map.value && destinationsLayer.value) {
+    map.value.removeLayer(destinationsLayer.value)
+    destinationsLayer.value = null
+  }
+}
+
+const renderDestinations = (activity) => {
+  if (!map.value || !destinationsData.value) return;
+  const wantedClass = activity?.replace(/ /g, "_");
+  const wantedCity  = sportsStore.commune;
+
+  const fc = {
+    type: "FeatureCollection",
+    features: destinationsData.value.features.filter(f => {
+      const okClass = !wantedClass || f.properties.classification === wantedClass;
+      const okCity  = !wantedCity  || f.properties.city_name      === wantedCity;
+      return okClass && okCity;
+    })
+  };
+
+  clearDestinations();
+
+  destinationsLayer.value = L.geoJSON(fc, {
+    pointToLayer: (_, latlng) =>
+      L.circleMarker(latlng, {
+        pane: 'destinationsPane',
+        radius: 6,
+        weight: 1,
+        color: "#444",
+        fillColor: "#ff6200",
+        fillOpacity: 0.9
+      }),
+  }).addTo(map.value);
+};
 </script>
 
 <style>
