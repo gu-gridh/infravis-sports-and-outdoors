@@ -53,75 +53,6 @@ onMounted(async () => {
   await initMap();
 });
 
-watch( //load destinations
-  [
-    () => sportsStore.destinations,
-    () => sportsStore.travelTimeActivity,
-    () => sportsStore.commune,
-  ],
-  async ([show, activity]) => {
-    if (!show) {
-      clearDestinations()
-      return
-    }
-    await loadDestinationsData()
-    renderDestinations(activity)
-  },
-  { immediate: true }
-)
-
-watch(() => props.showInfo, (newVal) => {
-  console.log("showInfo changed:", newVal);
-  if (newVal == true) {
-    document.querySelector(".info-overlay").style.display = "block";
-  } else {
-    document.querySelector(".info-overlay").style.display = "none";
-  }
-})
-
-//load commune geojson
-watch(
-  [
-    () => sportsStore.commune,
-    () => sportsStore.displayUnit,
-    () => sportsStore.sustainabilityFilterType,
-    () => sportsStore.travelTimePopulationWeight
-  ],
-  ([newCommune, newDisplayUnit]) => {
-    console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
-
-    if (!newCommune) {
-      map.value.setView([63, 17], 5);
-
-      //remove filtered layer if present
-      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
-        map.value.removeLayer(filteredLayer.value);
-        filteredLayer.value = null;
-      }
-
-      return;
-    }
-
-    loadGeoJSONFile(newCommune);
-  }
-);
-
-//watch for changes in the sustainability index and travel time filters
-watch( 
-  [
-    () => sportsStore.sustainabilityIndexActivity,
-    () => sportsStore.sustainabilityIndexMinutes,
-    () => sportsStore.sustainabilityIndexDay,
-    () => sportsStore.travelTimeActivity,
-    () => sportsStore.travelTimeTransportMode,
-    () => sportsStore.travelTimeMinutes,
-    () => sportsStore.travelTimeDay,
-  ],
-  () => {
-    updateIndexMapLayer();
-  }
-);
-
 function asset(path) {
   return `${import.meta.env.BASE_URL}${path}`;
 }
@@ -460,6 +391,75 @@ const renderDestinations = (activity) => {
       }),
   }).addTo(map.value);
 };
+
+watch( //load destinations
+  [
+    () => sportsStore.destinations,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.commune,
+  ],
+  async ([show, activity]) => {
+    if (!show) {
+      clearDestinations()
+      return
+    }
+    await loadDestinationsData()
+    renderDestinations(activity)
+  },
+  { immediate: true }
+)
+
+watch(() => props.showInfo, (newVal) => {
+  console.log("showInfo changed:", newVal);
+  if (newVal == true) {
+    document.querySelector(".info-overlay").style.display = "block";
+  } else {
+    document.querySelector(".info-overlay").style.display = "none";
+  }
+})
+
+//load commune geojson
+watch(
+  [
+    () => sportsStore.commune,
+    () => sportsStore.displayUnit,
+    () => sportsStore.sustainabilityFilterType,
+    () => sportsStore.travelTimePopulationWeight
+  ],
+  ([newCommune, newDisplayUnit]) => {
+    console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
+
+    if (!newCommune) {
+      map.value.setView([63, 17], 5);
+
+      //remove filtered layer if present
+      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
+        map.value.removeLayer(filteredLayer.value);
+        filteredLayer.value = null;
+      }
+
+      return;
+    }
+
+    loadGeoJSONFile(newCommune);
+  }
+);
+
+//watch for changes in the sustainability index and travel time filters
+watch( 
+  [
+    () => sportsStore.sustainabilityIndexActivity,
+    () => sportsStore.sustainabilityIndexMinutes,
+    () => sportsStore.sustainabilityIndexDay,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.travelTimeTransportMode,
+    () => sportsStore.travelTimeMinutes,
+    () => sportsStore.travelTimeDay,
+  ],
+  () => {
+    updateIndexMapLayer();
+  }
+);
 </script>
 
 <style>

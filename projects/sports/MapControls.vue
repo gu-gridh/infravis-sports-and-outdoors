@@ -163,6 +163,7 @@ function selectCommune(name) {
 
 function clearCommune() {
   store.commune = "";
+  store.destinations = false
   searchQuery.value = "";
   isDropdownVisible.value = false;
 }
