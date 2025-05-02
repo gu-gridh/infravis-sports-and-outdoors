@@ -221,6 +221,7 @@ const activityTypes = [
 function setDisplayUnit(unit) {
   if (unit === 'city') {
     store.commune = ''
+    store.destinations = false
     searchQuery.value = ''
     isDropdownVisible.value = false
   }
