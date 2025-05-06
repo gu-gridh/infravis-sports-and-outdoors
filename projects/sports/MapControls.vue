@@ -162,6 +162,7 @@ function selectCommune(name) {
 }
 
 function clearCommune() {
+  setDisplayUnit('city')
   store.commune = "";
   store.destinations = false
   searchQuery.value = "";
