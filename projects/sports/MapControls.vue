@@ -2,6 +2,13 @@
   <div class="map-controls">
     <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
+      <button
+          class="lang-btn"
+          @click="toggleLocale"
+          :title="locale === 'sv' ? 'English' : 'Svenska'"
+        >
+          {{ locale === 'sv' ? 'EN' : 'SV' }}
+      </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
     <div class="section">
@@ -36,7 +43,7 @@
     <!-- Sustainability Filters -->
     <div class="section">
       <h2>Indicator</h2>
-      <p>Choose one</p>
+      <p>{{ t('chooseone') }}</p>
       <div class="btn-group">
         <button @click="setSustainabilityFilterType('index')"
           :class="{ active: store.sustainabilityFilterType === 'index' }">
@@ -49,7 +56,7 @@
       </div>
       <template v-if="store.sustainabilityFilterType === 'index'">
         <div class="btn-group">
-          <label>Activity</label>
+          <label>{{ t('activity') }}</label>
           <select @change="setSustainabilityIndexActivity($event.target.value)"
             :value="store.sustainabilityIndexActivity">
             <option v-for="act in sustainabilityIndexOptions" :key="act.value" :value="act.value">
@@ -58,14 +65,14 @@
           </select>
         </div>
         <div class="btn-group">
-          <label>Minutes</label>
+          <label>{{ t('minutes') }}</label>
           <button v-for="min in minutesOptions" :key="min" @click="setSustainabilityIndexMinutes(min)"
             :class="{ active: store.sustainabilityIndexMinutes === min }">
             {{ min }}
           </button>
         </div>
         <div class="btn-group">
-          <span>Day</span>
+          <span>{{ t('day') }}</span>
           <button v-for="day in dayTypes" :key="day.value" @click="setSustainabilityIndexDay(day.value)"
             :class="{ active: store.sustainabilityIndexDay === day.value }">
             {{ day.label }}
@@ -75,7 +82,7 @@
 
       <template v-if="store.sustainabilityFilterType === 'travel'">
         <div class="btn-group">
-          <label>Activity</label>
+          <label>{{ t('activity') }}</label>
           <select @change="setTravelTimeActivity($event.target.value)" :value="store.travelTimeActivity">
             <option v-for="act in activityTypes" :key="act.value" :value="act.value">
               {{ act.label }}
@@ -91,14 +98,14 @@
           </select>
         </div>
         <div class="btn-group">
-          <label>Minutes</label>
+          <label>{{ t('minutes') }}</label>
           <button v-for="min in minutesOptions" :key="min" @click="setTravelTimeMinutes(min)"
             :class="{ active: store.travelTimeMinutes === min }">
             {{ min }}
           </button>
         </div>
         <div class="btn-group">
-          <span>Day</span>
+          <span>{{ t('day') }}</span>
           <button v-for="day in dayTypes" :key="day.value" @click="setTravelTimeDay(day.value)"
             :class="{ active: store.travelTimeDay === day.value }">
             {{ day.label }}
@@ -135,8 +142,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";    
 import { useSportsStore } from "./settings/store";
 
+const { t, locale } = useI18n();
 const store = useSportsStore();
 const searchQuery = ref("");
 const isDropdownVisible = ref(false);
@@ -149,6 +158,10 @@ const filteredCommunes = computed(() => {
     c.kommunnamn.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
+
+function toggleLocale() {
+  locale.value = locale.value === "sv" ? "en" : "sv";
+}
 
 function showDropdown() {
   isDropdownVisible.value = true;
@@ -437,5 +450,16 @@ input:checked+.slider:before {
 input:disabled+.slider {
   background-color: #999;
   cursor: not-allowed;
+}
+
+.lang-btn {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border: 1px solid #497723;
+  background: #497723;
+  color: #fff;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>
