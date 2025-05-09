@@ -12,9 +12,9 @@
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
     <div class="section">
-      <h2>Municipality</h2>
+      <h2>{{ t('Municipality') }}</h2>
       <div ref="searchContainer" class="municipality-search">
-        <input type="text" v-model="searchQuery" placeholder="Search municipality..." @focus="showDropdown" />
+        <input type="text" v-model="searchQuery" :placeholder="$t('search')" @focus="showDropdown" />
         <button v-if="searchQuery" class="clear-btn" @click="clearCommune">X</button>
         <ul v-show="isDropdownVisible && filteredCommunes.length" class="search-results">
           <li v-for="commune in filteredCommunes" :key="commune.id" @click="selectCommune(commune.kommunnamn)">
@@ -25,7 +25,7 @@
 
       <!-- Grid vs Regso -->
       <div class="btn-group2" style="margin-top: 10px;">
-        Display unit
+        {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
           Grid
@@ -145,7 +145,9 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";    
 import { useSportsStore } from "./settings/store";
 
-const { t, locale } = useI18n();
+const { t, locale } = useI18n(
+
+);
 const store = useSportsStore();
 const searchQuery = ref("");
 const isDropdownVisible = ref(false);
@@ -199,11 +201,11 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 
-const dayTypes = [
-  { label: "Weekday", value: "week_day" },
-  { label: "Saturday", value: "saturday" },
-  { label: "Sunday", value: "sunday" },
-];
+const dayTypes = computed(() => [
+  { label: t('weekday'), value: 'week_day' },
+  { label: t('saturday'), value: 'saturday' },
+  { label: t('sunday'),   value: 'sunday' },
+])
 
 const sustainabilityIndexOptions = [
   { label: "Total", value: "total" },
