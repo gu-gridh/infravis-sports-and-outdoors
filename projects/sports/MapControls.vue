@@ -3,11 +3,11 @@
     <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
       <button
-          class="lang-btn"
-          @click="toggleLocale"
-          :title="locale === 'sv' ? 'English' : 'Svenska'"
-        >
-          {{ locale === 'sv' ? 'EN' : 'SV' }}
+        class="lang-btn"
+        @click="toggleLocale"
+        :title="locale === 'sv' ? 'Svenska' : 'English'"
+      >
+        {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
