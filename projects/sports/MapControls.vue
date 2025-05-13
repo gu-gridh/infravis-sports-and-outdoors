@@ -119,10 +119,10 @@
           </label>
         </div>
 
-        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
+        <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
           <label>% Population with Access to City</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!store.commune">
+            <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
             <span class="slider"></span>
           </label>
         </div>
