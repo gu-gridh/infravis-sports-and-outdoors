@@ -227,7 +227,7 @@ const activityTypes = [
   { label: "Picnic", value: "Picnic" },
   { label: "Playground", value: "Playground" },
   { label: "Racket sports", value: "Racket sports" },
-  { label: "Walking / running", value: "Walking / running" },
+  { label: "Walking / running", value: "Walking Running" },
   { label: "Athletics", value: "Athletics" },
   { label: "Gymnastics", value: "Gymnastics" },
   { label: "Outdoor gym", value: "Outdoor gym" },
