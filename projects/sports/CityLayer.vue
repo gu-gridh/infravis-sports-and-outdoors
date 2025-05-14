@@ -166,7 +166,7 @@ function createLegend(map) {
     legend.onAdd = function () {
         var div = L.DomUtil.create("div", "legend");
         var accRanges = []
-        if (sportsStore.sustainabilityFilterType === "index") {
+        if (sportsStore.sustainabilityFilterType === "index" || sportsStore.travelTimePercentageAccess) {
             div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
             var indexRanges = [
                 { min: 0, max: 10, color: "#d7191c" },
