@@ -284,17 +284,32 @@ function setIndexColor(percent) { //for the index layer
     else console.log("setIndexColor: out of range", percent);
 }
 
-function setAccColor (time) { //for the accessibility layer
-  //no decimals
-  time = Math.round(time);
+function setAccColor(time) {
+    //no decimals
+    time = Math.round(time);
     //if (time === null || undefined) return "#cccccc";
-    if (time >= 0 && time <= 5) return "#ffea46";
-    if (time >= 6 && time <= 10) return "#ccbb69";
-    if (time >= 11 && time <= 15) return "#969078";
-    if (time >= 16 && time <= 20) return "#666970";
-    if (time >= 21 && time <= 25) return "#31446b";
-    if (time >= 26 && time <= 60) return "#00204d";
-    else console.log("setAccColor: out of range", time);
+
+    if (time === null || time === undefined || time == 0) return "#ffffff"; //white
+    if (sportsStore.travelTimeMinutes == 15) {
+        if (time > 0 && time <= 5) return "#ffea46";
+        if (time >= 6 && time <= 10) return "#ccbb69";
+        if (time >= 11 && time <= 15) return "#969078";
+    } else if (sportsStore.travelTimeMinutes == 30) {
+        console.log("setAccColor", time);
+        if (time >= 16 && time <= 20) return "#666970";
+        if (time >= 21 && time <= 25) return "#31446b";
+        if (time >= 26 && time <= 30) return "#00204d";
+    } else if (sportsStore.travelTimeMinutes == 60) {
+        console.log("setAccColor", time);
+        if (time >= 31 && time <= 35) return "#00204d";
+        if (time >= 36 && time <= 40) return "#31446b";
+        if (time >= 41 && time <= 45) return "#666970";
+        if (time >= 46 && time <= 50) return "#969078";
+    } else {
+        console.log("setAccColor: out of range", time);
+
+    }
+
 }
 
 // adds legend based on what layer is active
@@ -309,6 +324,7 @@ function createLegend(map) {
     var legend = L.control({ position: "bottomright" });
      legend.onAdd = function () {
       var div = L.DomUtil.create("div", "legend");
+      var accRanges = []
       if (sportsStore.sustainabilityFilterType === "index") {
         div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
               var indexRanges = [
@@ -327,19 +343,35 @@ function createLegend(map) {
                   div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
               });
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
-                div.innerHTML += `<p>Traveltime to activity (min)</p>`;
-                var accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
+          div.innerHTML += `<p>Traveltime to activity (min)</p>`;
+            //if <15min
+            if (sportsStore.travelTimeMinutes == 15) {
+                accRanges = [
+                    { min: 1, max: 5, color: "#ffea46" },
                     { min: 6, max: 10, color: "#ccbb69" },
                     { min: 11, max: 15, color: "#969078" },
+                ]
+            }
+            else if (sportsStore.travelTimeMinutes == 30) {
+                accRanges = [
                     { min: 16, max: 20, color: "#666970" },
                     { min: 21, max: 25, color: "#31446b" },
-                    { min: 26, max: 60, color: "#00204d" }
-                ];
+                    { min: 26, max: 30, color: "#00204d" },
+                ]
+            } else if (sportsStore.travelTimeMinutes == 60) {
+                accRanges = [
+                    { min: 31, max: 35, color: "#00204d" },
+                    { min: 36, max: 40, color: "#31446b" },
+                    { min: 41, max: 50, color: "#666970" },
+                    { min: 51, max: 60, color: "#969078" },
 
-        accRanges.forEach(function (range) {
-          div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-           });
+                ]
+            }
+            //always show value 0 as white on legend
+            div.innerHTML += `<div><span style="background:#ffffff"></span> 0</div>`;
+            accRanges.forEach(function (range) {
+                div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+            });
          }
          return div;
      };
@@ -458,6 +490,7 @@ watch(
   ],
   () => {
     updateIndexMapLayer();
+    createLegend(map.value);
   }
 );
 </script>
