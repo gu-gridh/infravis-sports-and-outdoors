@@ -26,8 +26,11 @@ import CityLayer from "./CityLayer.vue";
 
 const map = ref(null);
 const sportsStore = useSportsStore();
-
 const emit = defineEmits(['close']);
+
+//destinations layer
+const destinationsLayer = ref(null)
+const destinationsData  = ref(null)
 
 //info overlay
 const props = defineProps({
@@ -37,94 +40,35 @@ const props = defineProps({
 //region's data kommun_regso
 const geojsonData = ref(null);
 
-//raw commune data
 const communeData = ref(null);
-
-//const regionLayer = ref(null);
-//const pointsLayer = ref(null);
-
 const filteredLayer = ref(null);
 
 const mapStyles = ref({
-  arcGisTopo: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
-
-
-watch(() => props.showInfo, (newVal) => {
-  console.log("showInfo changed:", newVal);
-  if (newVal == true) {
-    document.querySelector(".info-overlay").style.display = "block";
-  } else {
-    document.querySelector(".info-overlay").style.display = "none";
-  }
-})
-//for generating asset URLs
-function asset(path) {
-  return `${import.meta.env.BASE_URL}${path}`;
-}
 
 onMounted(async () => {
   await initMap();
 });
 
-//load commune geojson
-watch(
-  [
-    () => sportsStore.commune,
-    () => sportsStore.displayUnit,
-    () => sportsStore.sustainabilityFilterType,
-    () => sportsStore.travelTimePopulationWeight
-  ],
-  ([newCommune, newDisplayUnit]) => {
-    console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
+function asset(path) {
+  return `${import.meta.env.BASE_URL}${path}`;
+}
 
-    if (!newCommune) {
-      map.value.setView([63, 17], 5);
-
-      //remove filtered layer if present
-      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
-        map.value.removeLayer(filteredLayer.value);
-        filteredLayer.value = null;
-      }
-
-      return;
-    }
-
-    loadGeoJSONFile(newCommune);
-  }
-);
-
-//watch for changes in the sustainability index and travel time filters
-watch( 
-  [
-    () => sportsStore.sustainabilityIndexActivity,
-    () => sportsStore.sustainabilityIndexMinutes,
-    () => sportsStore.sustainabilityIndexDay,
-    () => sportsStore.travelTimeActivity,
-    () => sportsStore.travelTimeTransportMode,
-    () => sportsStore.travelTimeMinutes,
-    () => sportsStore.travelTimeDay,
-  ],
-  () => {
-    updateIndexMapLayer();
-  }
-);
-
-//whenever a points file is selected
-// watch(() => sportsStore.activeGeoJsonFile, (newFile) => {
-//   if (newFile) {
-//     renderPointsLayer(newFile);
-//   } else {
-//     removePointsLayer();
-//   }
-// });
+function uriSegment(str) {
+  return encodeURIComponent(str);
+}
 
 async function initMap() {
   map.value = L.map("map", {
     minZoom: 5, 
   }).setView([63, 17], 5); // Sweden's approximate center (Sollefteå)
+
+  map.value.createPane('communePane')  
+  map.value.getPane('communePane').style.zIndex = 650
+
+  map.value.createPane('destinationsPane')
+  map.value.getPane('destinationsPane').style.zIndex = 700
 
   L.tileLayer(mapStyles.value.OSM, {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -146,15 +90,6 @@ async function initMap() {
     if (Array.isArray(sportsStore.allCommunes)) {
       sportsStore.allCommunes.sort((a, b) => a.kommunnamn.localeCompare(b.kommunnamn));
     }
-
-    // const plainRegion = JSON.parse(JSON.stringify(rawRegion));
-
-    // regionLayer.value = L.vectorGrid.slicer(plainRegion, {
-    //   vectorTileLayerStyles: {
-    //     sliced: { color: "blue", weight: 1, fillOpacity: 0.6 },
-    //   },
-    //   getFeatureId: (feature) => feature.id,
-    // }).addTo(map.value);
 
     //add north arrow and scale
     L.control.scale({
@@ -182,7 +117,7 @@ async function initMap() {
     L.control.northArrow({ position: "topright" }).addTo(map.value);
 
   } catch (error) {
-    console.error("Error loading kommun_regso.geojson:", error);
+    console.error(error);
   }
 }
 
@@ -255,6 +190,7 @@ function updateIndexMapLayer() {
   }
 
   filteredLayer.value = L.geoJSON(newFC, {
+    pane: 'communePane',
     style: styleFeature,
     onEachFeature,
   });
@@ -300,9 +236,9 @@ async function loadGeoJSONFile(commune) {
       // build path based on unit
       let geojsonPath
       if (unit === 'grid') {
-        // for example:: geojson/geojson_grid_by_city/Ale/Ale_t2_index_by_grid.geojson
-        geojsonPath = `geojson/geojson_grid_by_city/${commune}/${commune}_${prefix}_by_${unit}.geojson`
-      } else {
+        const seg = uriSegment(commune);
+        geojsonPath = `geojson/geojson_grid_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;     
+      } else { //regso
         // or: geojson/t2_index_by_regso.geojson
         geojsonPath = `geojson/${prefix}_by_${unit}.geojson`
       }
@@ -318,7 +254,7 @@ async function loadGeoJSONFile(commune) {
         )
         communeData.value = { type: 'FeatureCollection', features }
 
-        filteredLayer.value = L.geoJSON(communeData.value)
+        filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
         filteredLayer.value.addTo(map.value)
         map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] })
 
@@ -327,7 +263,7 @@ async function loadGeoJSONFile(commune) {
       } catch (err) {
         console.error(err)
       }
-    }
+}
 
 function setIndexColor(percent) { //for the index layer
   //no decimals
@@ -346,21 +282,36 @@ function setIndexColor(percent) { //for the index layer
     else console.log("setIndexColor: out of range", percent);
 }
 
-function setAccColor (time) { //for the accessibility layer
-  //no decimals
-  time = Math.round(time);
+function setAccColor(time) {
+    //no decimals
+    time = Math.round(time);
     //if (time === null || undefined) return "#cccccc";
-    if (time >= 0 && time <= 5) return "#ffea46";
-    if (time >= 6 && time <= 10) return "#ccbb69";
-    if (time >= 11 && time <= 15) return "#969078";
-    if (time >= 16 && time <= 20) return "#666970";
-    if (time >= 21 && time <= 25) return "#31446b";
-    if (time >= 26 && time <= 60) return "#00204d";
-    else console.log("setAccColor: out of range", time);
+
+    if (time === null || time === undefined || time == 0) return "#ffffff"; //white
+    if (sportsStore.travelTimeMinutes == 15) {
+        if (time > 0 && time <= 5) return "#ffea46";
+        if (time >= 6 && time <= 10) return "#ccbb69";
+        if (time >= 11 && time <= 15) return "#969078";
+    } else if (sportsStore.travelTimeMinutes == 30) {
+        console.log("setAccColor", time);
+        if (time >= 16 && time <= 20) return "#666970";
+        if (time >= 21 && time <= 25) return "#31446b";
+        if (time >= 26 && time <= 30) return "#00204d";
+    } else if (sportsStore.travelTimeMinutes == 60) {
+        console.log("setAccColor", time);
+        if (time >= 31 && time <= 35) return "#00204d";
+        if (time >= 36 && time <= 40) return "#31446b";
+        if (time >= 41 && time <= 45) return "#666970";
+        if (time >= 46 && time <= 50) return "#969078";
+    } else {
+        console.log("setAccColor: out of range", time);
+
+    }
+
 }
 
 // adds legend based on what layer is active
- function createLegend(map) {
+function createLegend(map) {
     // Check if map exists
     if (!map) {
       return;
@@ -371,6 +322,7 @@ function setAccColor (time) { //for the accessibility layer
     var legend = L.control({ position: "bottomright" });
      legend.onAdd = function () {
       var div = L.DomUtil.create("div", "legend");
+      var accRanges = []
       if (sportsStore.sustainabilityFilterType === "index") {
         div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
               var indexRanges = [
@@ -389,24 +341,156 @@ function setAccColor (time) { //for the accessibility layer
                   div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
               });
       } else if (sportsStore.sustainabilityFilterType === "travel") {         
-                div.innerHTML += `<p>Traveltime to activity (min)</p>`;
-                var accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
+          div.innerHTML += `<p>Traveltime to activity (min)</p>`;
+            //if <15min
+            if (sportsStore.travelTimeMinutes == 15) {
+                accRanges = [
+                    { min: 1, max: 5, color: "#ffea46" },
                     { min: 6, max: 10, color: "#ccbb69" },
                     { min: 11, max: 15, color: "#969078" },
+                ]
+            }
+            else if (sportsStore.travelTimeMinutes == 30) {
+                accRanges = [
                     { min: 16, max: 20, color: "#666970" },
                     { min: 21, max: 25, color: "#31446b" },
-                    { min: 26, max: 60, color: "#00204d" }
-                ];
+                    { min: 26, max: 30, color: "#00204d" },
+                ]
+            } else if (sportsStore.travelTimeMinutes == 60) {
+                accRanges = [
+                    { min: 31, max: 35, color: "#00204d" },
+                    { min: 36, max: 40, color: "#31446b" },
+                    { min: 41, max: 50, color: "#666970" },
+                    { min: 51, max: 60, color: "#969078" },
 
-        accRanges.forEach(function (range) {
-          div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-           });
+                ]
+            }
+            //always show value 0 as white on legend
+            div.innerHTML += `<div><span style="background:#ffffff"></span> 0</div>`;
+            accRanges.forEach(function (range) {
+                div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+            });
          }
          return div;
      };
      legend.addTo(map);
- }
+}
+
+const loadDestinationsData = async () => {
+  if (destinationsData.value) return
+  try {
+    const resp = await fetch(asset('geojson/destinations.geojson'))
+    destinationsData.value = await resp.json()
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const clearDestinations = () => {
+  if (map.value && destinationsLayer.value) {
+    map.value.removeLayer(destinationsLayer.value)
+    destinationsLayer.value = null
+  }
+}
+
+const renderDestinations = (activity) => {
+  if (!map.value || !destinationsData.value) return;
+  const wantedClass = activity?.replace(/ /g, "_");
+  const wantedCity  = sportsStore.commune;
+
+  const fc = {
+    type: "FeatureCollection",
+    features: destinationsData.value.features.filter(f => {
+      const okClass = !wantedClass || f.properties.classification === wantedClass;
+      const okCity  = !wantedCity  || f.properties.city_name      === wantedCity;
+      return okClass && okCity;
+    })
+  };
+
+  clearDestinations();
+
+  destinationsLayer.value = L.geoJSON(fc, {
+    pointToLayer: (_, latlng) =>
+      L.circleMarker(latlng, {
+        pane: 'destinationsPane',
+        radius: 6,
+        weight: 1,
+        color: "#444",
+        fillColor: "#ff6200",
+        fillOpacity: 0.9
+      }),
+  }).addTo(map.value);
+};
+
+watch( //load destinations
+  [
+    () => sportsStore.destinations,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.commune,
+  ],
+  async ([show, activity]) => {
+    if (!show) {
+      clearDestinations()
+      return
+    }
+    await loadDestinationsData()
+    renderDestinations(activity)
+  },
+  { immediate: true }
+)
+
+watch(() => props.showInfo, (newVal) => {
+  console.log("showInfo changed:", newVal);
+  if (newVal == true) {
+    document.querySelector(".info-overlay").style.display = "block";
+  } else {
+    document.querySelector(".info-overlay").style.display = "none";
+  }
+})
+
+//load commune geojson
+watch(
+  [
+    () => sportsStore.commune,
+    () => sportsStore.displayUnit,
+    () => sportsStore.sustainabilityFilterType,
+    () => sportsStore.travelTimePopulationWeight
+  ],
+  ([newCommune, newDisplayUnit]) => {
+    console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
+
+    if (!newCommune) {
+      map.value.setView([63, 17], 5);
+
+      //remove filtered layer if present
+      if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
+        map.value.removeLayer(filteredLayer.value);
+        filteredLayer.value = null;
+      }
+
+      return;
+    }
+
+    loadGeoJSONFile(newCommune);
+  }
+);
+
+//watch for changes in the sustainability index and travel time filters
+watch( 
+  [
+    () => sportsStore.sustainabilityIndexActivity,
+    () => sportsStore.sustainabilityIndexMinutes,
+    () => sportsStore.sustainabilityIndexDay,
+    () => sportsStore.travelTimeActivity,
+    () => sportsStore.travelTimeTransportMode,
+    () => sportsStore.travelTimeMinutes,
+    () => sportsStore.travelTimeDay,
+  ],
+  () => {
+    updateIndexMapLayer();
+    createLegend(map.value);
+  }
+);
 </script>
 
 <style>
@@ -429,6 +513,10 @@ function setAccColor (time) { //for the accessibility layer
   height: calc(100vh - 82px) !important;
 }
 
+/* .leaflet-tile-pane {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+} */
 .legend {
   position: absolute;
   bottom: 20px;

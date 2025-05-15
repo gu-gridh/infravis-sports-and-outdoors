@@ -81,6 +81,9 @@ function handleShowInfo() {
     left: calc(50% + 0px) !important;
     top: calc(100vh - 320px) !important;
   }
+  #map.leaflet-container {
+    height: 100vh !important;
+  }
 }
 
 .map-buttons {

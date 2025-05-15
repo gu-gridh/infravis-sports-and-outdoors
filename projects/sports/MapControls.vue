@@ -2,87 +2,88 @@
   <div class="map-controls">
     <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
+      <button
+        class="lang-btn"
+        @click="toggleLocale"
+        :title="locale === 'sv' ? 'Svenska' : 'English'"
+      >
+        {{ locale === 'sv' ? 'SV' : 'EN' }}
+      </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
     <div class="section">
-      <h2>Municipality</h2>
+      <h2>{{ t('Municipality') }}</h2>
       <div ref="searchContainer" class="municipality-search">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="Search municipality..." 
-          @focus="showDropdown"
-        />
+        <input type="text" v-model="searchQuery" :placeholder="$t('search')" @focus="showDropdown" />
         <button v-if="searchQuery" class="clear-btn" @click="clearCommune">X</button>
         <ul v-show="isDropdownVisible && filteredCommunes.length" class="search-results">
-          <li 
-            v-for="commune in filteredCommunes" 
-            :key="commune.id" 
-            @click="selectCommune(commune.kommunnamn)">
+          <li v-for="commune in filteredCommunes" :key="commune.id" @click="selectCommune(commune.kommunnamn)">
             {{ commune.kommunnamn }}
           </li>
         </ul>
       </div>
 
-    <!-- Grid vs Regso -->
+      <!-- Grid vs Regso -->
       <div class="btn-group2" style="margin-top: 10px;">
-        Display unit
-        <button @click="setDisplayUnit('grid')" :class="{ active: store.displayUnit === 'grid' }">
+        {{ t('display') }}
+        <button @click="setDisplayUnit('grid')" :disabled="isCity"
+          :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
           Grid
         </button>
-        <button @click="setDisplayUnit('regso')" :class="{ active: store.displayUnit === 'regso' }">
+        <button @click="setDisplayUnit('regso')" :disabled="isCity"
+          :class="[{ greyout: isCity }, { active: store.displayUnit === 'regso' }]">
           Regso
+        </button>
+        <button @click="setDisplayUnit('city')" :class="{ active: isCity }">
+          City
         </button>
       </div>
     </div>
-    
+
     <!-- Sustainability Filters -->
     <div class="section">
       <h2>Indicator</h2>
-      <p>Choose one</p>
+      <!-- <p>{{ t('chooseone') }}</p> -->
       <div class="btn-group">
         <button @click="setSustainabilityFilterType('index')"
-                :class="{ active: store.sustainabilityFilterType === 'index' }">
+          :class="{ active: store.sustainabilityFilterType === 'index' }">
           Sustainability Index
         </button>
         <button @click="setSustainabilityFilterType('travel')"
-                :class="{ active: store.sustainabilityFilterType === 'travel' }">
+          :class="{ active: store.sustainabilityFilterType === 'travel' }">
           Travel Time to Activities
         </button>
       </div>
       <template v-if="store.sustainabilityFilterType === 'index'">
         <div class="btn-group">
-          <label>Activity</label>
+          <label>{{ t('activity') }}</label>
           <select @change="setSustainabilityIndexActivity($event.target.value)"
-                  :value="store.sustainabilityIndexActivity">
+            :value="store.sustainabilityIndexActivity">
             <option v-for="act in sustainabilityIndexOptions" :key="act.value" :value="act.value">
               {{ act.label }}
             </option>
           </select>
         </div>
         <div class="btn-group">
-          <label>Minutes</label>
-          <button v-for="min in minutesOptions" :key="min"
-                  @click="setSustainabilityIndexMinutes(min)"
-                  :class="{ active: store.sustainabilityIndexMinutes === min }">
+          <label>{{ t('minutes') }}</label>
+          <button v-for="min in minutesOptions" :key="min" @click="setSustainabilityIndexMinutes(min)"
+            :class="{ active: store.sustainabilityIndexMinutes === min }">
             {{ min }}
           </button>
         </div>
         <div class="btn-group">
-          <span>Day</span>
-          <button v-for="day in dayTypes" :key="day.value"
-                  @click="setSustainabilityIndexDay(day.value)"
-                  :class="{ active: store.sustainabilityIndexDay === day.value }">
+          <span>{{ t('day') }}</span>
+          <button v-for="day in dayTypes" :key="day.value" @click="setSustainabilityIndexDay(day.value)"
+            :class="{ active: store.sustainabilityIndexDay === day.value }">
             {{ day.label }}
           </button>
         </div>
       </template>
-  
+
       <template v-if="store.sustainabilityFilterType === 'travel'">
         <div class="btn-group">
-          <label>Activity</label>
-          <select @change="setTravelTimeActivity($event.target.value)"
-                  :value="store.travelTimeActivity">
+          <label>{{ t('activity') }}</label>
+          <select @change="setTravelTimeActivity($event.target.value)" :value="store.travelTimeActivity">
             <option v-for="act in activityTypes" :key="act.value" :value="act.value">
               {{ act.label }}
             </option>
@@ -90,45 +91,46 @@
         </div>
         <div class="btn-group">
           <label>Mode</label>
-          <select @change="setTravelTimeTransportMode($event.target.value)"
-                  :value="store.travelTimeTransportMode">
+          <select @change="setTravelTimeTransportMode($event.target.value)" :value="store.travelTimeTransportMode">
             <option v-for="mode in travelModes" :key="mode" :value="mode">
               {{ mode }}
             </option>
           </select>
         </div>
         <div class="btn-group">
-          <label>Minutes</label>
-          <button v-for="min in minutesOptions" :key="min"
-                  @click="setTravelTimeMinutes(min)"
-                  :class="{ active: store.travelTimeMinutes === min }">
+          <label>{{ t('minutes') }}</label>
+          <button v-for="min in minutesOptions" :key="min" @click="setTravelTimeMinutes(min)"
+            :class="{ active: store.travelTimeMinutes === min }">
             {{ min }}
           </button>
         </div>
         <div class="btn-group">
-          <span>Day</span>
-          <button v-for="day in dayTypes" :key="day.value"
-                  @click="setTravelTimeDay(day.value)"
-                  :class="{ active: store.travelTimeDay === day.value }">
+          <!-- <span>{{ t('day') }}</span> -->
+          <button v-for="day in dayTypes" :key="day.value" @click="setTravelTimeDay(day.value)"
+            :class="{ active: store.travelTimeDay === day.value }">
             {{ day.label }}
           </button>
         </div>
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
           <label>Population Weight by Grid</label>
           <label class="switch">
-            <input type="checkbox"
-                  v-model="store.travelTimePopulationWeight"
-                  :disabled="!store.commune">
+            <input type="checkbox" v-model="store.travelTimePopulationWeight" :disabled="!store.commune">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
+          <label>% Population with Access to City</label>
+          <label class="switch">
+            <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>% Population with Access to City</label>
+          <label>Destinations</label>
           <label class="switch">
-            <input type="checkbox"
-                  v-model="store.travelTimePercentageAccess"
-                  :disabled="!store.commune">
+            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
             <span class="slider"></span>
           </label>
         </div>
@@ -140,13 +142,17 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";    
 import { useSportsStore } from "./settings/store";
 
+const { t, locale } = useI18n(
+
+);
 const store = useSportsStore();
 const searchQuery = ref("");
 const isDropdownVisible = ref(false);
 const searchContainer = ref(null);
-
+const isCity = computed(() => store.displayUnit === 'city')
 
 const filteredCommunes = computed(() => {
   if (!searchQuery.value) return [];
@@ -154,6 +160,10 @@ const filteredCommunes = computed(() => {
     c.kommunnamn.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
+
+function toggleLocale() {
+  locale.value = locale.value === "sv" ? "en" : "sv";
+}
 
 function showDropdown() {
   isDropdownVisible.value = true;
@@ -163,10 +173,13 @@ function selectCommune(name) {
   store.updateCommune(name);
   searchQuery.value = name;
   isDropdownVisible.value = false;
+  store.displayUnit = 'grid'
 }
 
 function clearCommune() {
+  setDisplayUnit('city')
   store.commune = "";
+  store.destinations = false
   searchQuery.value = "";
   isDropdownVisible.value = false;
 }
@@ -188,11 +201,11 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 
-const dayTypes = [
-  { label: "Weekday", value: "week_day" },
-  { label: "Saturday", value: "saturday" },
-  { label: "Sunday", value: "sunday" },
-];
+const dayTypes = computed(() => [
+  { label: t('weekday'), value: 'week_day' },
+  { label: t('saturday'), value: 'saturday' },
+  { label: t('sunday'),   value: 'sunday' },
+])
 
 const sustainabilityIndexOptions = [
   { label: "Total", value: "total" },
@@ -214,34 +227,39 @@ const activityTypes = [
   { label: "Picnic", value: "Picnic" },
   { label: "Playground", value: "Playground" },
   { label: "Racket sports", value: "Racket sports" },
-  { label: "Walking / running", value: "Walking / running" },
+  { label: "Walking / running", value: "Walking Running" },
   { label: "Athletics", value: "Athletics" },
   { label: "Gymnastics", value: "Gymnastics" },
   { label: "Outdoor gym", value: "Outdoor gym" },
   { label: "Swimming pool", value: "Swimming pool" },
 ];
 
+function setDisplayUnit(unit) {
+  if (unit === 'city') {
+    store.commune = ''
+    store.destinations = false
+    searchQuery.value = ''
+    isDropdownVisible.value = false
+  }
+  store.displayUnit = unit
+}
+
 const minutesOptions = [15, 30, 60];
 const travelModes = ["car", "bicycle", "walk", "transit", "sustainable"];
 
-//commune and (grid/regso)
-const setDisplayUnit = (value) => (store.displayUnit = value);
-  
 //index or travel
 const setSustainabilityFilterType = (value) => (store.sustainabilityFilterType = value);
-  
+
 //sustainability filters
 const setSustainabilityIndexActivity = (value) => (store.sustainabilityIndexActivity = value);
 const setSustainabilityIndexMinutes = (value) => (store.sustainabilityIndexMinutes = value);
 const setSustainabilityIndexDay = (value) => (store.sustainabilityIndexDay = value);
-  
+
 //travel time filters
 const setTravelTimeActivity = (value) => (store.travelTimeActivity = value);
 const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = value);
 const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
 const setTravelTimeDay = (value) => (store.travelTimeDay = value);
-const toggleTravelTimePopulationWeight = () => (store.travelTimePopulationWeight = !store.travelTimePopulationWeight);
-const toggleTravelTimePercentageAccess = () => (store.travelTimePercentageAccess = !store.travelTimePercentageAccess);
 </script>
 
 <style scoped>
@@ -323,8 +341,10 @@ input[type="text"] {
 .btn-group2 {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
   padding-bottom: 10px;
+  
 }
 
 
@@ -336,7 +356,7 @@ input[type="text"] {
   background-color: #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
-  
+
 }
 
 button.active {
@@ -400,7 +420,10 @@ select {
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #ccc;
   transition: 0.4s;
   border-radius: 26px;
@@ -419,17 +442,44 @@ select {
 }
 
 /* Checked state */
-input:checked + .slider {
+input:checked+.slider {
   background-color: #4caf50;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(24px);
 }
 
 /* Disabled state */
-input:disabled + .slider {
+input:disabled+.slider {
   background-color: #999;
   cursor: not-allowed;
+}
+
+.lang-btn {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border: 1px solid #497723;
+  background: #497723;
+  color: #fff;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .map-controls {
+    font-size: 0.8rem;
+  }
+  .section {
+    padding: 5px;
+  }
+  h2 {
+    font-size: 1.2rem !important;
+
+  }
+  button {
+    font-size: 0.8rem;
+  }
 }
 </style>

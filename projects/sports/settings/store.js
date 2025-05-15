@@ -7,7 +7,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const allCommunes = ref([]);
 
   //(grid vs regso)
-  const displayUnit = ref('grid');
+  const displayUnit = ref('city');
 
   //("index" or "travel")
   const sustainabilityFilterType = ref('index');
@@ -24,6 +24,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const travelTimeDay = ref('week_day');
   const travelTimePopulationWeight = ref(false);
   const travelTimePercentageAccess = ref(false);
+  const destinations = ref(false)
   
 
   const updateCommune = (value) => {
@@ -44,6 +45,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     travelTimeDay,
     travelTimePopulationWeight,
     travelTimePercentageAccess,
+    destinations,
     updateCommune,
   };
 });

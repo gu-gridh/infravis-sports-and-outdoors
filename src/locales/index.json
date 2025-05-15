@@ -1,0 +1,4 @@
+{
+    "sv": {"chooseone":"Välj en", "activity":"Aktivitet", "minutes":"Minuter","day":"Dag", "Municipality":"Kommun", "display": "Visningsenhet", "search":"Sök kommun", "weekday":"Veckodag", "saturday": "Lördag", "sunday":"Söndag" },
+    "en": {"chooseone":"Choose one", "activity":"Activity", "minutes":"Minutes","day":"Day", "Municipality":"Municipality", "display": "Display unit", "search":"Search municipality", "weekday":"Weekday", "saturday": "Saturday", "sunday":"Sunday" }
+  }

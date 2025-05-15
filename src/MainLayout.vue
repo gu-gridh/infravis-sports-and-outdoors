@@ -1,13 +1,12 @@
 <template>
   <div class="map-container h-full">
-    <div class="left-pane">
+<!--     <div class="left-pane">
       <div class="mobile-ui-drag"></div>
       <div class="left-pane-layer">
       
         <div class="left-pane-content">
          
           <slot name="title">
-            <!--<div v-if="config" class="px-8 py-6 bg-white rounded-t-lg shadow-lg">-->
             <div v-if="config" class="">
               <div class="main-title" v-html="config.title"></div>
               <div class="sub-title" v-html="config.subtitle"></div>
@@ -22,7 +21,7 @@
         </div>
       </div>
       <div class="atlas-gradient"></div>
-    </div>
+    </div> -->
     
     <div class="right-pane">
       <slot name="details">
