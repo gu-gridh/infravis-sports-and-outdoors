@@ -44,9 +44,7 @@ const communeData = ref(null);
 const filteredLayer = ref(null);
 
 const mapStyles = ref({
-  arcGisTopo: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  topPlus: "http://sgx.geodatenzentrum.de/wmts_topplus_open/tile/1.0.0/web_grau/default/WEBMERCATOR/{z}/{y}/{x}.png",
 });
 
 onMounted(async () => {

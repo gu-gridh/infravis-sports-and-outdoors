@@ -469,7 +469,7 @@ input:disabled+.slider {
 
 @media (max-width: 900px) {
   .map-controls {
-    font-size: small;
+    font-size: 0.8rem;
   }
   .section {
     padding: 5px;
@@ -478,6 +478,8 @@ input:disabled+.slider {
     font-size: 1.2rem !important;
 
   }
-  
+  button {
+    font-size: 0.8rem;
+  }
 }
 </style>
