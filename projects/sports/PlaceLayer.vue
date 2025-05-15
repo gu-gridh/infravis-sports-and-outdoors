@@ -515,6 +515,10 @@ watch(
   height: calc(100vh - 82px) !important;
 }
 
+/* .leaflet-tile-pane {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+} */
 .legend {
   position: absolute;
   bottom: 20px;

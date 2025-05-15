@@ -105,7 +105,7 @@
           </button>
         </div>
         <div class="btn-group">
-          <span>{{ t('day') }}</span>
+          <!-- <span>{{ t('day') }}</span> -->
           <button v-for="day in dayTypes" :key="day.value" @click="setTravelTimeDay(day.value)"
             :class="{ active: store.travelTimeDay === day.value }">
             {{ day.label }}
@@ -341,8 +341,10 @@ input[type="text"] {
 .btn-group2 {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
   padding-bottom: 10px;
+  
 }
 
 
