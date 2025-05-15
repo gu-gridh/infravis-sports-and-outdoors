@@ -43,7 +43,7 @@
     <!-- Sustainability Filters -->
     <div class="section">
       <h2>Indicator</h2>
-      <p>{{ t('chooseone') }}</p>
+      <!-- <p>{{ t('chooseone') }}</p> -->
       <div class="btn-group">
         <button @click="setSustainabilityFilterType('index')"
           :class="{ active: store.sustainabilityFilterType === 'index' }">
@@ -465,5 +465,19 @@ input:disabled+.slider {
   font-size: 0.8rem;
   border-radius: 4px;
   cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .map-controls {
+    font-size: small;
+  }
+  .section {
+    padding: 5px;
+  }
+  h2 {
+    font-size: 1.2rem !important;
+
+  }
+  
 }
 </style>
