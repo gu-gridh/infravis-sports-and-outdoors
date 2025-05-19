@@ -302,7 +302,6 @@ function setAccColor(time) {
         if (time >= 46 && time <= 50) return "#969078";
     } else {
         console.log("setAccColor: out of range", time);
-
     }
 }
 
@@ -378,7 +377,7 @@ async function loadDestinationsData (city) {
   if (destinationsDataByCity.value[city]) return
 
   try {
-    const seg = encodeURIComponent(city.normalize('NFD'))
+    const seg = encodeURIComponent(city)
     const path = `geojson/geojson_destinations_by_city/${seg}/${seg}_destinations.geojson`
     const resp = await fetch(asset(path))
     if (!resp.ok) {
