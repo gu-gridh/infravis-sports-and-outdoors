@@ -29,8 +29,8 @@ const sportsStore = useSportsStore();
 const emit = defineEmits(['close']);
 
 //destinations layer
-const destinationsLayer = ref(null)
-const destinationsData  = ref(null)
+const destinationsLayer      = ref(null)
+const destinationsDataByCity = ref({}) 
 
 //info overlay
 const props = defineProps({
@@ -154,7 +154,7 @@ function updateIndexMapLayer() {
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
-      console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
+      // console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
       const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
       const val = feature.properties[propName];
       return {
@@ -213,7 +213,6 @@ function generateTravelPropName() {
     }
   }
   
-  console.log('Travel prop name:', `${activity}_${mode}${dayPart}_${minutes}`);
   return `${activity}_${mode}${dayPart}_${minutes}`;
 }
 
@@ -242,8 +241,6 @@ async function loadGeoJSONFile(commune) {
         // or: geojson/t2_index_by_regso.geojson
         geojsonPath = `geojson/${prefix}_by_${unit}.geojson`
       }
-
-      console.log('Loading file:', geojsonPath)
 
       try {
         const resp = await fetch(asset(geojsonPath))
@@ -307,7 +304,6 @@ function setAccColor(time) {
         console.log("setAccColor: out of range", time);
 
     }
-
 }
 
 // adds legend based on what layer is active
@@ -376,71 +372,81 @@ function createLegend(map) {
      legend.addTo(map);
 }
 
-const loadDestinationsData = async () => {
-  if (destinationsData.value) return
+async function loadDestinationsData (city) {
+  if (!city) return
+
+  if (destinationsDataByCity.value[city]) return
+
   try {
-    const resp = await fetch(asset('geojson/destinations.geojson'))
-    destinationsData.value = await resp.json()
+    const seg = encodeURIComponent(city.normalize('NFD'))
+    const path = `geojson/geojson_destinations_by_city/${seg}/${seg}_destinations.geojson`
+    const resp = await fetch(asset(path))
+    if (!resp.ok) {
+      throw new Error('Error fetching destinations data')
+    }
+    destinationsDataByCity.value[city] = await resp.json()
   } catch (err) {
     console.error(err)
   }
 }
 
-const clearDestinations = () => {
+function clearDestinations () {
   if (map.value && destinationsLayer.value) {
     map.value.removeLayer(destinationsLayer.value)
     destinationsLayer.value = null
   }
 }
 
-const renderDestinations = (activity) => {
-  if (!map.value || !destinationsData.value) return;
-  const wantedClass = activity?.replace(/ /g, "_");
-  const wantedCity  = sportsStore.commune;
+function renderDestinations (activity) {
+  const city = sportsStore.commune
+  const data = destinationsDataByCity.value[city]
+  if (!map.value || !data) return
+
+  const wantedClass = activity?.replace(/ /g, '_')
 
   const fc = {
-    type: "FeatureCollection",
-    features: destinationsData.value.features.filter(f => {
-      const okClass = !wantedClass || f.properties.classification === wantedClass;
-      const okCity  = !wantedCity  || f.properties.city_name      === wantedCity;
-      return okClass && okCity;
+    type: 'FeatureCollection',
+    features: data.features.filter(f => {
+      const okClass = !wantedClass || f.properties.classification === wantedClass
+      return okClass
     })
-  };
+  }
 
-  clearDestinations();
+  clearDestinations()
 
   destinationsLayer.value = L.geoJSON(fc, {
-    pointToLayer: (_, latlng) =>
+    pointToLayer: (_f, latlng) =>
       L.circleMarker(latlng, {
         pane: 'destinationsPane',
         radius: 6,
         weight: 1,
-        color: "#444",
-        fillColor: "#ff6200",
+        color: '#444',
+        fillColor: '#ff6200',
         fillOpacity: 0.9
-      }),
-  }).addTo(map.value);
-};
+      })
+  }).addTo(map.value)
+}
 
 watch( //load destinations
   [
     () => sportsStore.destinations,
     () => sportsStore.travelTimeActivity,
-    () => sportsStore.commune,
+    () => sportsStore.commune
   ],
-  async ([show, activity]) => {
+  async ([show, activity, city]) => {
     if (!show) {
       clearDestinations()
       return
     }
-    await loadDestinationsData()
+    if (!city) return
+
+    await loadDestinationsData(city)
     renderDestinations(activity)
   },
   { immediate: true }
 )
 
 watch(() => props.showInfo, (newVal) => {
-  console.log("showInfo changed:", newVal);
   if (newVal == true) {
     document.querySelector(".info-overlay").style.display = "block";
   } else {
@@ -457,7 +463,7 @@ watch(
     () => sportsStore.travelTimePopulationWeight
   ],
   ([newCommune, newDisplayUnit]) => {
-    console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
+    // console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
 
     if (!newCommune) {
       map.value.setView([63, 17], 5);
@@ -597,7 +603,6 @@ watch(
   border: 1px solid #000;
   padding: 2px 4px;
 }
-
 
 .leaflet-control-scale {
   background: transparent;
