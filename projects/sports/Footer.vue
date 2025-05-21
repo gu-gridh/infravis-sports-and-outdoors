@@ -3,17 +3,12 @@
       <div id="developer-info">
         <div class="links-stack border-style">
           <a class="site-link link" href="https://github.com/gu-gridh/infravis-sports-and-outdoors" target="_blank">GitHub repository and development</a>
-          <a class="site-link link" href="" target="_blank">Link to their github repo</a>
         </div>
         <div class="links-stack">
-        <a class="site-link link" href="" target="_blank">Dataset documentation</a>
-        <!-- <a href="#" class="download-link link" @click="downloadData">Download the structured data</a> -->
+        <a class="site-link link" href="https://mistra.org/" target="_blank">Mistra</a>
       </div>
       </div>
       <div class="partners">
-        <!-- <a href="https://dh.gu.se/">
-          <div class="GRIDHLogo" id="">GRIDH</div>
-        </a> -->
   
         <a href="">
           <div class="PartnerLogo" id="">CHALMERS</div>
