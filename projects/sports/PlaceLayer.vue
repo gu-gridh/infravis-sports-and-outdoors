@@ -154,22 +154,21 @@ function updateIndexMapLayer() {
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
-      // console.log(`index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`);
       const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
       const val = feature.properties[propName];
       return {
-        color: 'black',
+        color: 'white',
         fillColor: setIndexColor(val),
-        fillOpacity: 0.9,
+        fillOpacity: 0.8,
         weight: 1,
       };
     } else { // travel time to activity
       const propName = generateTravelPropName();
       const val = feature.properties[propName];
       return {
-        color: 'black',
+        color: 'white',
         fillColor: setAccColor(val),
-        fillOpacity: 0.9,
+        fillOpacity: 0.8,
         weight: 1,
       };
     }

@@ -82,9 +82,9 @@ function styleFeature(feature) {
         const val = feature.properties[propName];
         //console.log("Index mode:", { propName, val, properties: feature.properties });
         return {
-            color: "black",
+            color: "white",
             fillColor: setIndexColor(val),
-            fillOpacity: 0.9,
+            fillOpacity: 0.8,
             weight: 1,
         };
     } else if (!sportsStore.travelTimePercentageAccess) {
@@ -92,18 +92,18 @@ function styleFeature(feature) {
         const val = feature.properties[propName];
         //console.log("Travel mode:", { propName, val, properties: feature.properties });
         return {
-            color: "black",
+            color: "white",
             fillColor: setAccColor(val),
-            fillOpacity: 0.9,
+            fillOpacity: 0.8,
             weight: 1,
         };
     } else {
         const propName = generatePercentPropName();
         const val = feature.properties[propName];
         return {
-            color: 'black',
+            color: 'white',
             fillColor: setIndexColor(val),
-            fillOpacity: 0.9,
+            fillOpacity: 0.8,
             weight: 1
         };
     }
