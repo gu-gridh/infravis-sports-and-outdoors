@@ -35,7 +35,7 @@
           Regso
         </button>
         <button @click="setDisplayUnit('city')" :class="{ active: isCity }">
-          City
+          Municipality
         </button>
       </div>
     </div>
@@ -111,16 +111,16 @@
             {{ day.label }}
           </button>
         </div>
-        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>Population Weight by Grid</label>
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
+          <label>Population weight by grid</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePopulationWeight" :disabled="!store.commune">
+            <input type="checkbox" v-model="store.travelTimePopulationWeight" :disabled="!store.commune || store.displayUnit === 'regso'">
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
-          <label>% Population with Access to City</label>
+          <label>% Population with access per city</label>
           <label class="switch">
             <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
             <span class="slider"></span>
@@ -343,10 +343,8 @@ input[type="text"] {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding-bottom: 10px;
-  
+  padding-bottom: 10px; 
 }
-
 
 .btn-group button,
 .btn-group2 button {
@@ -356,7 +354,6 @@ input[type="text"] {
   background-color: #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
-
 }
 
 button.active {

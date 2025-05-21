@@ -417,10 +417,10 @@ function renderDestinations (activity) {
     pointToLayer: (_f, latlng) =>
       L.circleMarker(latlng, {
         pane: 'destinationsPane',
-        radius: 6,
+        radius: 3,
         weight: 1,
         color: '#444',
-        fillColor: '#ff6200',
+        fillColor: '#000000',
         fillOpacity: 0.9
       })
   }).addTo(map.value)
