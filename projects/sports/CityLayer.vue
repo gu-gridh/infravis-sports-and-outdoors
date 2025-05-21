@@ -220,11 +220,12 @@ function createLegend(map) {
 }
 
 async function loadLayer() {
+
+    sportsStore.isLoading = true
+
     try {
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
-        console.log("CityLayer GeoJSON loaded:", geoData);
-
         // if (
         //     sportsStore.sustainabilityFilterType !== "index" &&
         //     sportsStore.travelTimePopulationWeight
@@ -262,6 +263,8 @@ async function loadLayer() {
 
     } catch (error) {
         console.error(error);
+    } finally {
+        sportsStore.isLoading = false
     }
 }
 
@@ -327,5 +330,4 @@ watch(
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
