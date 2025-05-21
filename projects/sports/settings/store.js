@@ -2,6 +2,9 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 
 export const useSportsStore = defineStore("sportsStore", () => {
+
+  const isLoading = ref(false);
+
   //commune data
   const commune = ref('');
   const allCommunes = ref([]);
@@ -25,7 +28,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const travelTimePopulationWeight = ref(false);
   const travelTimePercentageAccess = ref(false);
   const destinations = ref(false)
-  
+
 
   const updateCommune = (value) => {
     commune.value = value;
@@ -47,5 +50,6 @@ export const useSportsStore = defineStore("sportsStore", () => {
     travelTimePercentageAccess,
     destinations,
     updateCommune,
+    isLoading,
   };
 });

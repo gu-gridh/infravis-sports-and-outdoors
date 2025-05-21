@@ -2,16 +2,12 @@
   <div class="map-controls">
     <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
-      <button
-        class="lang-btn"
-        @click="toggleLocale"
-        :title="locale === 'sv' ? 'Svenska' : 'English'"
-      >
+      <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
         {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
-    <div class="section">
+    <div class="section" :class="{ greyout: store.isLoading }">
       <h2>{{ t('Municipality') }}</h2>
       <div ref="searchContainer" class="municipality-search">
         <input type="text" v-model="searchQuery" :placeholder="$t('search')" @focus="showDropdown" />
@@ -41,7 +37,7 @@
     </div>
 
     <!-- Sustainability Filters -->
-    <div class="section">
+    <div class="section" :class="{ greyout: store.isLoading }">
       <h2>Indicator</h2>
       <!-- <p>{{ t('chooseone') }}</p> -->
       <div class="btn-group">
@@ -114,7 +110,8 @@
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
           <label>Population weight by grid</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePopulationWeight" :disabled="!store.commune || store.displayUnit === 'regso'">
+            <input type="checkbox" v-model="store.travelTimePopulationWeight"
+              :disabled="!store.commune || store.displayUnit === 'regso'">
             <span class="slider"></span>
           </label>
         </div>
@@ -142,7 +139,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { useI18n } from "vue-i18n";    
+import { useI18n } from "vue-i18n";
 import { useSportsStore } from "./settings/store";
 
 const { t, locale } = useI18n(
@@ -204,7 +201,7 @@ onBeforeUnmount(() => {
 const dayTypes = computed(() => [
   { label: t('weekday'), value: 'week_day' },
   { label: t('saturday'), value: 'saturday' },
-  { label: t('sunday'),   value: 'sunday' },
+  { label: t('sunday'), value: 'sunday' },
 ])
 
 const sustainabilityIndexOptions = [
@@ -343,7 +340,7 @@ input[type="text"] {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding-bottom: 10px; 
+  padding-bottom: 10px;
 }
 
 .btn-group button,
@@ -468,13 +465,16 @@ input:disabled+.slider {
   .map-controls {
     font-size: 0.8rem;
   }
+
   .section {
     padding: 5px;
   }
+
   h2 {
     font-size: 1.2rem !important;
 
   }
+
   button {
     font-size: 0.8rem;
   }
