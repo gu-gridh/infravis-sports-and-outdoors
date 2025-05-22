@@ -20,7 +20,7 @@
       </div>
 
       <!-- Grid vs Regso -->
-      <div class="btn-group2" style="margin-top: 10px;">
+            <div class="btn-group2" style="margin-top: 10px;">
         {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
@@ -204,11 +204,11 @@ const dayTypes = computed(() => [
   { label: t('sunday'), value: 'sunday' },
 ])
 
-const sustainabilityIndexOptions = [
-  { label: "Total", value: "total" },
-  { label: "Sports", value: "sports" },
-  { label: "Outdoors", value: "outdoors" },
-];
+const sustainabilityIndexOptions = computed(() => [
+  { label: t('total'),    value: 'total'   },
+  { label: t('sports'),   value: 'sports'  },
+  { label: t('outdoors'), value: 'outdoors'},
+]);
 
 const activityTypes = [
   { label: "Disc golf", value: "Disc golf" },
