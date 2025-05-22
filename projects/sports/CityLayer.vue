@@ -185,7 +185,7 @@ function createLegend(map) {
         var div = L.DomUtil.create("div", "legend");
         var accRanges = []
         if (sportsStore.sustainabilityFilterType === "index") {
-            div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
+            div.innerHTML += "<p>activities reached by sustainable modes compared to by car (%)</p>";
             var indexRanges = [
                 { min: 0, max: 10, color: "#d7191c" },
                 { min: 11, max: 20, color: "#e85b3b" },
