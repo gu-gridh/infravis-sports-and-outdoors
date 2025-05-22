@@ -97,12 +97,12 @@ function styleFeature(feature) {
             fillOpacity: 0.8,
             weight: 1,
         };
-    } else {
+    } else if (sportsStore.travelTimePercentageAccess) {
         const propName = generatePercentPropName();
         const val = feature.properties[propName];
         return {
             color: 'white',
-            fillColor: setIndexColor(val),
+            fillColor: setPercAccColor(val),
             fillOpacity: 0.8,
             weight: 1
         };
@@ -150,6 +150,28 @@ function setAccColor(time) {
     }
 }
 
+function setPercAccColor(percent) {
+    //no decimals
+    percent = Math.round(percent);
+    if (percent >= 0 && percent <= 10) return "#feebe2";
+    if (percent >= 10 && percent <= 20) return "#fdd3d0";
+    if (percent >= 20 && percent <= 30) return "#fbbabe";
+    if (percent >= 30 && percent <= 40) return "#fa9bb1";
+    if (percent >= 40 && percent <= 50) return "#f879a6";
+    if (percent >= 50 && percent <= 60) return "#ec579c";
+    if (percent >= 60 && percent <= 70) return "#d63592";
+    if (percent >= 70 && percent <= 80) return "#bd1888";
+    if (percent >= 80 && percent <= 90) return "#9b0d7f";
+    if (percent >= 90 && percent <= 100) return "#7a0177";
+}
+
+function setAccColorPercent(percent) {
+    //no decimals
+    percent = Math.round(percent);
+    //
+    
+}
+
 function createLegend(map) {
     // Check if map exists
     if (!map) {
@@ -162,7 +184,7 @@ function createLegend(map) {
     legend.onAdd = function () {
         var div = L.DomUtil.create("div", "legend");
         var accRanges = []
-        if (sportsStore.sustainabilityFilterType === "index" || sportsStore.travelTimePercentageAccess) {
+        if (sportsStore.sustainabilityFilterType === "index") {
             div.innerHTML += "<p>Accessibility index</p><p>Activities reached (%)</p>";
             var indexRanges = [
                 { min: 0, max: 10, color: "#d7191c" },
@@ -179,7 +201,26 @@ function createLegend(map) {
             indexRanges.forEach(function (range) {
                 div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
             });
-        } else if (sportsStore.sustainabilityFilterType === "travel") {
+        } 
+        else if (sportsStore.travelTimePercentageAccess && sportsStore.sustainabilityFilterType === "travel") {
+            div.innerHTML += `<p>Travel time</p><p>Activities reached (%)</p>`;
+            var indexRanges = [
+                { min: 0, max: 10, color: "#feebe2" },
+                { min: 10, max: 20, color: "#fdd3d0" },
+                { min: 20, max: 30, color: "#fbbabe" },
+                { min: 30, max: 40, color: "#fa9bb1" },
+                { min: 40, max: 50, color: "#f879a6" },
+                { min: 50, max: 60, color: "#ec579c" },
+                { min: 60, max: 70, color: "#d63592" },
+                { min: 70, max: 80, color: "#bd1888" },
+                { min: 80, max: 90, color: "#9b0d7f" },
+                { min: 90, max: 100, color: "#7a0177" }
+            ];
+            indexRanges.forEach(function (range) {
+                div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+            });
+        }
+        else if (sportsStore.sustainabilityFilterType === "travel") {
             div.innerHTML += `<p>Traveltime to activity (min)</p>`;
             if (sportsStore.travelTimeMinutes == 15) {
                 accRanges = [
@@ -209,6 +250,7 @@ function createLegend(map) {
                 div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
             });
         }
+
         return div;
     };
     legend.addTo(map);
