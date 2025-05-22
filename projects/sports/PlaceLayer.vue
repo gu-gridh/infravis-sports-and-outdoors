@@ -355,7 +355,7 @@ function createLegend(map) {
     var div = L.DomUtil.create("div", "legend");
     var accRanges = []
     if (sportsStore.sustainabilityFilterType === "index") {
-      div.innerHTML += "<p>activities reached by sustainable modes compared to by car (%)</p>";
+      div.innerHTML += "<p>Activities reached by sustainable modes compared to by car (%)</p>";
       var indexRanges = [
         { min: 0, max: 10, color: "#d7191c" },
         { min: 11, max: 20, color: "#e85b3b" },
@@ -572,7 +572,7 @@ watch(
   font-size: 12px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  /* Ensure it appears on top */
+  max-width: 170px;
 }
 
 .legend h4 {

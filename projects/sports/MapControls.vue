@@ -24,14 +24,14 @@
         {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
-          Grid
+          {{ t('grid') }}
         </button>
         <button @click="setDisplayUnit('regso')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'regso' }]">
           Regso
         </button>
         <button @click="setDisplayUnit('city')" :class="{ active: isCity }">
-          Municipality
+          {{ t('city') }}
         </button>
       </div>
     </div>
