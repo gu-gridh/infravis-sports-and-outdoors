@@ -76,6 +76,7 @@ function drawCommuneBorder (communeName) {
 
   borderLayer.value = L.geoJSON(borderFc, {
     pane: 'borderPane',
+    interactive: false,
     style: {
       color: '#000',
       weight: 2,
@@ -283,9 +284,9 @@ async function loadGeoJSONFile(commune) {
 
     filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
     filteredLayer.value.addTo(map.value)
-    drawCommuneBorder(commune);
     
     if (commune !== lastCommune.value) {
+      drawCommuneBorder(commune);
       map.value.fitBounds(filteredLayer.value.getBounds(), { padding:[50,50] })
       lastCommune.value = commune
     }
