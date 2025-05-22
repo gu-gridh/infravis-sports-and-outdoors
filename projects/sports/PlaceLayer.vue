@@ -21,7 +21,7 @@ import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
 import CityLayer from "./CityLayer.vue";
 
-const lastCommune = ref(null) 
+const lastCommune = ref(null)
 const map = ref(null);
 const sportsStore = useSportsStore();
 const emit = defineEmits(['close']);
@@ -39,7 +39,7 @@ const props = defineProps({
 const geojsonData = ref(null);
 const communeData = ref(null);
 const filteredLayer = ref(null);
-const borderLayer   = ref(null);
+const borderLayer = ref(null);
 
 const mapStyles = ref({
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -57,7 +57,7 @@ function uriSegment(str) {
   return encodeURIComponent(str);
 }
 
-function drawCommuneBorder (communeName) {
+function drawCommuneBorder(communeName) {
   if (!geojsonData.value || !map.value) return;
 
   if (borderLayer.value) {
@@ -154,7 +154,7 @@ async function initMap() {
 function updateIndexMapLayer() {
   if (!map.value || !communeData.value) return;
 
-  // remove old layer
+  //remove old layer
   if (filteredLayer.value) {
     map.value.removeLayer(filteredLayer.value);
   }
@@ -172,7 +172,7 @@ function updateIndexMapLayer() {
   if (sportsStore.sustainabilityFilterType !== "index" && sportsStore.travelTimePopulationWeight) {
     scaledFeatures = features.map((feature) => {
       const pop = feature.properties.pop_1km_grid_decile ?? 0;
-      const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
+      const normPop = Math.min(9, pop) / 9; //normalize to 0–1
       const scale = 0.3 + normPop * 0.7;
       const scaled = turf.transformScale(feature, scale);
       scaled.properties = feature.properties;
@@ -192,7 +192,7 @@ function updateIndexMapLayer() {
         fillOpacity: 0.8,
         weight: 1,
       };
-    } else { // travel time to activity
+    } else { //travel time to activity
       const propName = generateTravelPropName();
       const val = feature.properties[propName];
       return {
@@ -204,15 +204,23 @@ function updateIndexMapLayer() {
     }
   }
 
-  //hover features...
+  //hover features
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
-      const population = feature.properties.pop_1km_grid ?? "unknown";
+      let val;
+      if (sportsStore.sustainabilityFilterType === "index") {
+        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+        val = feature.properties[p];
+      } else {
+        val = feature.properties[generateTravelPropName()];
+      }
+
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
-        .setContent(`<b>Population: ${population}</b>`)
+        .setContent(`<b>${val ?? "no data"}</b>`)
         .openOn(map.value);
     });
+
     layer.on("mouseout", () => {
       map.value.closePopup();
     });
@@ -284,10 +292,10 @@ async function loadGeoJSONFile(commune) {
 
     filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
     filteredLayer.value.addTo(map.value)
-    
+
     if (commune !== lastCommune.value) {
       drawCommuneBorder(commune);
-      map.value.fitBounds(filteredLayer.value.getBounds(), { padding:[50,50] })
+      map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] })
       lastCommune.value = commune
     }
 
@@ -319,27 +327,27 @@ function setIndexColor(percent) { //for the index layer
 }
 
 function setAccColor(time) {
-    //no decimals
-    time = Math.round(time);
-    if (time === null || time === undefined || time == 0) return "#ffffff"; //white
-    if (sportsStore.travelTimeMinutes == 15) {
-        if (time > 0 && time <= 5) return "#ffea46";
-        if (time >= 5 && time <= 10) return "#ccbb69";
-        if (time >= 10 && time <= 15) return "#969078";
-    } else if (sportsStore.travelTimeMinutes == 30) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
-    } else if (sportsStore.travelTimeMinutes == 60) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
-        if (time >= 30 && time <= 40) return "#666970";
-        if (time >= 40 && time <= 50) return "#31446b";
-        if (time >= 50 && time <= 60) return "#161e2e";
-    } else {
-        console.log("setAccColor: out of range", time);
-    }
+  //no decimals
+  time = Math.round(time);
+  if (time === null || time === undefined || time == 0) return "#ffffff"; //white
+  if (sportsStore.travelTimeMinutes == 15) {
+    if (time > 0 && time <= 5) return "#ffea46";
+    if (time >= 5 && time <= 10) return "#ccbb69";
+    if (time >= 10 && time <= 15) return "#969078";
+  } else if (sportsStore.travelTimeMinutes == 30) {
+    if (time >= 0 && time <= 10) return "#ffea46";
+    if (time >= 10 && time <= 20) return "#ccbb69";
+    if (time >= 20 && time <= 30) return "#969078";
+  } else if (sportsStore.travelTimeMinutes == 60) {
+    if (time >= 0 && time <= 10) return "#ffea46";
+    if (time >= 10 && time <= 20) return "#ccbb69";
+    if (time >= 20 && time <= 30) return "#969078";
+    if (time >= 30 && time <= 40) return "#666970";
+    if (time >= 40 && time <= 50) return "#31446b";
+    if (time >= 50 && time <= 60) return "#161e2e";
+  } else {
+    console.log("setAccColor: out of range", time);
+  }
 }
 
 // adds legend based on what layer is active
@@ -373,33 +381,33 @@ function createLegend(map) {
       });
     } else if (sportsStore.sustainabilityFilterType === "travel") {
       div.innerHTML += `<p>Traveltime to activity (min)</p>`;
-            if (sportsStore.travelTimeMinutes == 15) {
-                accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
-                    { min: 5, max: 10, color: "#ccbb69" },
-                    { min: 10, max: 15, color: "#969078" },
-                ]
-            }
-            else if (sportsStore.travelTimeMinutes == 30) {
-                accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
-                ]
-            } else if (sportsStore.travelTimeMinutes == 60) {
-                accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
-                    { min: 30, max: 40, color: "#666970" },
-                    { min: 40, max: 50, color: "#31446b" },
-                    { min: 50, max: 60, color: "#161e2e" },
+      if (sportsStore.travelTimeMinutes == 15) {
+        accRanges = [
+          { min: 0, max: 5, color: "#ffea46" },
+          { min: 5, max: 10, color: "#ccbb69" },
+          { min: 10, max: 15, color: "#969078" },
+        ]
+      }
+      else if (sportsStore.travelTimeMinutes == 30) {
+        accRanges = [
+          { min: 0, max: 10, color: "#ffea46" },
+          { min: 10, max: 20, color: "#ccbb69" },
+          { min: 20, max: 30, color: "#969078" },
+        ]
+      } else if (sportsStore.travelTimeMinutes == 60) {
+        accRanges = [
+          { min: 0, max: 10, color: "#ffea46" },
+          { min: 10, max: 20, color: "#ccbb69" },
+          { min: 20, max: 30, color: "#969078" },
+          { min: 30, max: 40, color: "#666970" },
+          { min: 40, max: 50, color: "#31446b" },
+          { min: 50, max: 60, color: "#161e2e" },
 
-                ]
-            }
-            accRanges.forEach(function (range) {
-                div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
-            });
+        ]
+      }
+      accRanges.forEach(function (range) {
+        div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
+      });
     }
     return div;
   };
@@ -502,7 +510,7 @@ watch(
         map.value.removeLayer(borderLayer.value);
         borderLayer.value = null;
       }
-      lastCommune.value = null; 
+      lastCommune.value = null;
       map.value.setView([63, 17], 5);
 
       //remove filtered layer if present
