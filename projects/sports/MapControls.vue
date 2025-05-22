@@ -28,7 +28,7 @@
         </button>
         <button @click="setDisplayUnit('regso')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'regso' }]">
-          Regso
+          RegSo
         </button>
         <button @click="setDisplayUnit('city')" :class="{ active: isCity }">
           {{ t('city') }}
@@ -38,16 +38,16 @@
 
     <!-- Sustainability Filters -->
     <div class="section" :class="{ greyout: store.isLoading }">
-      <h2>Indicator</h2>
+      <h2>{{ t('indicator') }}</h2>
       <!-- <p>{{ t('chooseone') }}</p> -->
       <div class="btn-group">
         <button @click="setSustainabilityFilterType('index')"
           :class="{ active: store.sustainabilityFilterType === 'index' }">
-          Sustainability Index
+          {{ t('susindex') }}
         </button>
         <button @click="setSustainabilityFilterType('travel')"
           :class="{ active: store.sustainabilityFilterType === 'travel' }">
-          Travel Time to Activities
+          {{ t('traveltime') }}
         </button>
       </div>
       <template v-if="store.sustainabilityFilterType === 'index'">
@@ -86,10 +86,10 @@
           </select>
         </div>
         <div class="btn-group">
-          <label>Mode</label>
+          <label>{{ t('mode') }}</label>
           <select @change="setTravelTimeTransportMode($event.target.value)" :value="store.travelTimeTransportMode">
-            <option v-for="mode in travelModes" :key="mode" :value="mode">
-              {{ mode }}
+            <option v-for="mode in travelModes" :key="mode.value" :value="mode.value">
+              {{ mode.label }}
             </option>
           </select>
         </div>
@@ -101,14 +101,13 @@
           </button>
         </div>
         <div class="btn-group">
-          <!-- <span>{{ t('day') }}</span> -->
           <button v-for="day in dayTypes" :key="day.value" @click="setTravelTimeDay(day.value)"
             :class="{ active: store.travelTimeDay === day.value }">
             {{ day.label }}
           </button>
         </div>
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
-          <label>Population weight by grid</label>
+          <label>{{ t('popgrid') }}</label>
           <label class="switch">
             <input type="checkbox" v-model="store.travelTimePopulationWeight"
               :disabled="!store.commune || store.displayUnit === 'regso'">
@@ -117,7 +116,7 @@
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
-          <label>% Population with access per city</label>
+          <label>% {{ t('popaccess') }}</label>
           <label class="switch">
             <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
             <span class="slider"></span>
@@ -125,7 +124,7 @@
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>Destinations</label>
+          <label>{{ t('destinations') }}</label>
           <label class="switch">
             <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
             <span class="slider"></span>
@@ -210,26 +209,26 @@ const sustainabilityIndexOptions = computed(() => [
   { label: t('outdoors'), value: 'outdoors'},
 ]);
 
-const activityTypes = [
+const activityTypes = computed(() => [
   { label: "Disc golf", value: "Disc golf" },
-  { label: "Dog park", value: "Dog park" },
-  { label: "Football", value: "Football" },
+  { label: t('dog'), value: "Dog park" },
+  { label: t('football'), value: "Football" },
   { label: "Golf", value: "Golf" },
-  { label: "Gym / fitness centre", value: "Gym FitnessCentre" },
-  { label: "Horse riding", value: "Horse riding" },
-  { label: "Ice hockey", value: "Ice hockey" },
-  { label: "Other ballsports", value: "Other ballsports" },
-  { label: "Outdoor swimming", value: "Outdoor swimming" },
-  { label: "Outdoors", value: "Outdoors" },
-  { label: "Picnic", value: "Picnic" },
-  { label: "Playground", value: "Playground" },
-  { label: "Racket sports", value: "Racket sports" },
-  { label: "Walking / running", value: "Walking Running" },
-  { label: "Athletics", value: "Athletics" },
-  { label: "Gymnastics", value: "Gymnastics" },
-  { label: "Outdoor gym", value: "Outdoor gym" },
-  { label: "Swimming pool", value: "Swimming pool" },
-];
+  { label: t('gym'), value: "Gym FitnessCentre" },
+  { label: t('horse'), value: "Horse riding" },
+  { label: t('hockey'), value: "Ice hockey" },
+  { label: t('otherball'), value: "Other ballsports" },
+  { label: t('outdoorswimming'), value: "Outdoor swimming" },
+  { label: t('outdoors'), value: "Outdoors" },
+  { label: t('picnic'), value: "Picnic" },
+  { label: t('playground'), value: "Playground" },
+  { label: t('racket'), value: "Racket sports" },
+  { label: t('walkrun'), value: "Walking Running" },
+  { label: t('athletics'), value: "Athletics" },
+  { label: t('gymnastics'), value: "Gymnastics" },
+  { label: t('outgym'), value: "Outdoor gym" },
+  { label: t('swimming'), value: "Swimming pool" },
+]);
 
 function setDisplayUnit(unit) {
   if (unit === 'city') {
@@ -242,7 +241,14 @@ function setDisplayUnit(unit) {
 }
 
 const minutesOptions = [15, 30, 60];
-const travelModes = ["car", "bicycle", "walk", "transit", "sustainable"];
+const travelModes = computed(() => [
+  { label: t('car'), value: 'car' },
+  { label: t('bicycle'), value: 'bicycle' },
+  { label: t('walk'), value: 'walk' },
+  { label: t('transit'), value: 'transit' },
+  { label: t('sustainable'), value: 'sustainable' },
+]);
+
 
 //index or travel
 const setSustainabilityFilterType = (value) => (store.sustainabilityFilterType = value);
