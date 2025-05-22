@@ -8,7 +8,10 @@
         <button @click="emit('close')">Close</button>
       </div>
     </div>
-    <CityLayer v-if="map" :map="map" />
+    <CityLayer
+      v-if="map && sportsStore.displayUnit === 'city'"
+      :map="map"
+    />
   </div>
 </template>
 
