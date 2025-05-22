@@ -21,6 +21,7 @@ import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
 import CityLayer from "./CityLayer.vue";
 
+const lastCommune = ref(null) 
 const map = ref(null);
 const sportsStore = useSportsStore();
 const emit = defineEmits(['close']);
@@ -36,7 +37,6 @@ const props = defineProps({
 
 //region's data kommun_regso
 const geojsonData = ref(null);
-
 const communeData = ref(null);
 const filteredLayer = ref(null);
 
@@ -251,7 +251,10 @@ async function loadGeoJSONFile(commune) {
 
     filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
     filteredLayer.value.addTo(map.value)
-    map.value.fitBounds(filteredLayer.value.getBounds(), { padding: [50, 50] })
+    if (commune !== lastCommune.value) {
+      map.value.fitBounds(filteredLayer.value.getBounds(), { padding:[50,50] })
+      lastCommune.value = commune
+    }
 
     createLegend(map.value)
     updateIndexMapLayer()
@@ -463,9 +466,8 @@ watch(
     () => sportsStore.travelTimePopulationWeight
   ],
   ([newCommune, newDisplayUnit]) => {
-    // console.log('newCommune:', newCommune, 'newDisplayUnit:', newDisplayUnit);
-
     if (!newCommune) {
+      lastCommune.value = null; 
       map.value.setView([63, 17], 5);
 
       //remove filtered layer if present
