@@ -203,7 +203,7 @@ function createLegend(map) {
             });
         } 
         else if (sportsStore.travelTimePercentageAccess && sportsStore.sustainabilityFilterType === "travel") {
-            div.innerHTML += `<p>Travel time</p><p>Activities reached (%)</p>`;
+            div.innerHTML += `<p>Population with access to activity (%)</p>`;
             var indexRanges = [
                 { min: 0, max: 10, color: "#feebe2" },
                 { min: 10, max: 20, color: "#fdd3d0" },
