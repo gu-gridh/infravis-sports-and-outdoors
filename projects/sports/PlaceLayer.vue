@@ -39,6 +39,7 @@ const props = defineProps({
 const geojsonData = ref(null);
 const communeData = ref(null);
 const filteredLayer = ref(null);
+const borderLayer   = ref(null);
 
 const mapStyles = ref({
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -56,6 +57,35 @@ function uriSegment(str) {
   return encodeURIComponent(str);
 }
 
+function drawCommuneBorder (communeName) {
+  if (!geojsonData.value || !map.value) return;
+
+  if (borderLayer.value) {
+    map.value.removeLayer(borderLayer.value);
+    borderLayer.value = null;
+  }
+
+  const borderFc = {
+    type: 'FeatureCollection',
+    features: geojsonData.value.features.filter(
+      f => f.properties.kommunnamn === communeName
+    )
+  };
+
+  if (!borderFc.features.length) return;
+
+  borderLayer.value = L.geoJSON(borderFc, {
+    pane: 'borderPane',
+    interactive: false,
+    style: {
+      color: '#000',
+      weight: 2,
+      dashArray: '6 4', //black dashed line
+      fillOpacity: 0
+    }
+  }).addTo(map.value);
+}
+
 async function initMap() {
   map.value = L.map("map", {
     minZoom: 5,
@@ -63,6 +93,9 @@ async function initMap() {
 
   map.value.createPane('communePane')
   map.value.getPane('communePane').style.zIndex = 650
+
+  map.value.createPane('borderPane')
+  map.value.getPane('borderPane').style.zIndex = 675
 
   map.value.createPane('destinationsPane')
   map.value.getPane('destinationsPane').style.zIndex = 700
@@ -251,7 +284,9 @@ async function loadGeoJSONFile(commune) {
 
     filteredLayer.value = L.geoJSON(communeData.value, { pane: 'communePane' })
     filteredLayer.value.addTo(map.value)
+    
     if (commune !== lastCommune.value) {
+      drawCommuneBorder(commune);
       map.value.fitBounds(filteredLayer.value.getBounds(), { padding:[50,50] })
       lastCommune.value = commune
     }
@@ -461,8 +496,12 @@ watch(
     () => sportsStore.sustainabilityFilterType,
     () => sportsStore.travelTimePopulationWeight
   ],
-  ([newCommune, newDisplayUnit]) => {
+  ([newCommune]) => {
     if (!newCommune) {
+      if (borderLayer.value) {
+        map.value.removeLayer(borderLayer.value);
+        borderLayer.value = null;
+      }
       lastCommune.value = null; 
       map.value.setView([63, 17], 5);
 
