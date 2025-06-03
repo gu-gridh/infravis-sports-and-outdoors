@@ -110,6 +110,7 @@ async function initMap() {
   try {
     const response = await fetch(asset("geojson/kommun_regso.geojson"));
     const rawRegion = await response.json();
+    console.log("Loaded region data:", rawRegion);
     geojsonData.value = rawRegion;
 
     if (!rawRegion?.features) {

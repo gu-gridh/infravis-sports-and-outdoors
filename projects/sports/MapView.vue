@@ -4,6 +4,7 @@ import { mapStore } from "@/stores/store";
 import { ref } from "vue";
 import MainLayout from "@/MainLayout.vue";
 import MapControls from "./MapControls.vue";
+//import MapViewThumbnail from "./MapViewThumbnail.vue";
 
 const store = mapStore();
 const showInfoOverlay = ref(false)
@@ -25,7 +26,7 @@ function handleShowInfo() {
     </template>
 
     <template #details>
-      <MapViewThumbnail />
+      <!-- <MapViewThumbnail /> -->
     </template>
 
   </MainLayout>

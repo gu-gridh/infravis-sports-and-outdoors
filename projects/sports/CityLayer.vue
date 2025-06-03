@@ -168,12 +168,6 @@ function setPercAccColor(percent) {
     if (percent >= 90 && percent <= 100) return "#7a0177";
 }
 
-function setAccColorPercent(percent) {
-    //no decimals
-    percent = Math.round(percent);
-    //
-    
-}
 
 function createLegend(map) {
     // Check if map exists
