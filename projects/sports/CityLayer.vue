@@ -48,11 +48,11 @@ const geojsonFile = computed(() => {
         sportsStore.sustainabilityFilterType === 'travel' &&
         sportsStore.travelTimePercentageAccess
     ) {
-        return 'geojson/t3_city_ttm_percent.geojson';
+        return 'geojson/t3_percent_15_30_60_by_city.geojson';
     }
 
     return sportsStore.sustainabilityFilterType === 'index'
-        ? 'geojson/t2_index_by_city.geojson'
+        ? 'geojson/t2_index_15_30_60_by_city.geojson'
         : 'geojson/t1_ttm_15_30_60_by_city.geojson';
 });
 
@@ -111,6 +111,7 @@ function styleFeature(feature) {
 
 function setIndexColor(percent) {
     //no decimals
+    if (percent === null || percent === undefined) return "#cccccc"; //gray
     percent = Math.round(percent);
     if (percent === null || undefined) return "#cccccc";
     if (percent >= 0 && percent <= 10) return "#d7191c";
@@ -127,6 +128,7 @@ function setIndexColor(percent) {
 }
 
 function setAccColor(time) {
+    if (time === null || time === undefined) return "#cccccc"; //gray
     //no decimals
     time = Math.round(time);
     if (time === null || time === undefined || time == 0) return "#ffffff"; //white
@@ -151,6 +153,7 @@ function setAccColor(time) {
 }
 
 function setPercAccColor(percent) {
+    if (percent === null || percent === undefined) return "#cccccc"; //gray
     //no decimals
     percent = Math.round(percent);
     if (percent >= 0 && percent <= 10) return "#feebe2";
@@ -259,8 +262,9 @@ function createLegend(map) {
 async function loadLayer() {
 
     sportsStore.isLoading = true
-
+    console.log('try fetching', geojsonFile.value);
     try {
+        console.log('try fetching', geojsonFile.value);
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
         // if (

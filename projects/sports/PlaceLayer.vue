@@ -313,6 +313,7 @@ async function loadGeoJSONFile(commune) {
 }
 
 function setIndexColor(percent) { //for the index layer
+  if (percent === null || percent === undefined) return "#cccccc"; //gray
   //no decimals
   percent = Math.round(percent);
   if (percent === null || undefined) return "#cccccc";
@@ -330,6 +331,7 @@ function setIndexColor(percent) { //for the index layer
 }
 
 function setAccColor(time) {
+  if (time === null || time === undefined) return "#cccccc"; 
   //no decimals
   time = Math.round(time);
   if (time === null || time === undefined || time == 0) return "#ffffff"; //white
