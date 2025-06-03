@@ -2,16 +2,12 @@
   <div class="map-controls">
     <div class="section logo">
       <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
-      <button
-        class="lang-btn"
-        @click="toggleLocale"
-        :title="locale === 'sv' ? 'Svenska' : 'English'"
-      >
+      <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
         {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
-    <div class="section">
+    <div class="section" :class="{ greyout: store.isLoading }">
       <h2>{{ t('Municipality') }}</h2>
       <div ref="searchContainer" class="municipality-search">
         <input type="text" v-model="searchQuery" :placeholder="$t('search')" @focus="showDropdown" />
@@ -24,34 +20,34 @@
       </div>
 
       <!-- Grid vs Regso -->
-      <div class="btn-group2" style="margin-top: 10px;">
+            <div class="btn-group2" style="margin-top: 10px;">
         {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
-          Grid
+          {{ t('grid') }}
         </button>
         <button @click="setDisplayUnit('regso')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'regso' }]">
-          Regso
+          RegSo
         </button>
         <button @click="setDisplayUnit('city')" :class="{ active: isCity }">
-          City
+          {{ t('city') }}
         </button>
       </div>
     </div>
 
     <!-- Sustainability Filters -->
-    <div class="section">
-      <h2>Indicator</h2>
+    <div class="section" :class="{ greyout: store.isLoading }">
+      <h2>{{ t('indicator') }}</h2>
       <!-- <p>{{ t('chooseone') }}</p> -->
       <div class="btn-group">
         <button @click="setSustainabilityFilterType('index')"
           :class="{ active: store.sustainabilityFilterType === 'index' }">
-          Sustainability Index
+          {{ t('susindex') }}
         </button>
         <button @click="setSustainabilityFilterType('travel')"
           :class="{ active: store.sustainabilityFilterType === 'travel' }">
-          Travel Time to Activities
+          {{ t('traveltime') }}
         </button>
       </div>
       <template v-if="store.sustainabilityFilterType === 'index'">
@@ -90,10 +86,10 @@
           </select>
         </div>
         <div class="btn-group">
-          <label>Mode</label>
+          <label>{{ t('mode') }}</label>
           <select @change="setTravelTimeTransportMode($event.target.value)" :value="store.travelTimeTransportMode">
-            <option v-for="mode in travelModes" :key="mode" :value="mode">
-              {{ mode }}
+            <option v-for="mode in travelModes" :key="mode.value" :value="mode.value">
+              {{ mode.label }}
             </option>
           </select>
         </div>
@@ -105,22 +101,22 @@
           </button>
         </div>
         <div class="btn-group">
-          <!-- <span>{{ t('day') }}</span> -->
           <button v-for="day in dayTypes" :key="day.value" @click="setTravelTimeDay(day.value)"
             :class="{ active: store.travelTimeDay === day.value }">
             {{ day.label }}
           </button>
         </div>
-        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>Population Weight by Grid</label>
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
+          <label>{{ t('popgrid') }}</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePopulationWeight" :disabled="!store.commune">
+            <input type="checkbox" v-model="store.travelTimePopulationWeight"
+              :disabled="!store.commune || store.displayUnit === 'regso'">
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
-          <label>% Population with Access to City</label>
+          <label>% {{ t('popaccess') }}</label>
           <label class="switch">
             <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
             <span class="slider"></span>
@@ -128,7 +124,7 @@
         </div>
 
         <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>Destinations</label>
+          <label>{{ t('destinations') }}</label>
           <label class="switch">
             <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
             <span class="slider"></span>
@@ -142,7 +138,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { useI18n } from "vue-i18n";    
+import { useI18n } from "vue-i18n";
 import { useSportsStore } from "./settings/store";
 
 const { t, locale } = useI18n(
@@ -204,35 +200,35 @@ onBeforeUnmount(() => {
 const dayTypes = computed(() => [
   { label: t('weekday'), value: 'week_day' },
   { label: t('saturday'), value: 'saturday' },
-  { label: t('sunday'),   value: 'sunday' },
+  { label: t('sunday'), value: 'sunday' },
 ])
 
-const sustainabilityIndexOptions = [
-  { label: "Total", value: "total" },
-  { label: "Sports", value: "sports" },
-  { label: "Outdoors", value: "outdoors" },
-];
+const sustainabilityIndexOptions = computed(() => [
+  { label: t('total'),    value: 'total'   },
+  { label: t('sports'),   value: 'sports'  },
+  { label: t('outdoors'), value: 'outdoors'},
+]);
 
-const activityTypes = [
+const activityTypes = computed(() => [
   { label: "Disc golf", value: "Disc golf" },
-  { label: "Dog park", value: "Dog park" },
-  { label: "Football", value: "Football" },
+  { label: t('dog'), value: "Dog park" },
+  { label: t('football'), value: "Football" },
   { label: "Golf", value: "Golf" },
-  { label: "Gym / fitness centre", value: "Gym FitnessCentre" },
-  { label: "Horse riding", value: "Horse riding" },
-  { label: "Ice hockey", value: "Ice hockey" },
-  { label: "Other ballsports", value: "Other ballsports" },
-  { label: "Outdoor swimming", value: "Outdoor swimming" },
-  { label: "Outdoors", value: "Outdoors" },
-  { label: "Picnic", value: "Picnic" },
-  { label: "Playground", value: "Playground" },
-  { label: "Racket sports", value: "Racket sports" },
-  { label: "Walking / running", value: "Walking Running" },
-  { label: "Athletics", value: "Athletics" },
-  { label: "Gymnastics", value: "Gymnastics" },
-  { label: "Outdoor gym", value: "Outdoor gym" },
-  { label: "Swimming pool", value: "Swimming pool" },
-];
+  { label: t('gym'), value: "Gym FitnessCentre" },
+  { label: t('horse'), value: "Horse riding" },
+  { label: t('hockey'), value: "Ice hockey" },
+  { label: t('otherball'), value: "Other ballsports" },
+  { label: t('outdoorswimming'), value: "Outdoor swimming" },
+  { label: t('outdoors'), value: "Outdoors" },
+  { label: t('picnic'), value: "Picnic" },
+  { label: t('playground'), value: "Playground" },
+  { label: t('racket'), value: "Racket sports" },
+  { label: t('walkrun'), value: "Walking Running" },
+  { label: t('athletics'), value: "Athletics" },
+  { label: t('gymnastics'), value: "Gymnastics" },
+  { label: t('outgym'), value: "Outdoor gym" },
+  { label: t('swimming'), value: "Swimming pool" },
+]);
 
 function setDisplayUnit(unit) {
   if (unit === 'city') {
@@ -245,7 +241,14 @@ function setDisplayUnit(unit) {
 }
 
 const minutesOptions = [15, 30, 60];
-const travelModes = ["car", "bicycle", "walk", "transit", "sustainable"];
+const travelModes = computed(() => [
+  { label: t('car'), value: 'car' },
+  { label: t('bicycle'), value: 'bicycle' },
+  { label: t('walk'), value: 'walk' },
+  { label: t('transit'), value: 'transit' },
+  { label: t('sustainable'), value: 'sustainable' },
+]);
+
 
 //index or travel
 const setSustainabilityFilterType = (value) => (store.sustainabilityFilterType = value);
@@ -344,9 +347,7 @@ input[type="text"] {
   align-items: center;
   gap: 10px;
   padding-bottom: 10px;
-  
 }
-
 
 .btn-group button,
 .btn-group2 button {
@@ -356,7 +357,6 @@ input[type="text"] {
   background-color: #f0f0f0;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
-
 }
 
 button.active {
@@ -471,13 +471,16 @@ input:disabled+.slider {
   .map-controls {
     font-size: 0.8rem;
   }
+
   .section {
     padding: 5px;
   }
+
   h2 {
     font-size: 1.2rem !important;
 
   }
+
   button {
     font-size: 0.8rem;
   }
