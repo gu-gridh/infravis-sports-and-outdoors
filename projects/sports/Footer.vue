@@ -11,11 +11,11 @@
       <div class="partners">
   
         <a href="">
-          <div class="PartnerLogo" id=""><img src="/chalmersLogo.png" class="chalmers"/> </div>
+          <div class="PartnerLogo" id=""><img src="/chalmersLogo.png" class="chalmers"/></div>
         </a>
   
         <a href="https://infravis.se">
-          <div class="PartnerLogo" id="">INFRAVIS</div>
+          <div class="PartnerLogo" id=""><img src="/infravisLogo.png" class="infravis"/></div>
         </a>
     </div>
     </footer>
@@ -146,6 +146,11 @@
 
   .chalmers {
     width: 150px;
+    height: auto;
+  }
+
+  .infravis {
+    width: 80px;
     height: auto;
   }
   
