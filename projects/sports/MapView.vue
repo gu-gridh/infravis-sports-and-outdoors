@@ -1,13 +1,31 @@
 <script setup>
 import PlaceLayer from "./PlaceLayer.vue";
 import { mapStore } from "@/stores/store";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import MainLayout from "@/MainLayout.vue";
 import MapControls from "./MapControls.vue";
 //import MapViewThumbnail from "./MapViewThumbnail.vue";
+import LandingPage from "./LandingPage.vue";
 
 const store = mapStore();
 const showInfoOverlay = ref(false)
+const visibleAbout = ref(true)
+
+onMounted(() => {
+  //check if the "visited" key exists in session storage
+//   let visited = false
+//   visited = sessionStorage.getItem("visited") === "true";
+
+//   if (!visited) {
+//     visibleAbout.value = true;
+//     sessionStorage.setItem("visited", "true");
+//   }
+ })
+
+/* const toggleAboutVisibility = async () => {
+  await nextTick();
+  visibleAbout.value = !visibleAbout.value;
+}; */
 
 function handleShowInfo() {
   showInfoOverlay.value = true
@@ -15,6 +33,9 @@ function handleShowInfo() {
 </script>
 
 <template>
+  <div v-if="visibleAbout" class="overlay-landing">
+    <LandingPage @close="visibleAbout = false" />
+  </div>
   <MainLayout>
     <template #background>
       <div class="map-container">
@@ -113,5 +134,18 @@ function handleShowInfo() {
 
 .map-button:hover {
   background-color: var(--theme-4);
+}
+
+.overlay-landing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1200; 
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
