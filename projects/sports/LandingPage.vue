@@ -14,6 +14,10 @@
     <p>Explore the map and learn about the landscape of sustainable accessibility to sport and outdoors across Sweden. </p>
   </div>
   <button @click="$emit('close')" class="btn">Explore the map</button>
+  <div class="disclaimer">
+    <p>Disclaimer: This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the complete and latest street network, public transport, or sport and outdoors destinations in Sweden. </p>
+  </div>
+  
   </div>
 </template>
 
@@ -72,5 +76,11 @@ p {
   font-size: 18px;
   cursor: pointer;
   margin-top: 20px;
+}
+
+.disclaimer {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
 }
 </style>
