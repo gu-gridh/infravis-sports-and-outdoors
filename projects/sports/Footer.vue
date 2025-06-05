@@ -5,12 +5,12 @@
           <a class="site-link link" href="https://github.com/gu-gridh/infravis-sports-and-outdoors" target="_blank">GitHub repository and development</a>
         </div>
         <div class="links-stack">
-        <a class="site-link link" href="https://mistra.org/" target="_blank">Mistra</a>
+        <a class="site-link link" href="https://mistra.org/" target="_blank">Data repository</a>
       </div>
       </div>
       <div class="partners">
   
-        <a href="">
+        <a href=" https://research.chalmers.se/project/12213">
           <div class="PartnerLogo" id=""><img src="/chalmersLogo.png" class="chalmers"/></div>
         </a>
   

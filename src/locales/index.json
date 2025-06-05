@@ -81,9 +81,9 @@
       "car":"Car",
       "bicycle":"Bicycle",
       "walk":"Walk",
-      "transit":"Transit",
+      "transit":"Public Transport",
       "sustainable":"Sustainable",
-      "popgrid":"Population weight by grid",
+      "popgrid":"Population weighted grid",
       "popaccess":"Population with access per city",
       "destinantions":"Destinations"
     }

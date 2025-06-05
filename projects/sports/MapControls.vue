@@ -1,7 +1,7 @@
 <template>
   <div class="map-controls">
-    <div class="section logo">
-      <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
+    <div class="section logo"><a href="https://www.mistrasportandoutdoors.se/ " target="_blank">
+      <img src="./assets/logo_mistra.png" alt="Logo" width="200" /></a>
       <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
         {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
@@ -84,6 +84,12 @@
               {{ act.label }}
             </option>
           </select>
+            <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
+          <label class="switch">
+            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
+            <span class="slider"></span>
+          </label>
+        </div>
         </div>
         <div class="btn-group">
           <label>{{ t('mode') }}</label>
@@ -123,13 +129,7 @@
           </label>
         </div>
 
-        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>{{ t('destinations') }}</label>
-          <label class="switch">
-            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
-            <span class="slider"></span>
-          </label>
-        </div>
+
 
       </template>
     </div>

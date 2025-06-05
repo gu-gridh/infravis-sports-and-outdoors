@@ -3,8 +3,10 @@
     <div id="map" style="width: 100%; height: 100vh;"></div>
     <div class="info-backdrop" :class="{ visible: showInfo }">
       <div class="info-overlay">
-        <h2>Info Overlay</h2>
-        <p>This is an info overlay.</p>
+        <h2>Mistra Sport and Outdoors Accessibility Index</h2>
+        <p>Home</p>
+        <p>Abouth the map and data</p>
+        <div class="disclaimer">This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the complete and latest street network, public transport, or sports and outdoors destinations in Sweden.</div>
         <button @click="emit('close')">Close</button>
       </div>
     </div>
@@ -659,5 +661,17 @@ watch(
 .leaflet-control-scale {
   background: transparent;
   box-shadow: none;
+}
+
+.disclaimer {
+  font-size: 14px;
+  color: #666;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.info-overlay h2 {
+  color: #497723;
+  font-weight: bold;
 }
 </style>
