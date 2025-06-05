@@ -30,7 +30,7 @@
     background-color: #222;
     color: white;
     line-height: 1;
-    height: 82px;
+    height: 65px;
     width: calc(100% + 2px);
     font-size: 12px;
     position: absolute;

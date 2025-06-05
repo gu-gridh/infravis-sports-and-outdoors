@@ -34,7 +34,7 @@ function handleShowInfo() {
 
 <style>
 .map-container {
-  height: calc(100vh - 80px) !important;
+  height: calc(100vh - 65) !important;
   width: 100%;
 }
 

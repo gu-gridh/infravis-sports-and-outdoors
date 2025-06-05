@@ -258,9 +258,9 @@ async function loadLayer() {
     sportsStore.isLoading = true
     console.log('try fetching', geojsonFile.value);
     try {
-        console.log('try fetching', geojsonFile.value);
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
+        console.log('fetched', geojsonFile.value, geoData);
         // if (
         //     sportsStore.sustainabilityFilterType !== "index" &&
         //     sportsStore.travelTimePopulationWeight

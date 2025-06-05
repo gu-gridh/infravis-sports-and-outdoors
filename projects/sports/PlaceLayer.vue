@@ -567,7 +567,7 @@ watch(
 }
 
 #map.leaflet-container {
-  height: calc(100vh - 82px) !important;
+  height: calc(100vh - 65px) !important;
 }
 
 /* .leaflet-tile-pane {
@@ -576,7 +576,7 @@ watch(
 } */
 .legend {
   position: absolute;
-  bottom: 20px;
+  bottom: 50px;
   right: 20px;
   background: white;
   padding: 10px;
