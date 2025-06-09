@@ -221,7 +221,7 @@ const activityTypes = computed(() => [
   { label: t('swimming'), value: "Swimming pool" },
   { label: t('horse'), value: "Horse riding" },
   { label: t('athletics'), value: "Athletics" },
-  { label: t('Martial Arts'), value: "Martial arts" },
+  { label: t('martialarts'), value: "Martial arts" },
   { label: "Golf", value: "Golf" },
   { label: t('racket'), value: "Racket sports" },
   { label: t('playground'), value: "Playground" },

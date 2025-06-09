@@ -41,7 +41,9 @@
     "sustainable": "Hållbart",
     "popgrid": "Befolkningsviktat rutnät",
     "popaccess": "Befolkning med tillgång per kommun",
-    "destinations": "Destinationer"
+    "destinations": "Destinationer",
+    "martialarts": "Kampsport"
+
   },
   "en": {
     "chooseone": "Choose one",
@@ -85,6 +87,7 @@
     "sustainable": "Sustainable",
     "popgrid": "Population weighted grid",
     "popaccess": "Population with access per city",
-    "destinations": "Destinations"
+    "destinations": "Destinations",
+    "martialarts": "Martial Arts"
   }
 }
