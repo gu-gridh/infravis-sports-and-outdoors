@@ -158,7 +158,12 @@ async function initMap() {
 }
 
 function updateIndexMapLayer() {
-  if (!map.value || !communeData.value) return;
+  if (
+      !map.value ||
+      !communeData.value ||
+      !sportsStore.commune ||
+      sportsStore.displayUnit === 'city'
+  ) return;
 
   //remove old layer
   if (filteredLayer.value) {
@@ -538,7 +543,7 @@ watch(
         map.value.removeLayer(filteredLayer.value);
         filteredLayer.value = null;
       }
-
+      communeData.value = null;
       return;
     }
 
