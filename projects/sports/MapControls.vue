@@ -210,24 +210,23 @@ const sustainabilityIndexOptions = computed(() => [
 ]);
 
 const activityTypes = computed(() => [
-  { label: "Disc golf", value: "Disc golf" },
-  { label: t('dog'), value: "Dog park" },
   { label: t('football'), value: "Football" },
-  { label: "Golf", value: "Golf" },
-  { label: t('gym'), value: "Gym FitnessCentre" },
-  { label: t('horse'), value: "Horse riding" },
-  { label: t('hockey'), value: "Ice hockey" },
   { label: t('otherball'), value: "Other ballsports" },
-  { label: t('outdoorswimming'), value: "Outdoor swimming" },
-  { label: t('outdoors'), value: "Outdoors" },
-  { label: t('picnic'), value: "Picnic" },
-  { label: t('playground'), value: "Playground" },
-  { label: t('racket'), value: "Racket sports" },
-  { label: t('walkrun'), value: "Walking Running" },
-  { label: t('athletics'), value: "Athletics" },
+  { label: t('hockey'), value: "Ice hockey" },
   { label: t('gymnastics'), value: "Gymnastics" },
-  { label: t('outgym'), value: "Outdoor gym" },
+  { label: t('gym'), value: "Gym FitnessCentre" },
   { label: t('swimming'), value: "Swimming pool" },
+  { label: t('horse'), value: "Horse riding" },
+  { label: t('athletics'), value: "Athletics" },
+  { label: "Golf", value: "Golf" },
+  { label: t('racket'), value: "Racket sports" },
+  { label: t('playground'), value: "Playground" },
+  { label: t('walkrun'), value: "Walking Running" },
+  { label: t('outdoorswimming'), value: "Outdoor swimming" },
+  { label: t('picnic'), value: "Picnic" },
+  { label: t('dog'), value: "Dog park" },
+  { label: t('outgym'), value: "Outdoor gym" },
+  { label: "Disc golf", value: "Disc golf" }, 
 ]);
 
 function setDisplayUnit(unit) {
