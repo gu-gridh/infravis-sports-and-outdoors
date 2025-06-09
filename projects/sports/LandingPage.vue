@@ -27,7 +27,7 @@ h1 {
   margin: 0;
   padding: 0;
   padding-bottom: 10px;
-  padding-top: 30px;
+  margin-top: 150px;
   color: #497723;
 }
 h2 {
