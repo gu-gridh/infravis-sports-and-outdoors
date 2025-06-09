@@ -290,17 +290,15 @@ async function loadGeoJSONFile(commune) {
 
   //"grid" or "regso"
   const unit = sportsStore.displayUnit
+  const seg = uriSegment(commune);
 
   // build path based on unit
   let geojsonPath
   if (unit === 'grid') {
-    const seg = uriSegment(commune);
     geojsonPath = `geojson/geojson_grid_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;
   } else { //regso
-    // or: geojson/t2_index_by_regso.geojson
-    geojsonPath = `geojson/${prefix}_by_${unit}.geojson`
+    geojsonPath = `geojson/geojson_regso_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;  
   }
-
   try {
     const resp = await fetch(asset(geojsonPath))
     const raw = await resp.json()
