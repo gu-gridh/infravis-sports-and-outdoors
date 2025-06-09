@@ -138,7 +138,7 @@ async function initMap() {
     const NorthArrowControl = L.Control.extend({
       onAdd: function (map) {
         const img = L.DomUtil.create("img");
-        img.src = "/north-arrow.svg";
+        img.src = "/assets/north-arrow.svg";
         img.style.width = "50px";
         img.style.opacity = "0.8";
         img.title = "North arrow";
@@ -220,10 +220,20 @@ function updateIndexMapLayer() {
       } else {
         val = feature.properties[generateTravelPropName()];
       }
-
+      //no decimals at all
+      if (val === null || val === undefined) {
+        val = "no data";
+      } else if (sportsStore.sustainabilityFilterType === "index") {
+        val = Math.round(val); //round to whole number
+      } else { //travel time
+        val = Math.round(val); //round to whole number
+      }
+      const valueIs = sportsStore.sustainabilityFilterType === "index"
+        ? `${val}%`
+        : `${val} min`;
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
-        .setContent(`<b>${val ?? "no data"}</b>`)
+        .setContent(`<b>${valueIs ?? "no data"}</b>`)
         .openOn(map.value);
     });
 

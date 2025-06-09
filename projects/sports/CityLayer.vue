@@ -109,6 +109,38 @@ function styleFeature(feature) {
     }
 }
 
+ //hover features
+  function onEachFeature(feature, layer) {
+    layer.on("mouseover", (e) => {
+      let val;
+      if (sportsStore.sustainabilityFilterType === "index") {
+        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+        val = feature.properties[p];
+      } else {
+        val = feature.properties[generateTravelPropName()];
+      }
+      //no decimals at all
+      if (val === null || val === undefined) {
+        val = "no data";
+      } else if (sportsStore.sustainabilityFilterType === "index") {
+        val = Math.round(val); //round to whole number
+      } else { //travel time
+        val = Math.round(val); //round to whole number
+      }
+      const valueIs = sportsStore.sustainabilityFilterType === "index"
+        ? `${val}%`
+        : `${val} min`;
+      L.popup({ offset: [0, -10] })
+        .setLatLng(e.latlng)
+        .setContent(`<b>${valueIs ?? "no data"}</b>`)
+        .openOn(map.value);
+    });
+
+    layer.on("mouseout", () => {
+      map.value.closePopup();
+    });
+  }
+
 function setIndexColor(percent) {
     //no decimals
     if (percent === null || percent === undefined) return "#cccccc"; //gray
@@ -284,9 +316,27 @@ async function loadLayer() {
             onEachFeature: (feature, lyr) => {
                 lyr.on("mouseover", (e) => {
                     const content = `${feature.properties.city_name + " kommun" || "N/A"}`;
+                    let val;
+                    if (sportsStore.sustainabilityFilterType === "index") {
+                        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+                        val = feature.properties[p];
+                    } else {
+                        val = feature.properties[generateTravelPropName()];
+                    }
+                    //no decimals at all
+                    if (val === null || val === undefined) {
+                        val = "no data";
+                    } else if (sportsStore.sustainabilityFilterType === "index") {
+                        val = Math.round(val); //round to whole number
+                    } else { //travel time
+                        val = Math.round(val); //round to whole number
+                    }
+                    const valueIs = sportsStore.sustainabilityFilterType === "index"
+                        ? `${val}%`
+                        : `${val} min`;
                     L.popup({ offset: [0, -10] })
                         .setLatLng(e.latlng)
-                        .setContent(content)
+                        .setContent(content + `<br><b>${valueIs ?? "no data"}</b>`)
                         .openOn(props.map);
                 });
                 lyr.on("mouseout", () => {
