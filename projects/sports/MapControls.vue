@@ -1,7 +1,7 @@
 <template>
   <div class="map-controls">
     <div class="section logo"><a href="https://www.mistrasportandoutdoors.se/ " target="_blank">
-      <img src="./assets/logo_mistra.png" alt="Logo" width="200" /></a>
+        <img src="./assets/logo_mistra.png" alt="Logo" width="200" /></a>
       <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
         {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Grid vs Regso -->
-            <div class="btn-group2" style="margin-top: 10px;">
+      <div class="btn-group2" style="margin-top: 10px;">
         {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
@@ -84,12 +84,15 @@
               {{ act.label }}
             </option>
           </select>
-            <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label class="switch">
-            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
-            <span class="slider"></span>
-          </label>
-        </div>
+          <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <small>{{ t('destinations') }}</small>
+              <label class="switch">
+                <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
         <div class="btn-group">
           <label>{{ t('mode') }}</label>
@@ -204,9 +207,9 @@ const dayTypes = computed(() => [
 ])
 
 const sustainabilityIndexOptions = computed(() => [
-  { label: t('total'),    value: 'total'   },
-  { label: t('sports'),   value: 'sports'  },
-  { label: t('outdoors'), value: 'outdoors'},
+  { label: t('total'), value: 'total' },
+  { label: t('sports'), value: 'sports' },
+  { label: t('outdoors'), value: 'outdoors' },
 ]);
 
 const activityTypes = computed(() => [
@@ -226,7 +229,7 @@ const activityTypes = computed(() => [
   { label: t('picnic'), value: "Picnic" },
   { label: t('dog'), value: "Dog park" },
   { label: t('outgym'), value: "Outdoor gym" },
-  { label: "Disc golf", value: "Disc golf" }, 
+  { label: "Disc golf", value: "Disc golf" },
 ]);
 
 function setDisplayUnit(unit) {
