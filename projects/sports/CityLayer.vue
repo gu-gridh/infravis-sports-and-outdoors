@@ -80,7 +80,6 @@ function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
         const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
         const val = feature.properties[propName];
-        //console.log("Index mode:", { propName, val, properties: feature.properties });
         return {
             color: "white",
             fillColor: setIndexColor(val),
@@ -90,7 +89,6 @@ function styleFeature(feature) {
     } else if (!sportsStore.travelTimePercentageAccess) {
         const propName = generateTravelPropName();
         const val = feature.properties[propName];
-        //console.log("Travel mode:", { propName, val, properties: feature.properties });
         return {
             color: "white",
             fillColor: setAccColor(val),
