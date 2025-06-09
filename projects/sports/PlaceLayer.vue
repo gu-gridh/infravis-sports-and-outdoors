@@ -469,19 +469,9 @@ function renderDestinations(activity) {
   const data = destinationsDataByCity.value[city]
   if (!map.value || !data) return
 
-  const wantedClass = activity?.replace(/ /g, '_')
-
-  const fc = {
-    type: 'FeatureCollection',
-    features: data.features.filter(f => {
-      const okClass = !wantedClass || f.properties.classification === wantedClass
-      return okClass
-    })
-  }
-
   clearDestinations()
 
-  destinationsLayer.value = L.geoJSON(fc, {
+  destinationsLayer.value = L.geoJSON(data, {
     pointToLayer: (_f, latlng) =>
       L.circleMarker(latlng, {
         pane: 'destinationsPane',
