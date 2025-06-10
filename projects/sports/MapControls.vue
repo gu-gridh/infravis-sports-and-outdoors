@@ -189,10 +189,6 @@ function handleClickOutside(event) {
   }
 }
 
-function showInfo() {
-  store.showInfo = true;
-}
-
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
 });
