@@ -120,12 +120,12 @@ function styleFeature(feature) {
       }
      //missing numbers check
         if (val === null || val === undefined) {
-            val = "no data";
+            val = "No data";
         } 
         else { //travel time
             val = Math.round(val); //round to whole number
         }
-      const valueIs = val === "no data"
+      const valueIs = val === "No data"
         ? val
         : (sportsStore.sustainabilityFilterType === "index"
             ? `${val}%`
@@ -340,7 +340,7 @@ async function loadLayer() {
                     }
                     //no decimals at all
                     if (val === null || val === undefined) {
-                        val = "no data";
+                        val = "No data";
                     } else if (sportsStore.sustainabilityFilterType === "index") {
                         val = Math.round(val); //round to whole number
                     } else { //travel time
@@ -351,7 +351,7 @@ async function loadLayer() {
                         : `${val} min`;
                     L.popup({ offset: [0, -10] })
                         .setLatLng(e.latlng)
-                        .setContent(content + `<br><b>${valueIs ?? "no data"}</b>`)
+                        .setContent(content + `<br><b>${valueIs ?? "No data"}</b>`)
                         .openOn(props.map);
                 });
                 lyr.on("mouseout", () => {
