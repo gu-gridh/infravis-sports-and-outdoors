@@ -6,6 +6,7 @@
 import { onMounted, onBeforeUnmount, watch, ref, computed } from "vue";
 import L from "leaflet";
 import { useSportsStore } from "./settings/store";
+import { color } from "d3";
 
 const props = defineProps({
     map: {
@@ -158,26 +159,34 @@ function setIndexColor(percent) {
     else console.log("setIndexColor: out of range", percent);
 }
 
+const colors = {1: '#ffea46', 2: '#ccbb69', 3: '#969078', 4: '#666970', 5: '#31446b', 6: '#00204d'};
+
 function setAccColor(time) {
     if (time === null || time === undefined) return "#cccccc"; //gray
     //no decimals
     time = Math.round(time);
-    if (time === null || time === undefined) return "#ffffff"; //white
+    if (time === null || time === undefined) return "#cccccc"; 
     if (sportsStore.travelTimeMinutes == 15) {
-        if (time >= 0 && time <= 5) return "#ffea46";
-        if (time >= 5 && time <= 10) return "#ccbb69";
-        if (time >= 10 && time <= 15) return "#969078";
+        if (time >= 0 && time <= 2.5) return colors[1];
+        if (time > 2.5 && time <= 5) return colors[2];
+        if (time > 5 && time <= 7.5) return colors[3];
+        if (time > 7.5 && time <= 10) return colors[4];
+        if (time > 10 && time <= 12.5) return colors[5];
+        if (time > 12.5 && time <= 15) return colors[6];
     } else if (sportsStore.travelTimeMinutes == 30) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
+        if (time >= 0 && time <= 5 ) return colors[1];
+        if (time > 5 && time <= 10) return colors[2];
+        if (time > 10 && time <= 15) return colors[3];
+        if (time > 15 && time <= 20) return colors[4];
+        if (time > 20 && time <= 25) return colors[5];
+        if (time > 25 && time <= 30) return colors[6];
     } else if (sportsStore.travelTimeMinutes == 60) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
-        if (time >= 30 && time <= 40) return "#666970";
-        if (time >= 40 && time <= 50) return "#31446b";
-        if (time >= 50 && time <= 60) return "#161e2e";
+        if (time >= 0 && time <= 10) return colors[1];
+        if (time > 10 && time <= 20) return colors[2];
+        if (time > 20 && time <= 30) return colors[3];
+        if (time > 30 && time <= 40) return colors[4];
+        if (time > 40 && time <= 50) return colors[5];
+        if (time > 50 && time <= 60) return colors[6];
     } else {
         console.log("setAccColor: out of range", time);
     }
@@ -252,25 +261,32 @@ function createLegend(map) {
             div.innerHTML += `<p>Traveltime to activity (min)</p>`;
             if (sportsStore.travelTimeMinutes == 15) {
                 accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
-                    { min: 5, max: 10, color: "#ccbb69" },
-                    { min: 10, max: 15, color: "#969078" },
+                    { min: 0, max: 2.5, color: colors[1] },
+                    { min: 2.5, max: 5, color: colors[2] },
+                    { min: 5, max: 7.5, color: colors[3] },
+                    { min: 7.5, max: 10, color: colors[4] },
+                    { min: 10, max: 12.5, color: colors[5] },
+                    { min: 12.5, max: 15, color: colors[6] },
                 ]
             }
             else if (sportsStore.travelTimeMinutes == 30) {
                 accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
+                    { min: 0, max: 5, color: colors[1] },
+                    { min: 5, max: 10, color: colors[2] },
+                    { min: 10, max: 15, color: colors[3] },
+                    { min: 15, max: 20, color: colors[4] },
+                    { min: 20, max: 25, color: colors[5] },
+                    { min: 25, max: 30, color: colors[6] },
                 ]
             } else if (sportsStore.travelTimeMinutes == 60) {
                 accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
-                    { min: 30, max: 40, color: "#666970" },
-                    { min: 40, max: 50, color: "#31446b" },
-                    { min: 50, max: 60, color: "#161e2e" },
+                    { min: 0, max: 10, color: colors[1] },
+                    { min: 10, max: 20, color: colors[2] },
+                    { min: 20, max: 30, color: colors[3] },
+                    { min: 30, max: 40, color: colors[4] },
+                    { min: 40, max: 50, color: colors[5] },
+                    { min: 50, max: 60, color: colors[6] },
+
 
                 ]
             }
