@@ -6,7 +6,6 @@
 import { onMounted, onBeforeUnmount, watch, ref, computed } from "vue";
 import L from "leaflet";
 import { useSportsStore } from "./settings/store";
-import { color } from "d3";
 
 const props = defineProps({
     map: {
@@ -107,39 +106,6 @@ function styleFeature(feature) {
         };
     }
 }
-
- //hover features
-  function onEachFeature(feature, layer) {
-    layer.on("mouseover", (e) => {
-      let val;
-      if (sportsStore.sustainabilityFilterType === "index") {
-        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
-        val = feature.properties[p];
-      } else {
-        val = feature.properties[generateTravelPropName()];
-      }
-     //missing numbers check
-        if (val === null || val === undefined) {
-            val = "No data";
-        } 
-        else { //travel time
-            val = Math.round(val); //round to whole number
-        }
-      const valueIs = val === "No data"
-        ? val
-        : (sportsStore.sustainabilityFilterType === "index"
-            ? `${val}%`
-            : `${val} min`);
-      L.popup({ offset: [0, -10] })
-        .setLatLng(e.latlng)
-        .setContent(`<b>${valueIs}</b>`)
-        .openOn(map.value);
-    });
-
-    layer.on("mouseout", () => {
-      map.value.closePopup();
-    });
-  }
 
 function setIndexColor(percent) {
     //no decimals
@@ -335,20 +301,25 @@ async function loadLayer() {
                     if (sportsStore.sustainabilityFilterType === "index") {
                         const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
                         val = feature.properties[p];
-                    } else {
+                    } else if (sportsStore.travelTimePercentageAccess && sportsStore.sustainabilityFilterType === "travel") {
+                        val = feature.properties[generatePercentPropName()];
+                    }
+                    else {
                         val = feature.properties[generateTravelPropName()];
                     }
-                    //no decimals at all
+                    // Check for missing value
                     if (val === null || val === undefined) {
-                        val = "No data";
-                    } else if (sportsStore.sustainabilityFilterType === "index") {
-                        val = Math.round(val); //round to whole number
-                    } else { //travel time
-                        val = Math.round(val); //round to whole number
+                    val = "No data";
+                    } else {
+                    val = Math.round(val); // Always round to whole number
                     }
-                    const valueIs = sportsStore.sustainabilityFilterType === "index"
+
+                    // Avoid appending unit when no value exists
+                    const valueIs = val === "No data"
+                    ? val
+                    : (sportsStore.sustainabilityFilterType === "index" | sportsStore.travelTimePercentageAccess
                         ? `${val}%`
-                        : `${val} min`;
+                        : `${val} min`);
                     L.popup({ offset: [0, -10] })
                         .setLatLng(e.latlng)
                         .setContent(content + `<br><b>${valueIs ?? "No data"}</b>`)
