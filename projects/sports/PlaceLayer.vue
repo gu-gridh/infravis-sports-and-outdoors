@@ -25,7 +25,6 @@ import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
 import CityLayer from "./CityLayer.vue";
-import { color } from "d3";
 
 const lastCommune = ref(null)
 const map = ref(null);
@@ -492,9 +491,9 @@ function renderDestinations(activity) {
     pointToLayer: (_f, latlng) =>
       L.circleMarker(latlng, {
         pane: 'destinationsPane',
-        radius: 3,
+        radius: 2.5,
         weight: 1,
-        color: '#444',
+        color: '#ccc',
         fillColor: '#000000',
         fillOpacity: 0.9
       })
