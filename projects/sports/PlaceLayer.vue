@@ -6,14 +6,12 @@
         <h2>Mistra Sport and Outdoors Accessibility Index</h2>
         <p>Home</p>
         <p>Abouth the map and data</p>
-        <div class="disclaimer">This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the complete and latest street network, public transport, or sports and outdoors destinations in Sweden.</div>
+        <div class="disclaimer">This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the
+          complete and latest street network, public transport, or sports and outdoors destinations in Sweden.</div>
         <button @click="emit('close')">Close</button>
       </div>
     </div>
-    <CityLayer
-      v-if="map && sportsStore.displayUnit === 'city'"
-      :map="map"
-    />
+    <CityLayer v-if="map && sportsStore.displayUnit === 'city'" :map="map" />
   </div>
 </template>
 
@@ -159,10 +157,10 @@ async function initMap() {
 
 function updateIndexMapLayer() {
   if (
-      !map.value ||
-      !communeData.value ||
-      !sportsStore.commune ||
-      sportsStore.displayUnit === 'city'
+    !map.value ||
+    !communeData.value ||
+    !sportsStore.commune ||
+    sportsStore.displayUnit === 'city'
   ) return;
 
   //remove old layer
@@ -218,25 +216,25 @@ function updateIndexMapLayer() {
   //hover features
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
-    let val;
-    if (sportsStore.sustainabilityFilterType === "index") {
-      const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
-      val = feature.properties[p];
-    } else {
-      val = feature.properties[generateTravelPropName()];
-    }
+      let val;
+      if (sportsStore.sustainabilityFilterType === "index") {
+        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+        val = feature.properties[p];
+      } else {
+        val = feature.properties[generateTravelPropName()];
+      }
 
-    // Check for missing value
-    if (val === null || val === undefined) {
-      val = "No data";
-    } else {
-      val = Math.round(val); // Always round to whole number
-    }
+      // Check for missing value
+      if (val === null || val === undefined) {
+        val = "No data";
+      } else {
+        val = Math.round(val); // Always round to whole number
+      }
 
-    // Avoid appending unit when no value exists
-    const valueIs = val === "No data"
-      ? val
-      : (sportsStore.sustainabilityFilterType === "index"
+      // Avoid appending unit when no value exists
+      const valueIs = val === "No data"
+        ? val
+        : (sportsStore.sustainabilityFilterType === "index"
           ? `${val}%`
           : `${val} min`);
 
@@ -302,7 +300,7 @@ async function loadGeoJSONFile(commune) {
   if (unit === 'grid') {
     geojsonPath = `geojson/geojson_grid_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;
   } else { //regso
-    geojsonPath = `geojson/geojson_regso_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;  
+    geojsonPath = `geojson/geojson_regso_by_city/${seg}/${seg}_${prefix}_by_${unit}.geojson`;
   }
   try {
     const resp = await fetch(asset(geojsonPath))
@@ -350,13 +348,13 @@ function setIndexColor(percent) { //for the index layer
   else console.log("setIndexColor: out of range", percent);
 }
 
-const colors = {1: '#ffea46', 2: '#ccbb69', 3: '#969078', 4: '#666970', 5: '#31446b', 6: '#00204d'};
+const colors = { 1: '#ffea46', 2: '#ccbb69', 3: '#969078', 4: '#666970', 5: '#31446b', 6: '#00204d' };
 
 function setAccColor(time) {
-  if (time === null || time === undefined) return "#cccccc"; 
+  if (time === null || time === undefined) return "#cccccc";
   //no decimals
   time = Math.round(time);
-  if (time === null || time === undefined ) return "#cccccc";
+  if (time === null || time === undefined) return "#cccccc";
   if (sportsStore.travelTimeMinutes == 15) {
     if (time >= 0 && time <= 2.5) return colors[1];
     if (time > 2.5 && time <= 5) return colors[2];
@@ -486,18 +484,25 @@ function renderDestinations(activity) {
   if (!map.value || !data) return
 
   clearDestinations()
+  const wanted = activity
+    .trim()
+    .replace(/[\s-]+/g, "_")
+    .toLowerCase();
 
   destinationsLayer.value = L.geoJSON(data, {
+    filter: f =>
+      (f.properties.classification || "")
+        .toLowerCase() === wanted,
     pointToLayer: (_f, latlng) =>
       L.circleMarker(latlng, {
         pane: 'destinationsPane',
         radius: 2.5,
         weight: 1,
         color: '#ccc',
-        fillColor: '#000000',
-        fillOpacity: 0.9
-      })
-  }).addTo(map.value)
+        fillColor: '#000',
+        fillOpacity: 0.9,
+      }),
+  }).addTo(map.value);
 }
 
 watch( //load destinations
