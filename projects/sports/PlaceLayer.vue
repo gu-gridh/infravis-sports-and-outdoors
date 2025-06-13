@@ -4,8 +4,9 @@
     <div class="info-backdrop" :class="{ visible: showInfo }">
       <div class="info-overlay">
         <h2>Mistra Sport and Outdoors Accessibility Index</h2>
-        <p>Home</p>
-        <p>Abouth the map and data</p>
+        <p><a href="/accessibility-index/about.html" target="_blank">About the project</a></p>
+        <p><a href="/accessibility-index/map.html" target="_blank">About the map</a></p>
+        
         <div class="disclaimer">This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the
           complete and latest street network, public transport, or sports and outdoors destinations in Sweden.</div>
         <button @click="emit('close')">Close</button>
@@ -702,4 +703,12 @@ watch(
   color: #497723;
   font-weight: bold;
 }
+
+.info-overlay a {
+  text-decoration: underline;
+  color: #497723;
+  font-weight: normal;
+  cursor: pointer;
+}
+
 </style>

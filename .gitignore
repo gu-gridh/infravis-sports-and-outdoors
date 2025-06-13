@@ -18,3 +18,5 @@ code-review.csv
 
 .geojson
 *.geojson
+
+yarn.lock
