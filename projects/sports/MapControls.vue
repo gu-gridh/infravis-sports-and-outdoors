@@ -193,6 +193,8 @@ function handleClickOutside(event) {
 
 onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
+
+  /*  used to generate the sustainability % per acitivty and city when in grid/regso view */
   const res = await fetch('geojson/t3_percent_15_30_60_by_city.geojson')
   geojson.value = await res.json()
 });
@@ -268,7 +270,6 @@ const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = v
 const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
 const setTravelTimeDay = (value) => (store.travelTimeDay = value);
 
-/*  used to generate the sustainability % per acitivty and city when in grid/regso view */
 function activityKey(str) { return str.replace(/\s+/g, '_') }
 
 const currentCity = computed(() =>

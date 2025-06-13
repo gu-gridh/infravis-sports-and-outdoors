@@ -174,7 +174,6 @@ function setPercAccColor(percent) {
     if (percent >= 90 && percent <= 100) return "#7a0177";
 }
 
-
 function createLegend(map) {
     // Check if map exists
     if (!map) {
@@ -252,8 +251,6 @@ function createLegend(map) {
                     { min: 30, max: 40, color: colors[4] },
                     { min: 40, max: 50, color: colors[5] },
                     { min: 50, max: 60, color: colors[6] },
-
-
                 ]
             }
             accRanges.forEach(function (range) {
@@ -269,11 +266,9 @@ function createLegend(map) {
 async function loadLayer() {
 
     sportsStore.isLoading = true
-    console.log('try fetching', geojsonFile.value);
     try {
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
-        console.log('fetched', geojsonFile.value, geoData);
         // if (
         //     sportsStore.sustainabilityFilterType !== "index" &&
         //     sportsStore.travelTimePopulationWeight
