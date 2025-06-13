@@ -138,6 +138,17 @@
         </div>
 
       </template>
+
+      <template v-else-if="store.sustainabilityFilterType == 'index'">
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
+          <label>{{ t('popgrid') }}</label>
+          <label class="switch">
+            <input type="checkbox" v-model="store.indexPopulationWeight"
+              :disabled="!store.commune || store.displayUnit === 'regso'">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </template>
     </div>
   </div>
 </template>

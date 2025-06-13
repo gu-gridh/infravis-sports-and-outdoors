@@ -325,7 +325,7 @@ async function loadLayer() {
                 });
                 lyr.on("click", () => {
                     const clickedCommune = feature.properties.city_name;
-                    sportsStore.updateCommune(clickedCommune) //TODO - MAKE IT WORK
+                    sportsStore.updateCommune(clickedCommune) 
                     sportsStore.clickedCommune = true
                     sportsStore.displayUnit = 'grid'
                 });
@@ -365,6 +365,7 @@ watch(
         () => sportsStore.travelTimeMinutes,
         () => sportsStore.travelTimeDay,
         () => sportsStore.travelTimePercentageAccess,
+        () => sportsStore.indexPopulationWeight
     ],
     () => {
         if (!sportsStore.commune && props.map) {

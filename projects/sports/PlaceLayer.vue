@@ -62,7 +62,12 @@ function uriSegment(str) {
 }
 
 function drawCommuneBorder(communeName) {
-  if (!geojsonData.value || !map.value) return;
+  if (
+    !geojsonData.value ||
+    !geojsonData.value.features || // add this check
+    !Array.isArray(geojsonData.value.features) ||
+    !map.value
+  ) return;
 
   if (borderLayer.value) {
     map.value.removeLayer(borderLayer.value);
@@ -84,7 +89,7 @@ function drawCommuneBorder(communeName) {
     style: {
       color: '#000',
       weight: 2,
-      dashArray: '6 4', //black dashed line
+      dashArray: '6 4',
       fillOpacity: 0
     }
   }).addTo(map.value);
@@ -160,29 +165,43 @@ function updateIndexMapLayer() {
   if (
     !map.value ||
     !communeData.value ||
+    !communeData.value.features ||
+    !Array.isArray(communeData.value.features) ||
     !sportsStore.commune ||
     sportsStore.displayUnit === 'city'
-  ) return;
-
-  //remove old layer
-  if (filteredLayer.value) {
-    map.value.removeLayer(filteredLayer.value);
+  ) {
+    console.warn('updateIndexMapLayer skipped due to missing data');
+    return;
   }
 
-  const features = communeData.value.features.filter((f) => {
-    if (sportsStore.sustainabilityFilterType === "index") {
-      return true;
-    } else {
-      const propName = generateTravelPropName();
-      return f.properties[propName] !== undefined;
-    }
-  });
+  // Remove old layer if present
+  if (filteredLayer.value && map.value.hasLayer(filteredLayer.value)) {
+    map.value.removeLayer(filteredLayer.value);
+    filteredLayer.value = null;
+  }
 
-  let scaledFeatures = features;
-  if (sportsStore.sustainabilityFilterType !== "index" && sportsStore.travelTimePopulationWeight) {
-    scaledFeatures = features.map((feature) => {
+  let features = communeData.value.features;
+
+  // Apply population-based scaling if needed
+  if (
+    sportsStore.sustainabilityFilterType !== "index" &&
+    sportsStore.travelTimePopulationWeight
+  ) {
+    features = features.map((feature) => {
       const pop = feature.properties.pop_1km_grid_decile ?? 0;
-      const normPop = Math.min(9, pop) / 9; //normalize to 0–1
+      const normPop = Math.min(9, pop) / 9;
+      const scale = 0.3 + normPop * 0.7;
+      const scaled = turf.transformScale(feature, scale);
+      scaled.properties = feature.properties;
+      return scaled;
+    });
+  } else if (
+    sportsStore.sustainabilityFilterType === "index" &&
+    sportsStore.indexPopulationWeight
+  ) {
+    features = features.map((feature) => {
+      const pop = feature.properties.pop_1km_grid_decile ?? 0;
+      const normPop = Math.min(9, pop) / 9;
       const scale = 0.3 + normPop * 0.7;
       const scaled = turf.transformScale(feature, scale);
       scaled.properties = feature.properties;
@@ -190,7 +209,7 @@ function updateIndexMapLayer() {
     });
   }
 
-  const newFC = { type: "FeatureCollection", features: scaledFeatures };
+  const newFC = { type: "FeatureCollection", features };
 
   function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
@@ -202,7 +221,7 @@ function updateIndexMapLayer() {
         fillOpacity: 0.8,
         weight: 1,
       };
-    } else { //travel time to activity
+    } else {
       const propName = generateTravelPropName();
       const val = feature.properties[propName];
       return {
@@ -214,7 +233,6 @@ function updateIndexMapLayer() {
     }
   }
 
-  //hover features
   function onEachFeature(feature, layer) {
     layer.on("mouseover", (e) => {
       let val;
@@ -225,19 +243,13 @@ function updateIndexMapLayer() {
         val = feature.properties[generateTravelPropName()];
       }
 
-      // Check for missing value
-      if (val === null || val === undefined) {
-        val = "No data";
-      } else {
-        val = Math.round(val); // Always round to whole number
-      }
+      val = (val === null || val === undefined) ? "No data" : Math.round(val);
 
-      // Avoid appending unit when no value exists
       const valueIs = val === "No data"
         ? val
         : (sportsStore.sustainabilityFilterType === "index"
-          ? `${val}%`
-          : `${val} min`);
+            ? `${val}%`
+            : `${val} min`);
 
       L.popup({ offset: [0, -10] })
         .setLatLng(e.latlng)
@@ -539,7 +551,8 @@ watch(
     () => sportsStore.commune,
     () => sportsStore.displayUnit,
     () => sportsStore.sustainabilityFilterType,
-    () => sportsStore.travelTimePopulationWeight
+    () => sportsStore.travelTimePopulationWeight,
+    () => sportsStore.indexPopulationWeight
   ],
   ([newCommune]) => {
     if (!newCommune) {
