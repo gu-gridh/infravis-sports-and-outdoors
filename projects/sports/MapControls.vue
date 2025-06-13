@@ -143,7 +143,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useSportsStore } from "./settings/store";
 
@@ -183,6 +183,7 @@ function clearCommune() {
   store.destinations = false
   searchQuery.value = "";
   isDropdownVisible.value = false;
+  store.clickedCommune = false;
 }
 
 function handleClickOutside(event) {
@@ -303,6 +304,17 @@ const percentageValue = computed(() => {
   // )
   return isFinite(num) ? Math.round(num) : null
 })
+
+//watch if clicked commune on city layer
+watch(
+  () => store.clickedCommune,
+  (newClicked) => {
+    if (newClicked && store.commune) {
+      searchQuery.value = store.commune;
+      isDropdownVisible.value = false;
+    }
+  }
+);
 </script>
 
 <style scoped>

@@ -323,6 +323,12 @@ async function loadLayer() {
                 lyr.on("mouseout", () => {
                     props.map.closePopup();
                 });
+                lyr.on("click", () => {
+                    const clickedCommune = feature.properties.city_name;
+                    sportsStore.updateCommune(clickedCommune) //TODO - MAKE IT WORK
+                    sportsStore.clickedCommune = true
+                    sportsStore.displayUnit = 'grid'
+                });
             },
         }).addTo(props.map);
         createLegend(props.map)
