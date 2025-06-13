@@ -280,16 +280,28 @@ const currentCity = computed(() =>
 
 const propName = computed(() => {
   if (!currentCity.value) return null
-  const a = activityKey(store.travelTimeActivity)
-  const m = store.travelTimeTransportMode
-  const d = store.travelTimeDay === 'week_day' ? '' : `_${store.travelTimeDay}`
-  const minutes = store.travelTimeMinutes
-  return `${a}_${m}${d}_${minutes}_percent`
+  const activity = activityKey(store.travelTimeActivity)
+  const mode     = store.travelTimeTransportMode.toLowerCase()
+  const minutes  = store.travelTimeMinutes
+  let dayPart = ''
+  if (mode === 'sustainable' || mode === 'transit') {
+    const dayValue = store.travelTimeDay.toLowerCase()
+    if (dayValue === 'saturday' || dayValue === 'sunday') {
+      dayPart = `_${dayValue}`
+    }
+  }
+
+  return `${activity}_${mode}${dayPart}_${minutes}_percent`
 })
 
 const percentageValue = computed(() => {
-  const v = currentCity.value?.properties[propName.value]
-  return typeof v === 'number' ? Math.round(v) : null
+  const key = propName.value
+  const num = Number(currentCity.value?.properties?.[key])
+  //   console.log(
+  //   `[lookup] ${store.commune || '(no commune)'} → ${propName.value} =`,
+  //   currentCity.value?.properties?.[propName.value]
+  // )
+  return isFinite(num) ? Math.round(num) : null
 })
 </script>
 
