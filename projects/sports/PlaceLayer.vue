@@ -142,7 +142,7 @@ async function initMap() {
     const NorthArrowControl = L.Control.extend({
       onAdd: function (map) {
         const img = L.DomUtil.create("img");
-        img.src = '/infravis-sports-and-outdoors/north-arrow.svg';
+        img.src = 'north-arrow.svg';
         img.style.width = "50px";
         img.style.opacity = "0.8";
         img.title = "North arrow";
