@@ -124,15 +124,18 @@
           </label>
         </div>
 
-        <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
+        <div v-if="isCity" class="btn-group toggle-switch">
           <label>% {{ t('popaccess') }}</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
+            <input type="checkbox" v-model="store.travelTimePercentageAccess">
             <span class="slider"></span>
           </label>
         </div>
 
-
+        <div v-else class="btn-group">
+          <label>% {{ t('popaccess') }}</label>
+          <span>{{ percentageValue ?? '–' }}%</span>
+        </div>
 
       </template>
     </div>
@@ -144,9 +147,8 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useSportsStore } from "./settings/store";
 
-const { t, locale } = useI18n(
-
-);
+const geojson = ref(null)
+const { t, locale } = useI18n();
 const store = useSportsStore();
 const searchQuery = ref("");
 const isDropdownVisible = ref(false);
@@ -189,9 +191,12 @@ function handleClickOutside(event) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
+  const res = await fetch('geojson/t3_percent_15_30_60_by_city.geojson')
+  geojson.value = await res.json()
 });
+
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
@@ -262,6 +267,29 @@ const setTravelTimeActivity = (value) => (store.travelTimeActivity = value);
 const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = value);
 const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
 const setTravelTimeDay = (value) => (store.travelTimeDay = value);
+
+/*  used to generate the sustainability % per acitivty and city when in grid/regso view */
+function activityKey(str) { return str.replace(/\s+/g, '_') }
+
+const currentCity = computed(() =>
+  geojson.value?.features.find(
+    f => f.properties.city_name.toLowerCase() === (store.commune || '').toLowerCase()
+  )
+)
+
+const propName = computed(() => {
+  if (!currentCity.value) return null
+  const a = activityKey(store.travelTimeActivity)
+  const m = store.travelTimeTransportMode
+  const d = store.travelTimeDay === 'week_day' ? '' : `_${store.travelTimeDay}`
+  const minutes = store.travelTimeMinutes
+  return `${a}_${m}${d}_${minutes}_percent`
+})
+
+const percentageValue = computed(() => {
+  const v = currentCity.value?.properties[propName.value]
+  return typeof v === 'number' ? Math.round(v) : null
+})
 </script>
 
 <style scoped>
