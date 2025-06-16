@@ -1,7 +1,7 @@
 <template>
   <div class="map-controls">
-    <div class="section logo">
-      <img src="./assets/logo_mistra.png" alt="Logo" width="200" />
+    <div class="section logo"><a href="https://www.mistrasportandoutdoors.se/ " target="_blank">
+        <img src="./assets/logo_mistra.png" alt="Logo" width="200" /></a>
       <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
         {{ locale === 'sv' ? 'SV' : 'EN' }}
       </button>
@@ -20,7 +20,7 @@
       </div>
 
       <!-- Grid vs Regso -->
-            <div class="btn-group2" style="margin-top: 10px;">
+      <div class="btn-group2" style="margin-top: 10px;">
         {{ t('display') }}
         <button @click="setDisplayUnit('grid')" :disabled="isCity"
           :class="[{ greyout: isCity }, { active: store.displayUnit === 'grid' }]">
@@ -84,6 +84,15 @@
               {{ act.label }}
             </option>
           </select>
+          <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <small>{{ t('destinations') }}</small>
+              <label class="switch">
+                <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
         <div class="btn-group">
           <label>{{ t('mode') }}</label>
@@ -115,35 +124,42 @@
           </label>
         </div>
 
-        <div class="btn-group toggle-switch" :class="{ greyout: !isCity }">
+        <div v-if="isCity" class="btn-group toggle-switch">
           <label>% {{ t('popaccess') }}</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.travelTimePercentageAccess" :disabled="!isCity">
+            <input type="checkbox" v-model="store.travelTimePercentageAccess">
             <span class="slider"></span>
           </label>
         </div>
 
-        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune }">
-          <label>{{ t('destinations') }}</label>
+        <div v-else class="btn-group">
+          <label>% {{ t('popaccess') }}</label>
+          <span>{{ percentageValue ?? '–' }}%</span>
+        </div>
+
+      </template>
+
+      <template v-else-if="store.sustainabilityFilterType == 'index'">
+        <div class="btn-group toggle-switch" :class="{ greyout: !store.commune || store.displayUnit === 'regso' }">
+          <label>{{ t('popgrid') }}</label>
           <label class="switch">
-            <input type="checkbox" v-model="store.destinations" :disabled="!store.commune">
+            <input type="checkbox" v-model="store.indexPopulationWeight"
+              :disabled="!store.commune || store.displayUnit === 'regso'">
             <span class="slider"></span>
           </label>
         </div>
-
       </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useSportsStore } from "./settings/store";
 
-const { t, locale } = useI18n(
-
-);
+const geojson = ref(null)
+const { t, locale } = useI18n();
 const store = useSportsStore();
 const searchQuery = ref("");
 const isDropdownVisible = ref(false);
@@ -178,6 +194,7 @@ function clearCommune() {
   store.destinations = false
   searchQuery.value = "";
   isDropdownVisible.value = false;
+  store.clickedCommune = false;
 }
 
 function handleClickOutside(event) {
@@ -186,13 +203,14 @@ function handleClickOutside(event) {
   }
 }
 
-function showInfo() {
-  store.showInfo = true;
-}
-
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
+
+  /*  used to generate the sustainability % per acitivty and city when in grid/regso view */
+  const res = await fetch('geojson/t3_percent_15_30_60_by_city.geojson')
+  geojson.value = await res.json()
 });
+
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside);
 });
@@ -204,30 +222,30 @@ const dayTypes = computed(() => [
 ])
 
 const sustainabilityIndexOptions = computed(() => [
-  { label: t('total'),    value: 'total'   },
-  { label: t('sports'),   value: 'sports'  },
-  { label: t('outdoors'), value: 'outdoors'},
+  { label: t('total'), value: 'total' },
+  { label: t('sports'), value: 'sports' },
+  { label: t('outdoors'), value: 'outdoors' },
 ]);
 
 const activityTypes = computed(() => [
-  { label: "Disc golf", value: "Disc golf" },
-  { label: t('dog'), value: "Dog park" },
   { label: t('football'), value: "Football" },
-  { label: "Golf", value: "Golf" },
-  { label: t('gym'), value: "Gym FitnessCentre" },
-  { label: t('horse'), value: "Horse riding" },
-  { label: t('hockey'), value: "Ice hockey" },
   { label: t('otherball'), value: "Other ballsports" },
-  { label: t('outdoorswimming'), value: "Outdoor swimming" },
-  { label: t('outdoors'), value: "Outdoors" },
-  { label: t('picnic'), value: "Picnic" },
-  { label: t('playground'), value: "Playground" },
-  { label: t('racket'), value: "Racket sports" },
-  { label: t('walkrun'), value: "Walking Running" },
-  { label: t('athletics'), value: "Athletics" },
+  { label: t('hockey'), value: "Ice hockey" },
   { label: t('gymnastics'), value: "Gymnastics" },
-  { label: t('outgym'), value: "Outdoor gym" },
+  { label: t('gym'), value: "Gym FitnessCentre" },
   { label: t('swimming'), value: "Swimming pool" },
+  { label: t('horse'), value: "Horse riding" },
+  { label: t('athletics'), value: "Athletics" },
+  { label: t('martialarts'), value: "Martial arts" },
+  { label: "Golf", value: "Golf" },
+  { label: t('racket'), value: "Racket sports" },
+  { label: t('playground'), value: "Playground" },
+  { label: t('walkrun'), value: "Walking Running" },
+  { label: t('outdoorswimming'), value: "Outdoor swimming" },
+  { label: t('picnic'), value: "Picnic" },
+  { label: t('dog'), value: "Dog park" },
+  { label: t('outgym'), value: "Outdoor gym" },
+  { label: "Disc golf", value: "Disc golf" },
 ]);
 
 function setDisplayUnit(unit) {
@@ -263,6 +281,51 @@ const setTravelTimeActivity = (value) => (store.travelTimeActivity = value);
 const setTravelTimeTransportMode = (value) => (store.travelTimeTransportMode = value);
 const setTravelTimeMinutes = (value) => (store.travelTimeMinutes = value);
 const setTravelTimeDay = (value) => (store.travelTimeDay = value);
+
+function activityKey(str) { return str.replace(/\s+/g, '_') }
+
+const currentCity = computed(() =>
+  geojson.value?.features.find(
+    f => f.properties.city_name.toLowerCase() === (store.commune || '').toLowerCase()
+  )
+)
+
+const propName = computed(() => {
+  if (!currentCity.value) return null
+  const activity = activityKey(store.travelTimeActivity)
+  const mode     = store.travelTimeTransportMode.toLowerCase()
+  const minutes  = store.travelTimeMinutes
+  let dayPart = ''
+  if (mode === 'sustainable' || mode === 'transit') {
+    const dayValue = store.travelTimeDay.toLowerCase()
+    if (dayValue === 'saturday' || dayValue === 'sunday') {
+      dayPart = `_${dayValue}`
+    }
+  }
+
+  return `${activity}_${mode}${dayPart}_${minutes}_percent`
+})
+
+const percentageValue = computed(() => {
+  const key = propName.value
+  const num = Number(currentCity.value?.properties?.[key])
+  //   console.log(
+  //   `[lookup] ${store.commune || '(no commune)'} → ${propName.value} =`,
+  //   currentCity.value?.properties?.[propName.value]
+  // )
+  return isFinite(num) ? Math.round(num) : null
+})
+
+//watch if clicked commune on city layer
+watch(
+  () => store.clickedCommune,
+  (newClicked) => {
+    if (newClicked && store.commune) {
+      searchQuery.value = store.commune;
+      isDropdownVisible.value = false;
+    }
+  }
+);
 </script>
 
 <style scoped>

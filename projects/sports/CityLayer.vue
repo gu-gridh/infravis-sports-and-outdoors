@@ -80,7 +80,6 @@ function styleFeature(feature) {
     if (sportsStore.sustainabilityFilterType === "index") {
         const propName = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
         const val = feature.properties[propName];
-        //console.log("Index mode:", { propName, val, properties: feature.properties });
         return {
             color: "white",
             fillColor: setIndexColor(val),
@@ -90,7 +89,6 @@ function styleFeature(feature) {
     } else if (!sportsStore.travelTimePercentageAccess) {
         const propName = generateTravelPropName();
         const val = feature.properties[propName];
-        //console.log("Travel mode:", { propName, val, properties: feature.properties });
         return {
             color: "white",
             fillColor: setAccColor(val),
@@ -115,38 +113,46 @@ function setIndexColor(percent) {
     percent = Math.round(percent);
     if (percent === null || undefined) return "#cccccc";
     if (percent >= 0 && percent <= 10) return "#d7191c";
-    if (percent >= 11 && percent <= 20) return "#e85b3b";
-    if (percent >= 21 && percent <= 30) return "#f99d59";
-    if (percent >= 31 && percent <= 40) return "#fec981";
-    if (percent >= 41 && percent <= 50) return "#ffedab";
-    if (percent >= 51 && percent <= 60) return "#ebf7ad";
-    if (percent >= 61 && percent <= 70) return "#c4e687";
-    if (percent >= 71 && percent <= 80) return "#96d265";
-    if (percent >= 81 && percent <= 90) return "#58b453";
-    if (percent >= 91 && percent <= 100) return "#1a9641";
+    if (percent >= 10 && percent <= 20) return "#e85b3b";
+    if (percent >= 20 && percent <= 30) return "#f99d59";
+    if (percent >= 30 && percent <= 40) return "#fec981";
+    if (percent >= 40 && percent <= 50) return "#ffedab";
+    if (percent >= 50 && percent <= 60) return "#ebf7ad";
+    if (percent >= 60 && percent <= 70) return "#c4e687";
+    if (percent >= 70 && percent <= 80) return "#96d265";
+    if (percent >= 80 && percent <= 90) return "#58b453";
+    if (percent >= 90 && percent <= 100) return "#1a9641";
     else console.log("setIndexColor: out of range", percent);
 }
+
+const colors = {1: '#ffea46', 2: '#ccbb69', 3: '#969078', 4: '#666970', 5: '#31446b', 6: '#00204d'};
 
 function setAccColor(time) {
     if (time === null || time === undefined) return "#cccccc"; //gray
     //no decimals
     time = Math.round(time);
-    if (time === null || time === undefined || time == 0) return "#ffffff"; //white
+    if (time === null || time === undefined) return "#cccccc"; 
     if (sportsStore.travelTimeMinutes == 15) {
-        if (time > 0 && time <= 5) return "#ffea46";
-        if (time >= 5 && time <= 10) return "#ccbb69";
-        if (time >= 10 && time <= 15) return "#969078";
+        if (time >= 0 && time <= 2.5) return colors[1];
+        if (time > 2.5 && time <= 5) return colors[2];
+        if (time > 5 && time <= 7.5) return colors[3];
+        if (time > 7.5 && time <= 10) return colors[4];
+        if (time > 10 && time <= 12.5) return colors[5];
+        if (time > 12.5 && time <= 15) return colors[6];
     } else if (sportsStore.travelTimeMinutes == 30) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
+        if (time >= 0 && time <= 5 ) return colors[1];
+        if (time > 5 && time <= 10) return colors[2];
+        if (time > 10 && time <= 15) return colors[3];
+        if (time > 15 && time <= 20) return colors[4];
+        if (time > 20 && time <= 25) return colors[5];
+        if (time > 25 && time <= 30) return colors[6];
     } else if (sportsStore.travelTimeMinutes == 60) {
-        if (time >= 0 && time <= 10) return "#ffea46";
-        if (time >= 10 && time <= 20) return "#ccbb69";
-        if (time >= 20 && time <= 30) return "#969078";
-        if (time >= 30 && time <= 40) return "#666970";
-        if (time >= 40 && time <= 50) return "#31446b";
-        if (time >= 50 && time <= 60) return "#161e2e";
+        if (time >= 0 && time <= 10) return colors[1];
+        if (time > 10 && time <= 20) return colors[2];
+        if (time > 20 && time <= 30) return colors[3];
+        if (time > 30 && time <= 40) return colors[4];
+        if (time > 40 && time <= 50) return colors[5];
+        if (time > 50 && time <= 60) return colors[6];
     } else {
         console.log("setAccColor: out of range", time);
     }
@@ -168,7 +174,6 @@ function setPercAccColor(percent) {
     if (percent >= 90 && percent <= 100) return "#7a0177";
 }
 
-
 function createLegend(map) {
     // Check if map exists
     if (!map) {
@@ -185,15 +190,15 @@ function createLegend(map) {
             div.innerHTML += "<p>Activities reached by sustainable modes compared to by car (%)</p>";
             var indexRanges = [
                 { min: 0, max: 10, color: "#d7191c" },
-                { min: 11, max: 20, color: "#e85b3b" },
-                { min: 21, max: 30, color: "#f99d59" },
-                { min: 31, max: 40, color: "#fec981" },
-                { min: 41, max: 50, color: "#ffedab" },
-                { min: 51, max: 60, color: "#ebf7ad" },
-                { min: 61, max: 70, color: "#c4e687" },
-                { min: 71, max: 80, color: "#96d265" },
-                { min: 81, max: 90, color: "#58b453" },
-                { min: 91, max: 100, color: "#1a9641" }
+                { min: 10, max: 20, color: "#e85b3b" },
+                { min: 20, max: 30, color: "#f99d59" },
+                { min: 30, max: 40, color: "#fec981" },
+                { min: 40, max: 50, color: "#ffedab" },
+                { min: 50, max: 60, color: "#ebf7ad" },
+                { min: 60, max: 70, color: "#c4e687" },
+                { min: 70, max: 80, color: "#96d265" },
+                { min: 80, max: 90, color: "#58b453" },
+                { min: 90, max: 100, color: "#1a9641" }
             ];
             indexRanges.forEach(function (range) {
                 div.innerHTML += `<div><span style="background:${range.color}"></span> ${range.min}-${range.max}</div>`;
@@ -221,26 +226,31 @@ function createLegend(map) {
             div.innerHTML += `<p>Traveltime to activity (min)</p>`;
             if (sportsStore.travelTimeMinutes == 15) {
                 accRanges = [
-                    { min: 0, max: 5, color: "#ffea46" },
-                    { min: 5, max: 10, color: "#ccbb69" },
-                    { min: 10, max: 15, color: "#969078" },
+                    { min: 0, max: 2.5, color: colors[1] },
+                    { min: 2.5, max: 5, color: colors[2] },
+                    { min: 5, max: 7.5, color: colors[3] },
+                    { min: 7.5, max: 10, color: colors[4] },
+                    { min: 10, max: 12.5, color: colors[5] },
+                    { min: 12.5, max: 15, color: colors[6] },
                 ]
             }
             else if (sportsStore.travelTimeMinutes == 30) {
                 accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
+                    { min: 0, max: 5, color: colors[1] },
+                    { min: 5, max: 10, color: colors[2] },
+                    { min: 10, max: 15, color: colors[3] },
+                    { min: 15, max: 20, color: colors[4] },
+                    { min: 20, max: 25, color: colors[5] },
+                    { min: 25, max: 30, color: colors[6] },
                 ]
             } else if (sportsStore.travelTimeMinutes == 60) {
                 accRanges = [
-                    { min: 0, max: 10, color: "#ffea46" },
-                    { min: 10, max: 20, color: "#ccbb69" },
-                    { min: 20, max: 30, color: "#969078" },
-                    { min: 30, max: 40, color: "#666970" },
-                    { min: 40, max: 50, color: "#31446b" },
-                    { min: 50, max: 60, color: "#161e2e" },
-
+                    { min: 0, max: 10, color: colors[1] },
+                    { min: 10, max: 20, color: colors[2] },
+                    { min: 20, max: 30, color: colors[3] },
+                    { min: 30, max: 40, color: colors[4] },
+                    { min: 40, max: 50, color: colors[5] },
+                    { min: 50, max: 60, color: colors[6] },
                 ]
             }
             accRanges.forEach(function (range) {
@@ -256,9 +266,7 @@ function createLegend(map) {
 async function loadLayer() {
 
     sportsStore.isLoading = true
-    console.log('try fetching', geojsonFile.value);
     try {
-        console.log('try fetching', geojsonFile.value);
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
         // if (
@@ -284,13 +292,42 @@ async function loadLayer() {
             onEachFeature: (feature, lyr) => {
                 lyr.on("mouseover", (e) => {
                     const content = `${feature.properties.city_name + " kommun" || "N/A"}`;
+                    let val;
+                    if (sportsStore.sustainabilityFilterType === "index") {
+                        const p = `index_dd_${sportsStore.sustainabilityIndexMinutes}_min_${sportsStore.sustainabilityIndexActivity}_${sportsStore.sustainabilityIndexDay}`;
+                        val = feature.properties[p];
+                    } else if (sportsStore.travelTimePercentageAccess && sportsStore.sustainabilityFilterType === "travel") {
+                        val = feature.properties[generatePercentPropName()];
+                    }
+                    else {
+                        val = feature.properties[generateTravelPropName()];
+                    }
+                    // Check for missing value
+                    if (val === null || val === undefined) {
+                    val = "No data";
+                    } else {
+                    val = Math.round(val); // Always round to whole number
+                    }
+
+                    // Avoid appending unit when no value exists
+                    const valueIs = val === "No data"
+                    ? val
+                    : (sportsStore.sustainabilityFilterType === "index" | sportsStore.travelTimePercentageAccess
+                        ? `${val}%`
+                        : `${val} min`);
                     L.popup({ offset: [0, -10] })
                         .setLatLng(e.latlng)
-                        .setContent(content)
+                        .setContent(content + `<br><b>${valueIs ?? "No data"}</b>`)
                         .openOn(props.map);
                 });
                 lyr.on("mouseout", () => {
                     props.map.closePopup();
+                });
+                lyr.on("click", () => {
+                    const clickedCommune = feature.properties.city_name;
+                    sportsStore.updateCommune(clickedCommune) 
+                    sportsStore.clickedCommune = true
+                    sportsStore.displayUnit = 'grid'
                 });
             },
         }).addTo(props.map);
@@ -328,6 +365,7 @@ watch(
         () => sportsStore.travelTimeMinutes,
         () => sportsStore.travelTimeDay,
         () => sportsStore.travelTimePercentageAccess,
+        () => sportsStore.indexPopulationWeight
     ],
     () => {
         if (!sportsStore.commune && props.map) {
@@ -350,18 +388,6 @@ watch(
         }
     }
 );
-
-//change legend if travel time is changed
-// watch(
-//     () => sportsStore.travelTimeActivity,
-//     (newActivity) => {
-//         if (layer.value) {
-//             props.map.removeLayer(layer.value);
-//             layer.value = null;
-//             loadLayer();
-//         }
-//     }
-// );
 
 </script>
 

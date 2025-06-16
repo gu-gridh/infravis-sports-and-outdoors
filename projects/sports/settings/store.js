@@ -19,6 +19,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const sustainabilityIndexActivity = ref('total');
   const sustainabilityIndexMinutes = ref(15);
   const sustainabilityIndexDay = ref('week_day');
+  const indexPopulationWeight = ref(false)
 
   //travel time filters
   const travelTimeActivity = ref('Football');
@@ -28,6 +29,8 @@ export const useSportsStore = defineStore("sportsStore", () => {
   const travelTimePopulationWeight = ref(false);
   const travelTimePercentageAccess = ref(false);
   const destinations = ref(false)
+  
+  const clickedCommune = ref(false)
 
 
   const updateCommune = (value) => {
@@ -42,6 +45,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     sustainabilityIndexActivity,
     sustainabilityIndexMinutes,
     sustainabilityIndexDay,
+    indexPopulationWeight,
     travelTimeActivity,
     travelTimeTransportMode,
     travelTimeMinutes,
@@ -49,6 +53,7 @@ export const useSportsStore = defineStore("sportsStore", () => {
     travelTimePopulationWeight,
     travelTimePercentageAccess,
     destinations,
+    clickedCommune,
     updateCommune,
     isLoading,
   };

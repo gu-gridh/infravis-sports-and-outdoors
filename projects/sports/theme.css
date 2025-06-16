@@ -18,7 +18,7 @@
 html,
 body {
   font-family: "Barlow Condensed", sans-serif !important;
-  background-color: var(--theme-1) !important;
+  /* background-color: var(--theme-1) !important; */
 }
 
 .theme-title-typography {

@@ -5,17 +5,17 @@
           <a class="site-link link" href="https://github.com/gu-gridh/infravis-sports-and-outdoors" target="_blank">GitHub repository and development</a>
         </div>
         <div class="links-stack">
-        <a class="site-link link" href="https://mistra.org/" target="_blank">Mistra</a>
+        <a class="site-link link" href="https://mistra.org/" target="_blank">Data repository</a>
       </div>
       </div>
       <div class="partners">
   
-        <a href="">
-          <div class="PartnerLogo" id="">CHALMERS</div>
+        <a href=" https://research.chalmers.se/project/12213">
+          <div class="PartnerLogo" id=""><img src="/chalmersLogo.png" class="chalmers"/></div>
         </a>
   
         <a href="https://infravis.se">
-          <div class="PartnerLogo" id="">INFRAVIS</div>
+          <div class="PartnerLogo" id=""><img src="/infravisLogo.png" class="infravis"/></div>
         </a>
     </div>
     </footer>
@@ -30,7 +30,7 @@
     background-color: #222;
     color: white;
     line-height: 1;
-    height: 82px;
+    height: 65px;
     width: calc(100% + 2px);
     font-size: 12px;
     position: absolute;
@@ -142,6 +142,16 @@
   
   #developer-info a:link{
     font-weight:200;
+  }
+
+  .chalmers {
+    width: 150px;
+    height: auto;
+  }
+
+  .infravis {
+    width: 80px;
+    height: auto;
   }
   
   </style>

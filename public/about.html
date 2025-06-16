@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:100,200,300,400,500,600&display=swap"
+    rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Geo&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./theme.css">
+    <link rel="stylesheet" href="./assets/main.css">
+    <link rel="stylesheet" href="./assets/base.css">
+    <script>
+        //toggle language
+          window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('lang-btn');
+    const englishDiv = document.querySelector('.english');
+    const swedishDiv = document.querySelector('.swedish');
+
+    // Initially show English
+    englishDiv.style.display = 'block';
+    swedishDiv.style.display = 'none';
+    btn.textContent = 'SV'; // Next click should show Swedish
+
+    btn.addEventListener('click', () => {
+      if (englishDiv.style.display === 'block') {
+        // Switch to Swedish
+        englishDiv.style.display = 'none';
+        swedishDiv.style.display = 'block';
+        btn.textContent = 'EN';
+      } else {
+        // Switch to English
+        englishDiv.style.display = 'block';
+        swedishDiv.style.display = 'none';
+        btn.textContent = 'SV';
+      }
+    });
+  });
+
+    </script>
+    <noscript>Sorry, your browser does not support JavaScript!</noscript>
+    <style>
+        body {
+            background-color: white !important;
+            padding: 20px;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #497723;
+        }
+        a {
+            color:#497723
+        }
+        button {
+            padding: 2px 6px;
+            border: 1px solid #497723;
+            background: #497723;
+            color: #fff;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        img {
+            max-height: 80px;
+            width: auto;
+        }
+        @media screen and (min-width: 900px) {
+            p {
+                max-width: 70%;
+            }
+            
+        } 
+    </style>
+</head>
+<body>
+<button id="lang-btn">EN</button>
+<div class="english">
+<h1>Sport and Outdoors Sustainable Accessibility Map </h1>
+
+
+<h2>About the project</h2>
+
+<p>Resulting from the collaboration process within the Mistra Sport & Outdoors programme (https://www.mistrasportandoutdoors.se/), this innovation project aims to foster a healthier, more active society, and to support the environmentally sustainable development of sports and outdoors sector in Sweden. </p>
+
+<p>This prototype tool was developed by Chalmers University of Technology, Department of Architecture and Civil Engineering, in collaboration with InfraVis: </p>
+
+<li>Jorge Gil, Associate Professor, Chalmers, project leader</li>
+<li>Flavia Lopes, Postdoc, Chalmers </li>
+<li>Roos Teeuwen, Postdoc, Chalmers </li>
+<li>Kristin Åkerlund, Application Expert, InfraVis </li>
+<li>Tristan Bridge, Application Expert, InfraVis</li>
+<p>And with support from Anna Tauson, Lilla Edet municipality, and Susan Ruinaard, Chalmers. </p>
+
+<p>For questions about the project or possible collaboration please contact Jorge Gil: jorge.gil@chalmers.se </p>
+
+<p>The accessibility index was originally developed by Jorge Gil and Susan Ruinaard under “Theme Sustainable Transport Solutions” of the Mistra Sport & Outdoors programme (https://www.mistrasportandoutdoors.se/Forskningsteman/hallbara-transportlosningar/), receiving valuable input from the partners:  Anders Larsonand Oscar Abrahamson, Gothenburg University; Ann Legeby, KTH; and stakeholders: Lilla Edet municipality, Uppsala municipality, Riksidrottsförbundet, SKR, Länstyrelsen, Västtrafik, and Trafikverket. </p>
+
+<p>The project has been funded by Mistra Sport & Outdoors, InfraVis – Swedish Research Council grant 2021-00181, and Chalmers University of Technology, Department of Architecture and Civil Engineering. </p>
+
+<div class="logos">
+    <img src="/chalmerslogo2.png"><img src="/logo_mistra copy.png"><img src="/InfraVis-dark.png">
+</div>
+
+ 
+
+<p>Sport and Outdoors Sustainable Accessibility Map © 2025 by Chalmers University of Technology is licensed under CC BY 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/ </p>
+<p>
+<a href="https://creativecommons.org"> Sport and Outdoors Sustainable Accessibility Map</a> © 2025 by <a href="https://creativecommons.org"> Chalmers University of Technology </a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"> 
+</p>
+
+</div>
+
+<div class="swedish">
+    <h1>Idrotts- och Friluftsliv Hållbar Tillgänglighetskarta </h1>
+
+
+<h2>Om projektet</h2>
+
+<p>Detta innovationsprojekt, som är ett resultat av samarbetet inom Mistra Sport & Outdoors-programmet (https://www.mistrasportandoutdoors.se/), syftar till att främja ett hälsosammare och mer aktivt samhälle samt stödja den miljömässigt hållbara utvecklingen av idrotts- och friluftssektorn i Sverige. </p>
+
+<p>Prototypverktyget utvecklades av Chalmers tekniska högskola, Institutionen för arkitektur och samhällsbyggnadsteknik, i samarbete med InfraVis:  </p>
+
+<li>Jorge Gil, Associate Professor, Chalmers, projektledare</li>
+<li>Flavia Lopes, Postdoc, Chalmers </li>
+<li>Roos Teeuwen, Postdoc, Chalmers </li>
+<li>Kristin Åkerlund, Application Expert, InfraVis </li>
+<li>Tristan Bridge, Application Expert, InfraVis</li>
+<p>Med stöd från Anna Tauson, Lilla Edet kommun, och Suan Ruinaard, Chalmers.</p>
+
+<p>För frågor om projektet eller eventuellt samarbete, vänlig  kontakta Jorge Gil: jorge.gil@chalmers.se </p>
+
+<p>Tillgänglighetsindexet utvecklades ursprungligen av Jorge Gil och Susan Ruinaard under ”Tema hållbara transportlösningar” inom Mistra Sport & Outdoors-programmet (https://www.mistrasportandoutdoors.se/Forskningsteman/hallbara-transportlosningar/), med värdefulla bidrag från partners: Anders Larson och Oscar Abrahamson, Göteborgs universitet; Ann Legeby, KTH; samt intressenter: Lilla Edet kommun, Uppsala kommun, Riksidrottsförbundet, SKR, Länsstyrelsen, Västtrafik och Trafikverket. </p>
+
+<p>Projektet har finansierats av Mistra Sport & Outdoors, InfraVis – Vetenskapsrådets anslag 2021-00181, och Chalmers tekniska högskola, Institutionen för arkitektur och samhällsbyggnadsteknik. </p>
+
+
+<div class="logos">
+    <img src="/chalmerslogo2.png"><img src="/logo_mistra copy.png"><img src="/InfraVis-dark.png">
+</div>
+
+
+<p>Idrotts- och Friluftsliv Hållbar Tillgänglighetskarta © 2025 av Chalmers tekniska högskola är licensierad under CC BY 4.0. För att se en kopia av denna licens, besök https://creativecommons.org/licenses/by/4.0/. </p>
+<a href="https://creativecommons.org"> Idrotts- och Friluftsliv Hållbar Tillgänglighetskarta </a> © 2025 by <a href="https://creativecommons.org">Chalmers tekniska högskol</a> är licensierad under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="max-width: 1em;max-height:1em;margin-left: .2em;"> 
+</div>
+
+</body>
+</html>
+

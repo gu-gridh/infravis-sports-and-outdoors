@@ -27,7 +27,7 @@
       <slot name="details">
         <div class="col-start-6 col-span-2 detail">
           <div class="detail">
-            <div class="px-8 py-6">
+            <div class="">
               <div>
               </div>
             </div>

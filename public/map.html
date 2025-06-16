@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:100,200,300,400,500,600&display=swap"
+    rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Geo&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./theme.css">
+    <link rel="stylesheet" href="./assets/main.css">
+    <link rel="stylesheet" href="./assets/base.css">
+    <script>
+        //toggle language
+          window.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('lang-btn');
+    const englishDiv = document.querySelector('.english');
+    const swedishDiv = document.querySelector('.swedish');
+
+    // Initially show English
+    englishDiv.style.display = 'block';
+    swedishDiv.style.display = 'none';
+    btn.textContent = 'SV'; // Next click should show Swedish
+
+    btn.addEventListener('click', () => {
+      if (englishDiv.style.display === 'block') {
+        // Switch to Swedish
+        englishDiv.style.display = 'none';
+        swedishDiv.style.display = 'block';
+        btn.textContent = 'EN';
+      } else {
+        // Switch to English
+        englishDiv.style.display = 'block';
+        swedishDiv.style.display = 'none';
+        btn.textContent = 'SV';
+      }
+    });
+  });
+
+    </script>
+    <noscript>Sorry, your browser does not support JavaScript!</noscript>
+    <style>
+        body {
+            background-color: white !important;
+            padding: 20px;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #497723;
+        }
+        a {
+            color:#497723
+        }
+        button {
+            padding: 2px 6px;
+            border: 1px solid #497723;
+            background: #497723;
+            color: #fff;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        img {
+            max-height: 80px;
+            width: auto;
+        }
+        @media screen and (min-width: 900px) {
+            p {
+                max-width: 70%;
+            }
+            
+        } 
+    </style>
+</head>
+<body>
+    <button id="lang-btn">EN</button>
+    <div class="english">
+        
+    </div>
+
+    <div class="swedish">
+
+    </div>
+</body>
+</html>

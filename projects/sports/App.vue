@@ -4,6 +4,7 @@ import config from "./config";
 import Footer from './Footer.vue';
 
 provide("config", config);
+
 </script>
 
 <template>
