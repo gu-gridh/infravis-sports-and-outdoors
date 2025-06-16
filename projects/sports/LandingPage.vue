@@ -1,26 +1,47 @@
 <template>
-    <div class="landing-page">
-  <h1>Sport and Outdoors Sustainable Accessibility Map </h1>  
-  <h2>Explore Sustainable Accessibility Across Sweden with Our Interactive Map </h2>
-  <div class="text">
-    <p>Welcome to the Sport and Outdoors Sustainable Accessibility Map - an innovative tool designed to explore, help understand and improve sustainable accessibility to sports and outdoor activities throughout Sweden. This tool offers an intuitive interactive map that visualizes accessibility at national and municipal scales, empowering individuals, policymakers, and organizations to make informed decisions.</p>
-    <p>With this tool you can visualize how the population can access different sports and outdoors activities using different transport modes, including walking, cycling, driving and by public transport. </p>
-    <ul>
-        <li>How long does one need to walk to the nearest football pitch?</li>
-        <li>Which locations can reach a swimming pool on a Saturday by public transport?</li>
-        <li>How many people in the municipality have access to outdoors for walking and running within 15 minutes?</li>
-        <li>How does access to sport by sustainable travel modes compare to using the car?</li>
-    </ul>
-    <p>Explore the map and learn about the landscape of sustainable accessibility to sport and outdoors across Sweden. </p>
-  </div>
-  <button @click="$emit('close')" class="btn">Explore the map</button>
-  <div class="disclaimer">
-    <p>Disclaimer: This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the complete and latest street network, public transport, or sport and outdoors destinations in Sweden. </p>
-  </div>
-  <p><a href="/accessibility-index/about.html" target="_blank">About the project</a> <a href="/accessibility-index/map.html" target="_blank">About the map</a></p>
-  
+  <div class="landing-page">
+    <div class="language-switch">
+      <button class="lang-btn" @click="toggleLocale" :title="locale === 'sv' ? 'Svenska' : 'English'">
+        {{ locale === 'sv' ? 'SV' : 'EN' }}
+      </button>
+    </div>
+    <h2>{{ $t('landingpage1') }}</h2>
+    <h2>{{ $t('landingpage2') }}</h2>
+    <div class="text">
+      <p>{{ $t('landingpage3') }}</p>
+      <p>{{ $t('landingpage4') }}</p>
+      <ul>
+        <li>{{ $t('landingpage5') }}</li>
+        <li>{{ $t('landingpage6') }}</li>
+        <li>{{ $t('landingpage7') }}</li>
+        <li>{{ $t('landingpage8') }}</li>
+      </ul>
+      <p>{{ $t('landingpage9') }}
+      </p>
+    </div>
+    <button @click="$emit('close')" class="btn">{{ $t('explorethemap') }}</button>
+    <div class="infotext">
+      <p>{{ $t('landingpage10') }}</p>
+    </div>
+    <p>
+      <a href="/accessibility-index/about.html" target="_blank">About the project</a> 
+      <a href="/accessibility-index/map.html" target="_blank">About the map</a>
+    </p>
+    <div class="disclaimer">
+      <p>{{ $t('disclaimer') }}</p>
+    </div>
   </div>
 </template>
+
+<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
+function toggleLocale() {
+  locale.value = locale.value === 'sv' ? 'en' : 'sv'
+}
+</script>
 
 <style scoped>
 h1 {
@@ -30,17 +51,18 @@ h1 {
   padding-bottom: 10px;
   color: #497723;
 }
+
 h2 {
   font-size: 24px;
   margin: 0;
   padding: 0;
   padding-bottom: 5px;
-    color: black;
+  color: black;
 }
 
 .landing-page {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   height: calc(100vh-65px);
   width: 80%;
@@ -49,8 +71,8 @@ h2 {
 }
 
 .text {
-    flex-direction: column;
-    columns: 2;
+  flex-direction: column;
+  columns: 2;
   max-width: 900px;
   margin: 20px auto;
   font-size: 18px;
@@ -83,6 +105,10 @@ p {
   color: #666;
 }
 
+.infotext {
+  margin-top: 20px;
+}
+
 a {
   text-decoration: underline;
   color: #497723;
@@ -90,5 +116,21 @@ a {
   cursor: pointer;
   justify-content: space-between;
   margin-right: 20px;
+}
+
+.language-switch {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.lang-btn {
+  background-color: transparent;
+  background-color: #497723;
+  color: white;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
 }
 </style>
