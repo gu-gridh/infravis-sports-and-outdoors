@@ -269,19 +269,6 @@ async function loadLayer() {
     try {
         const response = await fetch(asset(geojsonFile.value));
         let geoData = await response.json();
-        // if (
-        //     sportsStore.sustainabilityFilterType !== "index" &&
-        //     sportsStore.travelTimePopulationWeight
-        // ) {
-        //     geoData.features = geoData.features.map((feature) => {
-        //         const pop = feature.properties.pop_1km_grid_decile ?? 0;
-        //         const normPop = Math.min(9, pop) / 9; // Normalize to 0–1
-        //         const scale = 0.3 + normPop * 0.8;
-        //         const scaledFeature = turf.transformScale(feature, scale);
-        //         scaledFeature.properties = feature.properties;
-        //         return scaledFeature;
-        //     });
-        // }
 
         if (layer.value) {
             props.map.removeLayer(layer.value);

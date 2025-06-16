@@ -40,9 +40,10 @@
     "transit": "Kollektivtrafik",
     "sustainable": "Hållbart",
     "popgrid": "Befolkningsviktat rutnät",
-    "popaccess": "Befolkning med tillgång per kommun",
+    "popaccess": "Befolkning med tillgång",
     "destinations": "Destinationer",
-    "martialarts": "Kampsport"
+    "martialarts": "Kampsport",
+    "legend1": "Aktiviteter som nås på miljövänliga sätt jämfört med bil (%)"
 
   },
   "en": {
@@ -86,8 +87,10 @@
     "transit": "Public Transport",
     "sustainable": "Sustainable",
     "popgrid": "Population weighted grid",
-    "popaccess": "Population with access per city",
+    "popaccess": "Population with access",
     "destinations": "Destinations",
-    "martialarts": "Martial Arts"
+    "martialarts": "Martial Arts",
+    "legend1": "Activities reached by sustainable modes compared to by car (%)",
+    "legend2": ""
   }
 }

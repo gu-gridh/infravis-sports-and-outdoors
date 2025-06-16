@@ -17,6 +17,7 @@
   <div class="disclaimer">
     <p>Disclaimer: This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the complete and latest street network, public transport, or sport and outdoors destinations in Sweden. </p>
   </div>
+  <p><a href="/accessibility-index/about.html" target="_blank">About the project</a> <a href="/accessibility-index/map.html" target="_blank">About the map</a></p>
   
   </div>
 </template>
@@ -50,10 +51,9 @@ h2 {
 .text {
     flex-direction: column;
     columns: 2;
-  max-width: 800px;
+  max-width: 900px;
   margin: 20px auto;
   font-size: 18px;
-  line-height: 1.6;
   text-align: left;
 }
 
@@ -81,5 +81,14 @@ p {
   margin-top: 20px;
   font-size: 14px;
   color: #666;
+}
+
+a {
+  text-decoration: underline;
+  color: #497723;
+  font-weight: normal;
+  cursor: pointer;
+  justify-content: space-between;
+  margin-right: 20px;
 }
 </style>
