@@ -64,7 +64,7 @@ function uriSegment(str) {
 function drawCommuneBorder(communeName) {
   if (
     !geojsonData.value ||
-    !geojsonData.value.features || // add this check
+    !geojsonData.value.features || //add this check
     !Array.isArray(geojsonData.value.features) ||
     !map.value
   ) return;
@@ -181,9 +181,11 @@ function updateIndexMapLayer() {
   }
 
   let features = communeData.value.features;
+  const isGrid = sportsStore.displayUnit === 'grid';
 
   // Apply population-based scaling if needed
   if (
+    isGrid &&
     sportsStore.sustainabilityFilterType !== "index" &&
     sportsStore.travelTimePopulationWeight
   ) {
@@ -196,6 +198,7 @@ function updateIndexMapLayer() {
       return scaled;
     });
   } else if (
+    isGrid &&
     sportsStore.sustainabilityFilterType === "index" &&
     sportsStore.indexPopulationWeight
   ) {
