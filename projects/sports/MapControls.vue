@@ -7,6 +7,7 @@
       </button>
       <img src="./assets/info-button.svg" alt="Info" width="30" class="info-button" @click="$emit('showInfo')" />
     </div>
+
     <div class="section" :class="{ greyout: store.isLoading }">
       <h2>{{ t('Municipality') }}</h2>
       <div ref="searchContainer" class="municipality-search">

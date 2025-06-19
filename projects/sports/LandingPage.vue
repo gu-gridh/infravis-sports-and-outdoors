@@ -64,10 +64,11 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: calc(100vh-65px);
-  width: 80%;
+  height: 100%;
+  width: 100%;
   color: #333;
   text-align: center;
+  overflow-y: scroll;
 }
 
 .text {
@@ -120,7 +121,7 @@ a {
 
 .language-switch {
   position: absolute;
-  top: 20px;
+
   left: 20px;
   z-index: 1000;
 }
@@ -132,5 +133,34 @@ a {
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .text {
+    font-size: 16px;
+  }
+  
+  h2 {
+    font-size: 18px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 16px;
+  }
+  
+  .language-switch {
+    top: 10px;
+    left: 10px;
+  }
+
+  .landing-page {
+    width: 90%;
+    display: block;
+    overflow-y: auto;
+  }
+  .disclaimer {
+    font-size: 12px;
+  }
 }
 </style>

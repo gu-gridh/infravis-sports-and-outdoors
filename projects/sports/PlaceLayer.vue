@@ -3,12 +3,7 @@
     <div id="map" style="width: 100%; height: 100vh;"></div>
     <div class="info-backdrop" :class="{ visible: showInfo }">
       <div class="info-overlay">
-        <h2>Mistra Sport and Outdoors Accessibility Index</h2>
-        <p><a href="/accessibility-index/about.html" target="_blank">About the project</a></p>
-        <p><a href="/accessibility-index/map.html" target="_blank">About the map</a></p>
-        
-        <div class="disclaimer">This map uses data from SCB, Trafiklab and OpenStreetMap. It might not reflect the
-          complete and latest street network, public transport, or sports and outdoors destinations in Sweden.</div>
+        <LandingPage @close="emit('close')" />
         <button @click="emit('close')">Close</button>
       </div>
     </div>
@@ -24,6 +19,7 @@ import { onMounted, ref, watch } from "vue";
 import { useSportsStore } from "./settings/store";
 import * as turf from '@turf/turf';
 import CityLayer from "./CityLayer.vue";
+import LandingPage from "./LandingPage.vue";
 
 const lastCommune = ref(null)
 const map = ref(null);
@@ -688,11 +684,12 @@ watch(
 
 .info-overlay {
   background: white;
-  padding: 30px;
+  padding: 5px;
   border-radius: 10px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  max-width: 500px;
-  width: 90%;
+  overflow-y: scroll;
+  width: 100%;
+  height: calc(100vh - 65px);
   text-align: center;
 }
 
