@@ -6,6 +6,9 @@
 import { onMounted, onBeforeUnmount, watch, ref, computed } from "vue";
 import L from "leaflet";
 import { useSportsStore } from "./settings/store";
+import { useI18n } from 'vue-i18n';
+
+const { t, locale } = useI18n(); 
 
 const props = defineProps({
     map: {
@@ -187,7 +190,7 @@ function createLegend(map) {
         var div = L.DomUtil.create("div", "legend");
         var accRanges = []
         if (sportsStore.sustainabilityFilterType === "index") {
-            div.innerHTML += "<p>Activities reached by sustainable modes compared to by car (%)</p>";
+             div.innerHTML += `<p>${t('legend1')}</p>`;
             var indexRanges = [
                 { min: 0, max: 10, color: "#d7191c" },
                 { min: 10, max: 20, color: "#e85b3b" },
@@ -337,6 +340,10 @@ onBeforeUnmount(() => {
     if (layer.value) {
         props.map.removeLayer(layer.value);
     }
+});
+
+watch(locale, () => {
+  createLegend(props.map);
 });
 
 watch(

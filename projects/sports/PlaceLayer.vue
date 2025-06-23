@@ -683,14 +683,19 @@ watch(
 }
 
 .info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1200;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 80px;
   background: white;
-  padding: 5px;
-  border-radius: 10px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  overflow-y: scroll;
-  width: 100%;
-  height: calc(100vh - 65px);
-  text-align: center;
+  overflow: hidden;
 }
 
 .leaflet-control-scale-line {

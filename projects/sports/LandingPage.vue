@@ -120,8 +120,8 @@ a {
 }
 
 .language-switch {
-  position: absolute;
-
+  position: fixed;
+  top: 20px;
   left: 20px;
   z-index: 1000;
 }
@@ -136,29 +136,25 @@ a {
 }
 
 @media (max-width: 800px) {
-  .text {
-    font-size: 16px;
+  .landing-page {
+    padding: 20px;
+    box-sizing: border-box;
   }
-  
+
+  .text {
+    columns: 1;
+    padding: 0;
+  }
+
   h2 {
     font-size: 18px;
   }
-  
+
   .btn {
     padding: 6px 12px;
     font-size: 16px;
   }
-  
-  .language-switch {
-    top: 10px;
-    left: 10px;
-  }
 
-  .landing-page {
-    width: 90%;
-    display: block;
-    overflow-y: auto;
-  }
   .disclaimer {
     font-size: 12px;
   }
