@@ -2,11 +2,11 @@
     <footer id="footer">
       <div id="developer-info">
         <div class="links-stack border-style">
-          <a class="site-link link" href="https://github.com/gu-gridh/infravis-sports-and-outdoors" target="_blank">GitHub repository and development</a>
-          <a class="site-link link" href="https://github.com/FlaviaMLopes/sustainable-access-sports-outdoors" target="_blank">GitHub Data Analysis</a>
+          <a class="site-link link" href="https://github.com/gu-gridh/infravis-sports-and-outdoors" target="_blank">GitHub - Interactive Map</a>
+          <a class="site-link link" href="https://github.com/FlaviaMLopes/sustainable-access-sports-outdoors" target="_blank">GitHub - Accessibility Analysis</a>
         </div>
         <div class="links-stack">
-        <a class="site-link link" href="https://zenodo.org/records/15675429" target="_blank">Data repository</a>
+        <a class="site-link link" href="https://zenodo.org/records/15675429" target="_blank">Zenodo - Data Layers</a>
       </div>
       </div>
       <div class="partners">
