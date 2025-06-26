@@ -1,5 +1,7 @@
 {
   "sv": {
+    "abouttheproject": "Om projektet",
+    "aboutthemap": "Om kartan",
     "landingpage1": "Idrotts- och Friluftsliv Hållbar Tillgänglighetskarta",
     "landingpage2": "Utforska hållbar tillgänglighet över hela Sverige med vår interaktiva karta",
     "landingpage3": "Välkommen till Idrotts- och Friluftsliv Hållbar Tillgänglighetskarta – ett innovativt verktyg skapat för att utforska, förstå och förbättra hållbar tillgänglighet till idrotts- och friluftsaktiviteter i hela Sverige. Detta verktyg erbjuder en intuitiv interaktiv karta som visar tillgänglighet på nationell och kommunal nivå, vilket ger individer, beslutsfattare och organisationer möjlighet att fatta välgrundade beslut.",
@@ -58,6 +60,8 @@
     "legend1": "Aktiviteter som nås på miljövänliga sätt jämfört med bil (%)"
   },
   "en": {
+    "abouttheproject": "About the project",
+    "aboutthemap": "About the map",
     "landingpage1": "Sport and Outdoors Sustainable Accessibility Map",
     "landingpage2": "Explore Sustainable Accessibility Across Sweden with Our Interactive Map",
     "landingpage3": "Welcome to the Sport and Outdoors Sustainable Accessibility Map - an innovative tool designed to explore, help understand and improve sustainable accessibility to sports and outdoor activities throughout Sweden. This tool offers an intuitive interactive map that visualizes accessibility at national and municipal scales, empowering individuals, policymakers, and organizations to make informed decisions.",

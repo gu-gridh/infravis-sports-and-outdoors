@@ -24,8 +24,8 @@
       <p>{{ $t('landingpage10') }}</p>
     </div>
     <p>
-      <a href="/accessibility-index/about.html" target="_blank">About the project</a> 
-      <a href="/accessibility-index/map.html" target="_blank">About the map</a>
+      <a href="/accessibility-index/about.html" target="_blank">{{ $t('abouttheproject') }}</a> 
+      <a href="/accessibility-index/map.html" target="_blank">{{ $t('aboutthemap') }}</a>
     </p>
     <div class="disclaimer">
       <p>{{ $t('disclaimer') }}</p>
