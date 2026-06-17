@@ -42,7 +42,7 @@ const filteredLayer = ref(null);
 const borderLayer = ref(null);
 
 const mapStyles = ref({
-  OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  OSM: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
 });
 
 onMounted(async () => {
